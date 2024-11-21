@@ -1,9 +1,10 @@
----
 ![Project Status](https://img.shields.io/badge/status-WIP-orange)
+
 > **Note**: This project is currently **not functional** and is a **Work in Progress (WIP)**.
 
 Currently it is possible to:
-* Get raw champion data.
+
+- Get raw champion data.
 
 ---
 
@@ -70,9 +71,9 @@ LoLMatchup is a web application built with Go that allows users to retrieve and 
 
 ### Prerequisites
 
-- ![Go Logo](https://img.shields.io/badge/Go-1.16+-blue?logo=go) **Go**: Version 1.16 or higher is recommended.
-- ![Git](https://img.shields.io/badge/Git-Required-orange?logo=git) **Git**: For cloning the repository.
-- ![Internet Connection](https://img.shields.io/badge/Internet-Connection_Required-lightgrey?logo=windows) **Internet Connection**: Required to fetch data from Riot's Data Dragon API.
+- **Go**: Version 1.16 or higher is recommended.
+- **Git**: For cloning the repository.
+- **Internet Connection**: Required to fetch data from Riot's Data Dragon API.
 
 ### Installation
 
