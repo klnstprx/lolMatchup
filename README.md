@@ -31,9 +31,8 @@ LoLMatchup is a web application built with Go that allows users to retrieve and 
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Development](#development)
-- [Contributing](#contributing)
 - [License](#license)
-- [Acknowledgments](#acknowledgments)
+
 
 ## Project Structure
 
