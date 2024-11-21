@@ -1,0 +1,42 @@
+package components
+
+import (
+"github.com/klnstprx/lolMatchup/models"
+"strconv"
+)
+
+templ ChampionComponent(champion models.Champion) {
+<div>
+  <h1>{ champion.Name } - { champion.Title }</h1>
+  <img src={ champion.Image.Full } alt={ champion.Name } />
+  <h2>Stats</h2>
+  <ul>
+    <li>{ strconv.FormatFloat(champion.Stats.HP, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.HPPerLevel,'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.MP, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.MPPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.MoveSpeed, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.Armor, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.ArmorPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.SpellBlock, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.SpellBlockPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.AttackRange, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.HPRegen, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.HPRegenPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.MPRegen, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.MPRegenPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.Crit, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.CritPerLevel, 'E', -1, 64) }</li>
+    <li>{ strconv.FormatFloat(champion.Stats.AttackDamage, 'E', -1, 64) }</li>
+  </ul>
+  <h2>Passive: { champion.Passive.Name }</h2>
+  <p>{ champion.Passive.Description }</p>
+  <img src={ champion.Passive.Image.Full } alt={ champion.Passive.Name } />
+  <h2>Abilities</h2>
+  for _, spell := range champion.Spells {
+  <h3>{ spell.Name }</h3>
+  <p>{ spell.Description }</p>
+  <img src={ spell.Image.Full } alt={ spell.Name } />
+  }
+</div>
+}
