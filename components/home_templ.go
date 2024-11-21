@@ -71,7 +71,7 @@ func navTemplate() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-gray-700 text-white p-2\"><div class=\"container mx-auto\"><ul class=\"flex space-x-4\"><li><a href=\"/\" class=\"hover:underline\">Home</a></li><li><a href=\"/about\" class=\"hover:underline\">About</a></li><li><a href=\"/contact\" class=\"hover:underline\">Contact</a></li></ul></div></nav>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<nav class=\"bg-gray-700 text-white p-2\"><div class=\"container mx-auto\"><ul class=\"flex space-x-4\"><li><a href=\"/\" class=\"hover:underline\">Home</a></li></ul></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,7 +136,7 @@ func layout(name string) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 36, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 34, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
