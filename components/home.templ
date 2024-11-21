@@ -1,0 +1,70 @@
+package components
+
+templ headerTemplate(name string) {
+	<header class="bg-gray-800 text-white p-4">
+		<div class="container mx-auto flex justify-between items-center">
+			<div class="text-xl font-semibold">
+				{ name }
+			</div>
+		</div>
+	</header>
+}
+
+templ navTemplate() {
+	<nav class="bg-gray-700 text-white p-2">
+		<div class="container mx-auto">
+			<ul class="flex space-x-4">
+				<li><a href="/" class="hover:underline">Home</a></li>
+				<li><a href="/about" class="hover:underline">About</a></li>
+				<li><a href="/contact" class="hover:underline">Contact</a></li>
+			</ul>
+		</div>
+	</nav>
+}
+
+templ footerTemplate() {
+	<footer class="bg-gray-800 text-white p-4">
+		<div class="container mx-auto text-center">
+			&copy; 2023 My Website. All rights reserved.
+		</div>
+	</footer>
+}
+
+templ layout(name string) {
+	<html>
+		<head>
+			<title>{ name }</title>
+			<!-- Include Tailwind CSS -->
+			<script src="https://cdn.tailwindcss.com"></script>
+		</head>
+		<body>
+			@headerTemplate(name)
+			@navTemplate()
+			<main class="container mx-auto my-8">
+				{ children... }
+			</main>
+			@footerTemplate()
+			<!-- Include htmx -->
+			<script src="/static/htmx/htmx.min.js"></script>
+		</body>
+	</html>
+}
+
+templ championForm() {
+	<form id="championForm" hx-get="/champion" hx-target="#championResult" hx-swap="innerHTML" class="space-y-4">
+		<div>
+			<label class="block text-gray-700 font-bold mb-2">Champion Name</label>
+			<input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" name="champion" placeholder="Enter champion name"/>
+		</div>
+		<div>
+			<button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Submit</button>
+		</div>
+	</form>
+	<div id="championResult" class="mt-4"></div>
+}
+
+templ Home() {
+	@layout("Home") {
+		@championForm()
+	}
+}
