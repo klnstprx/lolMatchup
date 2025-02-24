@@ -2,52 +2,75 @@ package config
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/charmbracelet/log"
+	"github.com/gin-gonic/gin"
+	"github.com/klnstprx/lolMatchup/cache"
 )
 
 type AppConfig struct {
-	ListenAddr     string      `toml:"listen_addr"`
-	Port           int         `toml:"port"`
-	PatchNumber    string      `toml:"patch_number"`
-	LanguageCode   string      `toml:"language_code"`
-	DDragonURL     string      `toml:"ddragon_url"`
-	DDragonURLData string      `toml:"-"`
-	Debug          bool        `toml:"debug"`
-	Logger         *log.Logger `toml:"-"` // Exclude Logger from TOML output
+	ListenAddr           string       `toml:"listen_addr"`
+	Port                 int          `toml:"port"`
+	PatchNumber          string       `toml:"-"`
+	LanguageCode         string       `toml:"language_code"`
+	LevenshteinThreshold int          `toml:"levenshtein_threshold"`
+	DDragonURL           string       `toml:"ddragon_url"`
+	DDragonURLData       string       `toml:"-"`
+	DDragonVersionURL    string       `toml:"ddragon_version_url"`
+	Debug                bool         `toml:"debug"`
+	HTTPClientTimeout    int          `toml:"http_client_timeout"`
+	CachePath            string       `toml:"cache_path"`
+	Logger               *log.Logger  `toml:"-"` // Exclude from TOML
+	Cache                *cache.Cache `toml:"-"` // Exclude from TOML
+	HTTPClient           *http.Client `toml:"-"` // Exclude from TOML
 }
 
-var App AppConfig
-
-// Creates global AppConfig
-func New() {
-	App = AppConfig{}
-}
-
-// default config
-func (cfg *AppConfig) Default() {
-	cfg.ListenAddr = ""
-	cfg.Port = 1337
-	cfg.Debug = true
-	cfg.LanguageCode = "en_US"
-	cfg.DDragonURL = "https://ddragon.leagueoflegends.com/cdn/"
-	cfg.PatchNumber = "14.21.1"
-}
-
-func (cfg *AppConfig) Load() {
-	_, err := toml.DecodeFile("config.toml", cfg)
-	if err != nil {
-		cfg.Logger.Fatalf("Error decoding config file: %v", err)
+// initialize a new AppConfig struct with default values
+func New() *AppConfig {
+	return &AppConfig{
+		Port:                 1337,
+		Debug:                true,
+		LanguageCode:         "en_US",
+		DDragonURL:           "https://ddragon.leagueoflegends.com/cdn/",
+		DDragonVersionURL:    "https://ddragon.leagueoflegends.com/api/versions.json",
+		LevenshteinThreshold: 3,
+		CachePath:            "cache.gob",
+		HTTPClientTimeout:    10,
 	}
+}
+
+func (cfg *AppConfig) Initialize() error {
+	cfg.SetLogger()
+	cfg.SetGinMode()
+	cfg.SetCache()
+	cfg.SetHTTPClient()
+	return nil
+}
+
+func (cfg *AppConfig) SetHTTPClient() {
+	timeout := time.Duration(cfg.HTTPClientTimeout) * time.Second
+	cfg.HTTPClient = &http.Client{
+		Timeout: timeout,
+	}
+}
+
+func (cfg *AppConfig) Load(path string) error {
+	_, err := toml.DecodeFile(path, cfg)
+	if err != nil {
+		return fmt.Errorf("error decoding config file: %s", err)
+	}
+	return nil
 }
 
 func (cfg *AppConfig) LogConfig() {
 	// Marshal cfg into TOML bytes
 	tomlBytes, err := toml.Marshal(cfg)
 	if err != nil {
-		cfg.Logger.Errorf("Failed to marshal config to TOML:", err)
+		cfg.Logger.Errorf("Failed to marshal config to TOML: %s", err)
 		return
 	}
 
@@ -55,7 +78,7 @@ func (cfg *AppConfig) LogConfig() {
 	var data map[string]interface{}
 	err = toml.Unmarshal(tomlBytes, &data)
 	if err != nil {
-		cfg.Logger.Errorf("Failed to unmarshal TOML:", err)
+		cfg.Logger.Errorf("Failed to unmarshal TOML: %s", err)
 		return
 	}
 
@@ -82,8 +105,20 @@ func (cfg *AppConfig) logMap(prefix string, data map[string]interface{}) {
 	}
 }
 
+func (cfg *AppConfig) SetPatchNumber(patch string) {
+	cfg.PatchNumber = patch
+}
+
 func (cfg *AppConfig) SetDDragonDataURL() {
 	cfg.DDragonURLData = fmt.Sprintf(cfg.DDragonURL+"%s/data/%s/champion/", cfg.PatchNumber, cfg.LanguageCode)
+}
+
+func (cfg *AppConfig) SetGinMode() {
+	if cfg.Debug {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 }
 
 func (cfg *AppConfig) SetLogger() {
@@ -92,4 +127,8 @@ func (cfg *AppConfig) SetLogger() {
 		cfg.Logger.SetLevel(log.DebugLevel)
 	}
 	cfg.Logger.SetReportTimestamp(true)
+}
+
+func (cfg *AppConfig) SetCache() {
+	cfg.Cache = cache.New(cfg.CachePath, cfg.LevenshteinThreshold)
 }
