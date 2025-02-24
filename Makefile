@@ -1,10 +1,12 @@
 .PHONY: build clean
 
+all: templ build
+
 templ: 
 	templ generate
 
-build: templ
-	go build -o lolmatchup
+build:
+	go build -o lolmatchup.bin
 
 clean: 
 	rm lolmatchup

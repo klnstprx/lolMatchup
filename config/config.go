@@ -105,10 +105,6 @@ func (cfg *AppConfig) logMap(prefix string, data map[string]interface{}) {
 	}
 }
 
-func (cfg *AppConfig) SetPatchNumber(patch string) {
-	cfg.PatchNumber = patch
-}
-
 func (cfg *AppConfig) SetDDragonDataURL() {
 	cfg.DDragonURLData = fmt.Sprintf(cfg.DDragonURL+"%s/data/%s/champion/", cfg.PatchNumber, cfg.LanguageCode)
 }
