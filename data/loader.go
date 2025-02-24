@@ -33,6 +33,7 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		return err
 	}
 	dl.Logger.Infof("Latest patch version: %s", latestPatch)
+	dl.Config.PatchNumber = latestPatch
 
 	cachePatchVersion := dl.Cache.Patch
 	if cachePatchVersion != latestPatch {
@@ -71,6 +72,8 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 			}
 		}
 	}
+
+	dl.Config.SetDDragonDataURL()
 
 	return nil
 }
