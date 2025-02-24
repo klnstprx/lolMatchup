@@ -132,6 +132,14 @@ templ ChampionComponent(champion models.Champion, cfg *config.AppConfig) {
 						//not too safe...
 						@templ.Raw(template.HTML(spell.Description))
 					</p>
+					<div class="mt-2">
+						<span class="text-sm text-gray-500">Cooldown:</span>
+						<span class="text-sm font-semibold text-gray-800 ml-1">{ spell.CooldownBurn }</span>
+					</div>
+					<div class="mt-1">
+						<span class="text-sm text-gray-500">Cost:</span>
+						<span class="text-sm font-semibold text-gray-800 ml-1">{ spell.CostBurn }</span>
+					</div>
 				</div>
 			}
 		</div>
