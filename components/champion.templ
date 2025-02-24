@@ -1,42 +1,79 @@
 package components
 
 import (
-"github.com/klnstprx/lolMatchup/models"
-"strconv"
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+	"strconv"
 )
 
-templ ChampionComponent(champion models.Champion) {
-<div>
-  <h1>{ champion.Name } - { champion.Title }</h1>
-  <img src={ champion.Image.Full } alt={ champion.Name } />
-  <h2>Stats</h2>
-  <ul>
-    <li>{ strconv.FormatFloat(champion.Stats.HP, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.HPPerLevel,'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.MP, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.MPPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.MoveSpeed, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.Armor, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.ArmorPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.SpellBlock, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.SpellBlockPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.AttackRange, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.HPRegen, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.HPRegenPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.MPRegen, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.MPRegenPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.Crit, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.CritPerLevel, 'E', -1, 64) }</li>
-    <li>{ strconv.FormatFloat(champion.Stats.AttackDamage, 'E', -1, 64) }</li>
-  </ul>
-  <h2>Passive: { champion.Passive.Name }</h2>
-  <p>{ champion.Passive.Description }</p>
-  <img src={ champion.Passive.Image.Full } alt={ champion.Passive.Name } />
-  <h2>Abilities</h2>
-  for _, spell := range champion.Spells {
-  <h3>{ spell.Name }</h3>
-  <p>{ spell.Description }</p>
-  <img src={ spell.Image.Full } alt={ spell.Name } />
-  }
-</div>
+templ ChampionComponent(champion models.Champion, cfg *config.AppConfig) {
+	<div class="max-w-4xl mx-auto p-6">
+		<div class="flex items-center mb-6">
+			<img
+				class="w-24 h-24 rounded-full shadow-lg"
+				src={ string(templ.URL(fmt.Sprintf("%s%s/img/champion/%s.png",
+      cfg.DDragonURL, cfg.PatchNumber, champion.ID))) }
+				alt={ champion.Name }
+			/>
+			<div class="ml-6">
+				<h1 class="text-3xl font-bold">{ champion.Name }</h1>
+				<h2 class="text-xl text-gray-500 italic">{ champion.Title }</h2>
+			</div>
+		</div>
+		<div class="mb-6">
+			<h3 class="text-2xl font-semibold mb-4">Stats</h3>
+			<div class="overflow-x-auto">
+				<table class="min-w-full bg-white rounded-lg shadow overflow-hidden"></table>
+			</div>
+			<ul>
+				<li>{ strconv.FormatFloat(champion.Stats.HP, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.HPPerLevel,'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.MP, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.MPPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.MoveSpeed, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.Armor, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.ArmorPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.SpellBlock, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.SpellBlockPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.AttackRange, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.HPRegen, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.HPRegenPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.MPRegen, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.MPRegenPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.Crit, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.CritPerLevel, 'f', -1, 64) }</li>
+				<li>{ strconv.FormatFloat(champion.Stats.AttackDamage, 'f', -1, 64) }</li>
+			</ul>
+		</div>
+		<div class="mb-6">
+			<h3 class="text-2xl font-semibold mb-2">Passive: { champion.Passive.Name }</h3>
+			<div class="flex space-x-4">
+				<img
+					class="w-16 h-16"
+					src={ string(templ.URL(fmt.Sprintf("%s%s/img/passive/%s", cfg.DDragonURL, cfg.PatchNumber,
+        champion.Passive.Image.Full))) }
+					alt={ champion.Passive.Name }
+				/>
+				<p class="text-gray-700 leading-relaxed">{ champion.Passive.Description }</p>
+			</div>
+		</div>
+		<div>
+			<h3 class="text-2xl font-semibold mb-4">Abilities</h3>
+			for _, spell := range champion.Spells {
+				<div class="mb-6">
+					<div class="flex items-center mb-2">
+						<img
+							class="w-12 h-12"
+							src={ string(templ.URL(fmt.Sprintf("%s%s/img/spell/%s", cfg.DDragonURL, cfg.PatchNumber,
+          spell.Image.Full))) }
+							alt={ spell.Name }
+						/>
+						<h4 class="text-xl font-semibold ml-4">{ spell.Name }</h4>
+					</div>
+					<p class="text-gray-700 leading-relaxed">{ spell.Description }</p>
+				</div>
+			}
+		</div>
+	</div>
 }
