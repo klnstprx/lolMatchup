@@ -1,11 +1,11 @@
 package models
 
-// Root represents the top-level structure containing the data.
+// Root represents the top-level structure returned by champion data endpoints.
 type Root struct {
 	Data map[string]Champion `json:"data"`
 }
 
-// Champion represents the data for an individual champion.
+// Champion represents an individual champion's full data structure.
 type Champion struct {
 	ID      string  `json:"id"`
 	Key     string  `json:"key"`
@@ -18,7 +18,7 @@ type Champion struct {
 	Stats   Stats   `json:"stats"`
 }
 
-// Image represents image details for champions and spells.
+// Image holds sprite information for visual assets.
 type Image struct {
 	Full   string `json:"full"`
 	Sprite string `json:"sprite"`
@@ -29,7 +29,7 @@ type Image struct {
 	H      int    `json:"h"`
 }
 
-// Stats represents the statistical data of a champion.
+// Stats represents a champion's base stats and growth per level.
 type Stats struct {
 	HP                   float64 `json:"hp"`
 	HPPerLevel           float64 `json:"hpperlevel"`
@@ -53,7 +53,7 @@ type Stats struct {
 	AttackSpeed          float64 `json:"attackspeed"`
 }
 
-// Spell represents the details of a champion's spell.
+// Spell represents details of an ability in a champion's kit.
 type Spell struct {
 	DataValues   DataValues    `json:"datavalues"`
 	MaxAmmo      string        `json:"maxammo"`
@@ -77,25 +77,25 @@ type Spell struct {
 	MaxRank      int           `json:"maxrank"`
 }
 
-// LevelTip represents the leveling information for a spell.
+// LevelTip provides textual hints for leveling up spells.
 type LevelTip struct {
 	Label  []string `json:"label"`
 	Effect []string `json:"effect"`
 }
 
-// DataValues represents additional data for a spell (can be expanded as needed).
+// DataValues unused in typical champion JSON, placeholder for future expansions.
 type DataValues struct {
 	// Add fields here if data becomes available.
 }
 
-// Var represents variable coefficients in a spell's calculation.
+// Var describes dynamic scaling or coefficient data for spells.
 type Var struct {
 	Coeff interface{} `json:"coeff"`
 	Key   string      `json:"key"`
 	Link  string      `json:"link"`
 }
 
-// Passive represents a champion's passive ability.
+// Passive is the champion's innate ability.
 type Passive struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`

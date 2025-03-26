@@ -5,33 +5,30 @@ import (
 	"unicode"
 )
 
-// Helper function to preprocess strings
+// preprocessString normalizes a string by converting it to lowercase
+// and removing all non-alphanumeric characters.
 func preprocessString(s string) string {
-	// Convert to lowercase
 	s = strings.ToLower(s)
-	// Remove special characters
 	var builder strings.Builder
 	for _, r := range s {
 		if unicode.IsLetter(r) || unicode.IsNumber(r) {
 			builder.WriteRune(r)
 		}
 	}
-
 	return builder.String()
 }
 
-// Levenshtein distance algorithm
+// levenshteinDistance implements the standard Levenshtein distance algorithm.
 func levenshteinDistance(a, b string) int {
 	la := len(a)
 	lb := len(b)
-
 	if la == 0 {
 		return lb
-	} else if lb == 0 {
+	}
+	if lb == 0 {
 		return la
 	}
 
-	// Create a distance matrix
 	dp := make([][]int, la+1)
 	for i := range dp {
 		dp[i] = make([]int, lb+1)
@@ -42,6 +39,7 @@ func levenshteinDistance(a, b string) int {
 	for j := 0; j <= lb; j++ {
 		dp[0][j] = j
 	}
+
 	for i := 1; i <= la; i++ {
 		for j := 1; j <= lb; j++ {
 			cost := 0

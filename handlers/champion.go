@@ -9,7 +9,6 @@ import (
 	"github.com/klnstprx/lolMatchup/client"
 	"github.com/klnstprx/lolMatchup/components"
 	"github.com/klnstprx/lolMatchup/config"
-	"github.com/klnstprx/lolMatchup/models"
 	"github.com/klnstprx/lolMatchup/renderer"
 )
 
@@ -29,51 +28,39 @@ func NewChampionHandler(cfg *config.AppConfig, apiClient *client.Client) *Champi
 	}
 }
 
+// ChampionGET handles /champion GET requests, returning champion data in templ format.
 func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 	ctx := c.Request.Context()
 	inputName, ok := c.GetQuery("champion")
-	if !ok || len(inputName) == 0 {
+	if !ok || inputName == "" {
 		c.String(http.StatusBadRequest, "Champion name is required.")
-		h.Logger.Error("Champion name empty!", "url", c.Request.URL)
+		h.Logger.Error("Champion name query param is missing", "url", c.Request.URL.String())
 		return
 	}
 
-	var champion models.Champion
-	cachedChampionID, err := h.Cache.SearchChampionName(inputName)
+	championID, err := h.Cache.SearchChampionName(inputName)
 	if err != nil {
-		h.Logger.Debug("Champion's name not found in cache.", "error", err)
+		h.Logger.Debug("Champion name not found in cache by SearchChampionName", "error", err)
+		// We'll try to use the raw inputName as champion ID if no match was found.
+		championID = inputName
 	}
 
-	var inCache bool
-	if cachedChampionID != "" {
-		// Champion's name found in cache, check if data is already cached
-		champion, inCache = h.Cache.GetChampionByID(cachedChampionID)
-		if inCache {
-			h.Logger.Debug("Champion data found in cache.", "championID", cachedChampionID)
-		}
-	}
-
-	if !inCache {
-		championID := cachedChampionID
-		if championID == "" {
-			championID = inputName
-		}
-
-		champion, err = h.Client.FetchChampionData(ctx, championID, h.Config.DDragonURLData)
-		h.Logger.Debug("Fetching champion data.")
-		if err != nil {
+	champion, inCache := h.Cache.GetChampionByID(championID)
+	if inCache {
+		h.Logger.Debug("Champion data loaded from cache", "championID", championID)
+	} else {
+		fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID, h.Config.DDragonURLData)
+		if fetchErr != nil {
+			h.Logger.Error("Failed to fetch champion detail", "error", fetchErr, "championID", championID)
 			c.String(http.StatusInternalServerError, "Error fetching champion data.")
-			h.Logger.Error("Error fetching champion data.", "error", err)
 			return
 		}
-
-		// Cache the champion data
-		h.Logger.Debug("Caching champion data.", "championID", champion.ID)
-		h.Cache.SetChampion(champion)
+		h.Cache.SetChampion(fetchedChampion)
+		champion = fetchedChampion
+		h.Logger.Debug("Fetched champion data from DDragon", "championID", champion.ID)
 	}
 
-	h.Logger.Debug("Serving champion data.", "championID", champion.ID)
-
-	r := renderer.New(c.Request.Context(), http.StatusOK, components.ChampionComponent(champion, h.Config))
-	c.Render(http.StatusOK, r)
+	// Render the champion data using templ and our custom renderer.
+	renderComp := renderer.New(ctx, http.StatusOK, components.ChampionComponent(champion, h.Config))
+	c.Render(http.StatusOK, renderComp)
 }

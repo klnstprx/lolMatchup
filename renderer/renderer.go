@@ -9,13 +9,15 @@ import (
 	"github.com/a-h/templ"
 )
 
-var Default = &HTMLTemplRenderer{}
-
+// HTMLTemplRenderer is a custom renderer that can handle templ.Component.
 type HTMLTemplRenderer struct {
 	FallbackHtmlRenderer render.HTMLRender
 }
 
-func (r *HTMLTemplRenderer) Instance(s string, d any) render.Render {
+// Instance implements gin's HTMLRender interface. If the data is a templ.Component,
+// it returns our custom Renderer struct; otherwise, it falls back to the default
+// provided gin HTML renderer (if set).
+func (r *HTMLTemplRenderer) Instance(s string, d interface{}) render.Render {
 	templData, ok := d.(templ.Component)
 	if !ok {
 		if r.FallbackHtmlRenderer != nil {
@@ -29,6 +31,7 @@ func (r *HTMLTemplRenderer) Instance(s string, d any) render.Render {
 	}
 }
 
+// New creates a new Renderer with a given context, status code, and templ component.
 func New(ctx context.Context, status int, component templ.Component) *Renderer {
 	return &Renderer{
 		Ctx:       ctx,
@@ -37,12 +40,14 @@ func New(ctx context.Context, status int, component templ.Component) *Renderer {
 	}
 }
 
+// Renderer implements gin.Render for templ components.
 type Renderer struct {
 	Ctx       context.Context
 	Status    int
 	Component templ.Component
 }
 
+// Render writes headers and renders the templ component to the HTTP response.
 func (t Renderer) Render(w http.ResponseWriter) error {
 	t.WriteContentType(w)
 	if t.Status != -1 {
@@ -54,6 +59,7 @@ func (t Renderer) Render(w http.ResponseWriter) error {
 	return nil
 }
 
+// WriteContentType sets "Content-Type: text/html; charset=utf-8".
 func (t Renderer) WriteContentType(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 }

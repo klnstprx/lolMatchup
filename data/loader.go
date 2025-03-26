@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/charmbracelet/log"
 	"github.com/klnstprx/lolMatchup/cache"
@@ -9,6 +10,7 @@ import (
 	"github.com/klnstprx/lolMatchup/config"
 )
 
+// DataLoader handles obtaining the latest patch and champion data, caching as needed.
 type DataLoader struct {
 	Config *config.AppConfig
 	Client *client.Client
@@ -16,6 +18,7 @@ type DataLoader struct {
 	Cache  *cache.Cache
 }
 
+// NewDataLoader creates a DataLoader with references to config, client, and cache.
 func NewDataLoader(cfg *config.AppConfig, client *client.Client, cache *cache.Cache) *DataLoader {
 	return &DataLoader{
 		Config: cfg,
@@ -25,55 +28,47 @@ func NewDataLoader(cfg *config.AppConfig, client *client.Client, cache *cache.Ca
 	}
 }
 
-// Initialize checks for the latest patch and updates champion data if necessary
+// Initialize checks the latest patch from DDragon and refreshes champion data if needed.
 func (dl *DataLoader) Initialize(ctx context.Context) error {
-	// Fetch the latest patch number
 	latestPatch, err := dl.Client.FetchLatestPatch(ctx, dl.Config.DDragonVersionURL)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to fetch latest patch: %w", err)
 	}
 	dl.Logger.Infof("Latest patch version: %s", latestPatch)
 	dl.Config.PatchNumber = latestPatch
 
-	cachePatchVersion := dl.Cache.Patch
-	if cachePatchVersion != latestPatch {
-		dl.Logger.Infof("Patch version changed from %s to %s. Invalidating cache.", cachePatchVersion, latestPatch)
-		// Invalidate the cache
+	if dl.Cache.Patch != latestPatch {
+		dl.Logger.Infof("Patch changed from %s to %s; invalidating cache.", dl.Cache.Patch, latestPatch)
 		dl.Cache.Invalidate()
 		dl.Cache.Patch = latestPatch
 
-		// Fetch the new champion map
-		championMap, err := dl.Client.FetchChampionNameIDMap(ctx, dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
+		championMap, err := dl.Client.FetchChampionNameIDMap(ctx,
+			dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to fetch champion map: %w", err)
 		}
-		// Update the cache with the new champion map
 		dl.Cache.SetChampionMap(championMap)
 
-		// Save the updated cache to disk
 		if err := dl.Cache.Save(); err != nil {
-			dl.Logger.Errorf("Error saving cache: %v", err)
+			dl.Logger.Errorf("Could not save cache: %v", err)
 		}
 	} else {
-		dl.Logger.Info("Patch is up to date. Loading champion map from cache.")
-		// If the ChampionMap is empty, we might need to fetch it
+		dl.Logger.Info("Patch is up to date. Checking champion map in cache.")
 		if len(dl.Cache.ChampionMap) == 0 {
-			dl.Logger.Info("Champion map is empty. Fetching champion map.")
-			championMap, err := dl.Client.FetchChampionNameIDMap(ctx, dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
+			dl.Logger.Info("Champion map is empty; fetching from Data Dragon.")
+			championMap, err := dl.Client.FetchChampionNameIDMap(ctx,
+				dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to fetch champion map: %w", err)
 			}
-			// Update the cache with the fetched champion map
 			dl.Cache.SetChampionMap(championMap)
 
-			// Save the updated cache to disk
 			if err := dl.Cache.Save(); err != nil {
-				dl.Logger.Errorf("Error saving cache: %v", err)
+				dl.Logger.Errorf("Could not save cache: %v", err)
 			}
 		}
 	}
 
 	dl.Config.SetDDragonDataURL()
-
 	return nil
 }

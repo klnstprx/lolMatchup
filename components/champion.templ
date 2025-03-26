@@ -129,7 +129,7 @@ templ ChampionComponent(champion models.Champion, cfg *config.AppConfig) {
 						<h4 class="text-xl font-semibold text-gray-800 ml-4">{ spell.Name }</h4>
 					</div>
 					<p class="text-gray-700">
-						//not too safe...
+						//not too safe... please fix
 						@templ.Raw(template.HTML(spell.Description))
 					</p>
 					<div class="mt-2">

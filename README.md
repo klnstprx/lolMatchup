@@ -1,8 +1,13 @@
+--------------------------------------------------------------------------------
+
+# README.md
+
+--------------------------------------------------------------------------------
 ![Project Status](https://img.shields.io/badge/status-WIP-orange)
 
 > **Note**: This project is currently **not functional** and is a **Work in Progress (WIP)**.
 
-Currently it is possible to:
+Currently, it is possible to:
 
 - Get raw champion data.
 
@@ -18,80 +23,84 @@ LoLMatchup is a web application built with Go that allows users to retrieve and 
 
 ## Features
 
-- **Champion Lookup**: Enter a champion's name to get detailed stats, abilities, and images.
-- **Dynamic Loading**: Uses htmx for seamless AJAX requests without full page reloads.
-- **Server-Side Rendering**: Utilizes `templ` for efficient server-side HTML rendering.
+- **Champion Lookup**: Enter a champion's name to get detailed stats, abilities, and images.  
+- **Dynamic Loading**: Uses htmx for seamless AJAX requests without full page reloads.  
+- **Server-Side Rendering**: Utilizes "templ" for efficient server-side HTML rendering.
 
 ## Table of Contents
 
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Development](#development)
-- [License](#license)
-
+1. [Project Structure](#project-structure)  
+2. [Getting Started](#getting-started)  
+   1. [Prerequisites](#prerequisites)  
+   2. [Installation](#installation)  
+3. [Usage](#usage)  
+4. [Configuration](#configuration)  
+5. [Development](#development)  
+6. [Testing](#testing)  
+7. [Contributing](#contributing)  
+8. [License](#license)
 
 ## Project Structure
+
+Below is a high-level overview of the project structure:
 
 ```
 ├── LICENSE
 ├── README.md
+├── .gitignore
 ├── components
-│   ├── champion.templ       # Templ file for champion component
-│   ├── champion_templ.go    # Generated Go code from champion.templ
-│   ├── home.templ           # Templ file for home component
-│   └── home_templ.go        # Generated Go code from home.templ
+│   ├── champion.templ
+│   ├── champion_templ.go
+│   ├── home.templ
+│   └── home_templ.go
 ├── config
-│   ├── config.go            # Application configuration logic
-├── config.toml              # Application configuration file
-├── go.mod                   # Go module dependencies
-├── go.sum                   # Checksums for module dependencies
+│   └── config.go
+├── go.mod
+├── go.sum
 ├── handlers
-│   └── champion.go          # HTTP handlers for champion routes
-├── main.go                  # Entry point of the application
+│   ├── champion.go
+│   └── home.go
+├── main.go
 ├── middleware
-│   ├── logger.go            # Middleware for logging requests
-│   └── recovery.go          # Middleware for recovering from panics
+│   ├── logger.go
+│   └── recovery.go
 ├── models
-│   └── champion.go          # Data models for champions
+│   ├── champion.go
+│   └── championList.go
 ├── renderer
-│   └── renderer.go          # Custom renderer for templ templates
+│   └── renderer.go
 ├── router
-│   └── router.go            # Application routes setup
-└── static
-    └── htmx
-        └── htmx.min.js      # htmx library for AJAX requests
+│   └── router.go
+├── static
+│   └── htmx
+│       └── htmx.min.js
+└── ...
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Go**: Version 1.16 or higher is recommended.
-- **Git**: For cloning the repository.
-- **Internet Connection**: Required to fetch data from Riot's Data Dragon API.
+- **Go** (1.16 or higher is recommended).  
+- **Git** (for cloning the repository).  
+- **Internet Connection** (to fetch data from Riot's Data Dragon API).
 
 ### Installation
 
-1. **Clone the Repository**
+1. **Clone the Repository**:
 
    ```bash
    git clone https://github.com/yourusername/lolMatchup.git
    cd lolMatchup
    ```
 
-2. **Install Dependencies**
-
-   Use `go mod` to download the necessary dependencies:
+2. **Install Dependencies**:
 
    ```bash
    go mod download
    ```
 
-3. **Build the Application**
+3. **Build the Application**:
 
    ```bash
    go build
@@ -99,21 +108,19 @@ LoLMatchup is a web application built with Go that allows users to retrieve and 
 
 ## Usage
 
-1. **Configure the Application**
+1. **Configure the Application**  
+   Make sure the configuration file (config.toml) exists with the desired settings (see [Configuration](#configuration)).
 
-   Ensure the `config.toml` file exists in the root directory with the appropriate settings (see [Configuration](#configuration)).
-
-2. **Run the Application**
+2. **Run the Application**:
 
    ```bash
    ./lolMatchup
    ```
 
-   The server will start, listening on the port specified in your configuration (default is `1337`).
+   The server will start listening on the port specified in your configuration (default is 1337).
 
-3. **Access the Web Interface**
-
-   Open your web browser and navigate to:
+3. **Access the Web Interface**  
+   Open your web browser and go to:
 
    ```
    http://localhost:1337
@@ -121,60 +128,70 @@ LoLMatchup is a web application built with Go that allows users to retrieve and 
 
    You should see the home page with a form to enter a champion's name.
 
-4. **Retrieve Champion Data**
-
-   - Enter the name of a League of Legends champion in the provided form.
-   - Click **Submit**.
-   - The application will fetch and display detailed information about the champion, including stats, abilities, and images.
+4. **Retrieve Champion Data**  
+   - Enter the name of a League of Legends champion.  
+   - Click "Submit".  
+   - The application will fetch and display champion information including stats, abilities, and images.
 
 ## Configuration
 
-The application uses a `config.toml` file for configuration settings. Here's an example of what your `config.toml` might look like:
+The application uses a TOML-based configuration file (config.toml) by default. An example configuration might look like:
 
 ```toml
-listen_addr = ""
-port = 1337
-patch_number = "14.21.1"
-language_code = "en_US"
-ddragon_url = "https://ddragon.leagueoflegends.com/cdn/"
-debug = true
+listen_addr         = ""
+port               = 1337
+patch_number       = "14.21.1"
+language_code      = "en_US"
+ddragon_url        = "https://ddragon.leagueoflegends.com/cdn/"
+ddragon_version_url= "https://ddragon.leagueoflegends.com/api/versions.json"
+levenshtein_threshold = 3
+debug              = true
+http_client_timeout= 10
+cache_path         = "cache.gob"
 ```
 
-- **listen_addr**: The address the server listens on (leave empty for localhost).
-- **port**: The port number for the server (default `1337`).
-- **patch_number**: The version of the game data to use.
-- **language_code**: The language code for data localization (e.g., `en_US`).
-- **ddragon_url**: Base URL for Riot's Data Dragon CDN.
-- **debug**: Enables debug mode for more verbose logging.
+Key fields:  
+• listen_addr: The host/IP for the server. Leave empty for localhost.  
+• port: The port on which the server listens (default is 1337).  
+• patch_number: The version of the game data (often overwritten dynamically).  
+• language_code: Data localization language (e.g. "en_US").  
+• ddragon_url: Riot’s Data Dragon CDN base URL.  
+• ddragon_version_url: Endpoint for fetching available patch versions.  
+• debug: Enables debug mode for more verbose logs.  
+• http_client_timeout: Timeout for HTTP calls, in seconds.  
+• cache_path: Where to store champion data cache.
 
-### Logging Configuration
+### Logging
 
-The application uses `charmbracelet/log` for logging. The logging level is determined by the `debug` setting in your `config.toml`:
-
-- **debug = true**: Sets the logging level to `DebugLevel` for detailed logs.
-- **debug = false**: Default logging level.
+The application uses charmbracelet/log for logging. If debug = true in config.toml, the log level is set to Debug. Otherwise, it defaults to Info level.
 
 ## Development
 
-### Project Highlights
+Highlights:  
+• Go modules for dependency management.  
+• Gin web framework for routing and middleware.  
+• Templ engine for server-side HTML generation.  
+• Custom middleware for request logging and panic recovery.  
+• A structured, modular design to keep code maintainable and scalable.
 
-- **Go Modules**: Dependency management using Go modules (`go.mod`, `go.sum`).
-- **Gin Web Framework**: Efficient HTTP routing and middleware support.
-- **templ Templating Engine**: Generates efficient Go code from `.templ` files.
-- **Custom Middleware**: For request logging and panic recovery.
-- **Modular Design**: Organized code structure for scalability and maintainability.
+## Testing
 
-### Key Components
+1. Run any Go-based tests using:  
 
-- **main.go**: Initializes the application, loads configuration, and starts the server.
-- **handlers/champion.go**: Contains the logic for handling champion data requests.
-- **components/**: Holds the templating files (`.templ`) and their generated Go code.
-- **models/champion.go**: Defines the data structures for champion data.
-- **middleware/**: Custom middleware for logging and error handling.
-- **router/router.go**: Sets up the application's HTTP routes.
+   ```bash
+   go test ./...
+   ```  
+
+2. (Optional) You can place integration or system tests in the "lolmatchup_testing" directory or any dedicated testing folder.
+
+## Contributing
+
+1. Fork the repository.  
+2. Create a new branch: git checkout -b feature/myFeature.  
+3. Commit your changes: git commit -m 'Add some feature'.  
+4. Push the branch: git push origin feature/myFeature.  
+5. Create a Pull Request on GitHub.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----

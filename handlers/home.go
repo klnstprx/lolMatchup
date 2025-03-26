@@ -21,14 +21,16 @@ type HomeHandler struct {
 
 func NewHomeHandler(cfg *config.AppConfig, apiClient *client.Client) *HomeHandler {
 	return &HomeHandler{
-		Cache:  cfg.Cache,
 		Logger: cfg.Logger,
-		Config: cfg,
+		Cache:  cfg.Cache,
 		Client: apiClient,
+		Config: cfg,
 	}
 }
 
+// HomeGET handles the home page request and renders the home templ.
 func (h *HomeHandler) HomeGET(c *gin.Context) {
-	r := renderer.New(c.Request.Context(), http.StatusOK, components.Home())
-	c.Render(http.StatusOK, r)
+	h.Logger.Debug("Rendering home page")
+	renderComp := renderer.New(c.Request.Context(), http.StatusOK, components.Home())
+	c.Render(http.StatusOK, renderComp)
 }

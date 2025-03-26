@@ -12,24 +12,26 @@ import (
 	"github.com/klnstprx/lolMatchup/cache"
 )
 
+// AppConfig holds configuration options loaded from TOML or defaulted at runtime.
 type AppConfig struct {
-	ListenAddr           string       `toml:"listen_addr"`
-	Port                 int          `toml:"port"`
-	PatchNumber          string       `toml:"-"`
-	LanguageCode         string       `toml:"language_code"`
-	LevenshteinThreshold int          `toml:"levenshtein_threshold"`
-	DDragonURL           string       `toml:"ddragon_url"`
-	DDragonURLData       string       `toml:"-"`
-	DDragonVersionURL    string       `toml:"ddragon_version_url"`
-	Debug                bool         `toml:"debug"`
-	HTTPClientTimeout    int          `toml:"http_client_timeout"`
-	CachePath            string       `toml:"cache_path"`
-	Logger               *log.Logger  `toml:"-"` // Exclude from TOML
-	Cache                *cache.Cache `toml:"-"` // Exclude from TOML
-	HTTPClient           *http.Client `toml:"-"` // Exclude from TOML
+	ListenAddr           string `toml:"listen_addr"`
+	Port                 int    `toml:"port"`
+	PatchNumber          string `toml:"-"` // Set dynamically upon initialization
+	LanguageCode         string `toml:"language_code"`
+	LevenshteinThreshold int    `toml:"levenshtein_threshold"`
+	DDragonURL           string `toml:"ddragon_url"`
+	DDragonURLData       string `toml:"-"` // Derived after patch is set
+	DDragonVersionURL    string `toml:"ddragon_version_url"`
+	Debug                bool   `toml:"debug"`
+	HTTPClientTimeout    int    `toml:"http_client_timeout"`
+	CachePath            string `toml:"cache_path"`
+
+	Logger     *log.Logger  `toml:"-"` // Exclude from TOML
+	Cache      *cache.Cache `toml:"-"`
+	HTTPClient *http.Client `toml:"-"`
 }
 
-// initialize a new AppConfig struct with default values
+// New returns an AppConfig with default values.
 func New() *AppConfig {
 	return &AppConfig{
 		Port:                 1337,
@@ -43,51 +45,50 @@ func New() *AppConfig {
 	}
 }
 
+// Initialize sets up logger, gin mode, cache, and HTTP client.
 func (cfg *AppConfig) Initialize() error {
-	cfg.SetLogger()
-	cfg.SetGinMode()
-	cfg.SetCache()
-	cfg.SetHTTPClient()
+	cfg.setLogger()
+	cfg.setGinMode()
+	cfg.setCache()
+	cfg.setHTTPClient()
 	return nil
 }
 
-func (cfg *AppConfig) SetHTTPClient() {
+// setHTTPClient configures the HTTP client with a timeout from the config.
+func (cfg *AppConfig) setHTTPClient() {
 	timeout := time.Duration(cfg.HTTPClientTimeout) * time.Second
 	cfg.HTTPClient = &http.Client{
 		Timeout: timeout,
 	}
 }
 
+// Load reads a TOML file into AppConfig.
 func (cfg *AppConfig) Load(path string) error {
-	_, err := toml.DecodeFile(path, cfg)
-	if err != nil {
-		return fmt.Errorf("error decoding config file: %s", err)
+	if _, err := toml.DecodeFile(path, cfg); err != nil {
+		return fmt.Errorf("error decoding config file %s: %w", path, err)
 	}
 	return nil
 }
 
+// LogConfig logs configuration keys and values as TOML after marshalling.
 func (cfg *AppConfig) LogConfig() {
-	// Marshal cfg into TOML bytes
-	tomlBytes, err := toml.Marshal(cfg)
+	tomlBytes, err := toml.Marshal(*cfg)
 	if err != nil {
-		cfg.Logger.Errorf("Failed to marshal config to TOML: %s", err)
+		cfg.Logger.Errorf("Failed to marshal config to TOML: %v", err)
 		return
 	}
 
-	// Unmarshal TOML bytes into a map
 	var data map[string]interface{}
-	err = toml.Unmarshal(tomlBytes, &data)
-	if err != nil {
-		cfg.Logger.Errorf("Failed to unmarshal TOML: %s", err)
+	if err = toml.Unmarshal(tomlBytes, &data); err != nil {
+		cfg.Logger.Errorf("Failed to unmarshal TOML: %v", err)
 		return
 	}
 
-	cfg.Logger.Info("Printing configuration...")
-	// Iterate over the map and log each field individually
+	cfg.Logger.Info("Configuration:")
 	cfg.logMap("", data)
 }
 
-// Recursive function to handle nested maps
+// logMap logs nested data structures from a map, used by LogConfig.
 func (cfg *AppConfig) logMap(prefix string, data map[string]interface{}) {
 	for key, value := range data {
 		fullKey := key
@@ -96,20 +97,20 @@ func (cfg *AppConfig) logMap(prefix string, data map[string]interface{}) {
 		}
 		switch v := value.(type) {
 		case map[string]interface{}:
-			// Recursively log nested maps
 			cfg.logMap(fullKey, v)
 		default:
-			// Log the field name and value
 			cfg.Logger.Infof("%s: %v", fullKey, v)
 		}
 	}
 }
 
+// SetDDragonDataURL builds the full URL for champion data after patch is known.
 func (cfg *AppConfig) SetDDragonDataURL() {
-	cfg.DDragonURLData = fmt.Sprintf(cfg.DDragonURL+"%s/data/%s/champion/", cfg.PatchNumber, cfg.LanguageCode)
+	cfg.DDragonURLData = fmt.Sprintf("%s%s/data/%s/champion/", cfg.DDragonURL, cfg.PatchNumber, cfg.LanguageCode)
 }
 
-func (cfg *AppConfig) SetGinMode() {
+// setGinMode sets Gin to debug or release mode based on cfg.Debug.
+func (cfg *AppConfig) setGinMode() {
 	if cfg.Debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -117,14 +118,17 @@ func (cfg *AppConfig) SetGinMode() {
 	}
 }
 
-func (cfg *AppConfig) SetLogger() {
-	cfg.Logger = log.New(os.Stderr)
+// setLogger configures cfg.Logger based on the debug setting.
+func (cfg *AppConfig) setLogger() {
+	logger := log.New(os.Stderr)
 	if cfg.Debug {
-		cfg.Logger.SetLevel(log.DebugLevel)
+		logger.SetLevel(log.DebugLevel)
 	}
-	cfg.Logger.SetReportTimestamp(true)
+	logger.SetReportTimestamp(true)
+	cfg.Logger = logger
 }
 
-func (cfg *AppConfig) SetCache() {
+// setCache initializes the cache with config path and threshold.
+func (cfg *AppConfig) setCache() {
 	cfg.Cache = cache.New(cfg.CachePath, cfg.LevenshteinThreshold)
 }
