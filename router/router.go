@@ -9,25 +9,32 @@ import (
 	"github.com/klnstprx/lolMatchup/renderer"
 )
 
+// SetupRouter configures Gin, applying custom renderer and middleware,
+// then registers routes.
 func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	r := gin.New()
 
-	// Set up middleware with cfg.Logger
+	// Middlewares for logging and recovery
 	r.Use(middleware.LoggerMiddleware(cfg.Logger))
 	r.Use(middleware.RecoveryMiddleware(cfg.Logger))
 
 	// Serve static files
 	r.Static("/static", "./static")
-	ginHtmlRenderer := r.HTMLRender
-	r.HTMLRender = &renderer.HTMLTemplRenderer{FallbackHtmlRenderer: ginHtmlRenderer}
 
-	// Initialize handlers with dependencies
+	// Wrap default gin HTML renderer in our custom templ renderer
+	defaultGinRenderer := r.HTMLRender
+	r.HTMLRender = &renderer.HTMLTemplRenderer{
+		FallbackHtmlRenderer: defaultGinRenderer,
+	}
+
+	// Handlers
 	championHandler := handlers.NewChampionHandler(cfg, apiClient)
 	homeHandler := handlers.NewHomeHandler(cfg, apiClient)
+	autocompleteHandler := handlers.NewAutocompleteHandler(cfg, apiClient)
 
-	// Routes
 	r.GET("/", homeHandler.HomeGET)
 	r.GET("/champion", championHandler.ChampionGET)
+	r.GET("/autocomplete", autocompleteHandler.AutocompleteGET)
 
 	return r
 }

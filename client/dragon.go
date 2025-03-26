@@ -16,13 +16,18 @@ type Client struct {
 	Logger     *log.Logger
 }
 
-// FetchLatestPatch fetches the latest game version from the DDragon API.
+// FetchLatestPatch retrieves the latest game version from the DDragon API.
 func (c *Client) FetchLatestPatch(ctx context.Context, ddragonVersionURL string) (string, error) {
-	c.Logger.Debug("Querying...", "url", ddragonVersionURL)
+	c.Logger.Debug("Fetching latest patch", "url", ddragonVersionURL)
 
-	resp, err := c.HTTPClient.Get(ddragonVersionURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ddragonVersionURL, nil)
 	if err != nil {
-		return "", fmt.Errorf("error fetching versions from DDragon API: %v", err)
+		return "", fmt.Errorf("failed to create request: %w", err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch versions from DDragon: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -32,31 +37,33 @@ func (c *Client) FetchLatestPatch(ctx context.Context, ddragonVersionURL string)
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("error reading response body: %v", err)
+		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var versions []string
-	err = json.Unmarshal(body, &versions)
-	if err != nil {
-		return "", fmt.Errorf("error parsing JSON data: %v", err)
+	if err = json.Unmarshal(body, &versions); err != nil {
+		return "", fmt.Errorf("failed to parse JSON data: %w", err)
 	}
-
 	if len(versions) == 0 {
 		return "", fmt.Errorf("no versions found in response")
 	}
 
-	latestVersion := versions[0]
-	return latestVersion, nil
+	return versions[0], nil
 }
 
-// FetchChampionNameIDMap fetches a map of champion names to their IDs.
+// FetchChampionNameIDMap retrieves a map of champion names -> champion IDs.
 func (c *Client) FetchChampionNameIDMap(ctx context.Context, ddragonURL, patchNumber, languageCode string) (map[string]string, error) {
 	targetURL := fmt.Sprintf("%s%s/data/%s/champion.json", ddragonURL, patchNumber, languageCode)
-	c.Logger.Debug("Querying...", "url", targetURL)
+	c.Logger.Debug("Fetching champion name/ID map", "url", targetURL)
 
-	resp, err := c.HTTPClient.Get(targetURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching champion list: %v", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch champion list: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -66,16 +73,15 @@ func (c *Client) FetchChampionNameIDMap(ctx context.Context, ddragonURL, patchNu
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %v", err)
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var championList models.ChampionList
-	err = json.Unmarshal(body, &championList)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing JSON data: %v", err)
+	if err = json.Unmarshal(body, &championList); err != nil {
+		return nil, fmt.Errorf("failed to parse JSON data: %w", err)
 	}
 
-	championMap := make(map[string]string)
+	championMap := make(map[string]string, len(championList.Data))
 	for _, champ := range championList.Data {
 		championMap[champ.Name] = champ.ID
 	}
@@ -83,33 +89,39 @@ func (c *Client) FetchChampionNameIDMap(ctx context.Context, ddragonURL, patchNu
 	return championMap, nil
 }
 
-// FetchChampionData fetches champion data from the DDragon API.
+// FetchChampionData fetches detailed champion information for a given champion ID.
 func (c *Client) FetchChampionData(ctx context.Context, championID, ddragonURLData string) (models.Champion, error) {
 	var champion models.Champion
 	targetURL := fmt.Sprintf("%s%s.json", ddragonURLData, championID)
-	c.Logger.Debug("Querying...", "url", targetURL)
+	c.Logger.Debug("Fetching champion data", "url", targetURL, "champID", championID)
 
-	resp, err := c.HTTPClient.Get(targetURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
 	if err != nil {
-		return champion, fmt.Errorf("error fetching data for champion %s: %v", championID, err)
+		return champion, fmt.Errorf("failed to create request for champion %s: %w", championID, err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return champion, fmt.Errorf("failed to fetch data for champion %s: %w", championID, err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return champion, fmt.Errorf("champion '%s' not found", championID)
+		return champion, fmt.Errorf("champion '%s' not found or returned status code %d",
+			championID, resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return champion, fmt.Errorf("error reading response body: %v", err)
+		return champion, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var root models.Root
-	err = json.Unmarshal(body, &root)
-	if err != nil {
-		return champion, fmt.Errorf("error parsing JSON data: %v", err)
+	if err = json.Unmarshal(body, &root); err != nil {
+		return champion, fmt.Errorf("failed to parse JSON data: %w", err)
 	}
 
+	// There's usually just one champion in the "Data" map; retrieve first.
 	for _, champ := range root.Data {
 		champion = champ
 		break
