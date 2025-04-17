@@ -1,12 +1,15 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/klnstprx/lolMatchup/client"
-	"github.com/klnstprx/lolMatchup/config"
-	"github.com/klnstprx/lolMatchup/handlers"
-	"github.com/klnstprx/lolMatchup/middleware"
-	"github.com/klnstprx/lolMatchup/renderer"
+   "net/http"
+
+   "github.com/gin-gonic/gin"
+   "github.com/klnstprx/lolMatchup/client"
+   "github.com/klnstprx/lolMatchup/config"
+   "github.com/klnstprx/lolMatchup/handlers"
+   "github.com/klnstprx/lolMatchup/middleware"
+   "github.com/klnstprx/lolMatchup/renderer"
+   "github.com/klnstprx/lolMatchup/static"
 )
 
 // SetupRouter configures Gin, applying custom renderer and middleware,
@@ -18,8 +21,8 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	r.Use(middleware.LoggerMiddleware(cfg.Logger))
 	r.Use(middleware.RecoveryMiddleware(cfg.Logger))
 
-	// Serve static files
-	r.Static("/static", "./static")
+   // Serve embedded static files under /static
+   r.StaticFS("/static", http.FS(static.FS))
 
 	// Wrap default gin HTML renderer in our custom templ renderer
 	defaultGinRenderer := r.HTMLRender
