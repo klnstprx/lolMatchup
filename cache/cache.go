@@ -1,14 +1,14 @@
 package cache
 
 import (
-	"encoding/gob"
-	"fmt"
-	"os"
-	"sort"
-	"strings"
-	"sync"
+   "encoding/json"
+   "fmt"
+   "os"
+   "sort"
+   "strings"
+   "sync"
 
-	"github.com/klnstprx/lolMatchup/models"
+   "github.com/klnstprx/lolMatchup/models"
 )
 
 type Cache struct {
@@ -21,52 +21,71 @@ type Cache struct {
 	mu sync.RWMutex
 }
 
+// New creates a Cache with the given file path and Levenshtein threshold.
 func New(path string, threshold int) *Cache {
-	return &Cache{
-		Path:                 path,
-		Champions:            make(map[string]models.Champion),
-		ChampionMap:          make(map[string]string),
-		LevenshteinThreshold: threshold,
-	}
+   return &Cache{
+       Path:                 path,
+       Champions:            make(map[string]models.Champion),
+       ChampionMap:          make(map[string]string),
+       LevenshteinThreshold: threshold,
+   }
 }
 
+// Load reads the persisted cache (patch, champions, and champion map) from file.
+// Missing or invalid files are treated as cache misses.
 func (c *Cache) Load() error {
-	file, err := os.Open(c.Path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("cache file not found: %w", err)
-		}
-		return fmt.Errorf("failed to open cache file: %w", err)
-	}
-	defer file.Close()
+   file, err := os.Open(c.Path)
+   if err != nil {
+       if os.IsNotExist(err) {
+           return nil
+       }
+       return fmt.Errorf("failed to open cache file: %w", err)
+   }
+   defer file.Close()
 
-	dec := gob.NewDecoder(file)
-	// Protect cache state during decode
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	// Decode exported fields into the cache
-	if err := dec.Decode(c); err != nil {
-		return fmt.Errorf("failed to decode cache file: %w", err)
-	}
-	return nil
+   dec := json.NewDecoder(file)
+   var persist struct {
+       Patch       string                       `json:"patch"`
+       Champions   map[string]models.Champion   `json:"champions"`
+       ChampionMap map[string]string           `json:"champion_map"`
+   }
+   if err := dec.Decode(&persist); err != nil {
+       // On decode errors, ignore and start fresh
+       return nil
+   }
+   c.mu.Lock()
+   c.Patch = persist.Patch
+   c.ChampionMap = persist.ChampionMap
+   c.Champions = persist.Champions
+   c.mu.Unlock()
+   return nil
 }
 
+// Save writes the cache (patch, champions, and champion map) to file.
 func (c *Cache) Save() error {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+   c.mu.RLock()
+   defer c.mu.RUnlock()
 
-	file, err := os.Create(c.Path)
-	if err != nil {
-		return fmt.Errorf("failed to create cache file: %w", err)
-	}
-	defer file.Close()
+   file, err := os.Create(c.Path)
+   if err != nil {
+       return fmt.Errorf("failed to create cache file: %w", err)
+   }
+   defer file.Close()
 
-	enc := gob.NewEncoder(file)
-	err = enc.Encode(c)
-	if err != nil {
-		return fmt.Errorf("failed to encode cache data: %w", err)
-	}
-	return nil
+   enc := json.NewEncoder(file)
+   persist := struct {
+       Patch       string                       `json:"patch"`
+       Champions   map[string]models.Champion   `json:"champions"`
+       ChampionMap map[string]string           `json:"champion_map"`
+   }{
+       Patch:       c.Patch,
+       Champions:   c.Champions,
+       ChampionMap: c.ChampionMap,
+   }
+   if err := enc.Encode(&persist); err != nil {
+       return fmt.Errorf("failed to encode cache data: %w", err)
+   }
+   return nil
 }
 
 func (c *Cache) Invalidate() {
@@ -201,69 +220,72 @@ func (c *Cache) SetChampion(champion models.Champion) {
 // Autocomplete returns up to 'limit' champion names that best match the input using
 // a weighted Levenshtein distance, including prefix and substring bonuses.
 func (c *Cache) Autocomplete(input string, limit int) []string {
-   c.mu.RLock()
-   defer c.mu.RUnlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 
-   typed := preprocessString(input)
-   if typed == "" {
-       return nil
-   }
-   var results []string
-   // 1) prefix matches
-   for name := range c.ChampionMap {
-       if strings.HasPrefix(preprocessString(name), typed) {
-           results = append(results, name)
-       }
-   }
-   if len(results) > 0 {
-       sort.Strings(results)
-       if len(results) > limit && limit > 0 {
-           results = results[:limit]
-       }
-       return results
-   }
-   // 2) substring matches
-   for name := range c.ChampionMap {
-       if strings.Contains(preprocessString(name), typed) {
-           results = append(results, name)
-       }
-   }
-   if len(results) > 0 {
-       sort.Strings(results)
-       if len(results) > limit && limit > 0 {
-           results = results[:limit]
-       }
-       return results
-   }
-   // 3) fuzzy fallback: weighted Levenshtein, pick best match
-   type candidate struct { name string; weighted int }
-   const (
-       prefixBonus    = 2
-       substringBonus = 1
-   )
-   var fuzzy []candidate
-   for name := range c.ChampionMap {
-       processed := preprocessString(name)
-       dist := levenshteinDistance(typed, processed)
-       if dist > c.LevenshteinThreshold+prefixBonus {
-           continue
-       }
-       weighted := dist
-       if len(processed) >= len(typed) && processed[:len(typed)] == typed {
-           weighted -= prefixBonus
-       } else if strings.Contains(processed, typed) {
-           weighted -= substringBonus
-       }
-       if weighted < 0 {
-           weighted = 0
-       }
-       if weighted <= c.LevenshteinThreshold {
-           fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
-       }
-   }
-   if len(fuzzy) == 0 {
-       return nil
-   }
+	typed := preprocessString(input)
+	if typed == "" {
+		return nil
+	}
+	var results []string
+	// 1) prefix matches
+	for name := range c.ChampionMap {
+		if strings.HasPrefix(preprocessString(name), typed) {
+			results = append(results, name)
+		}
+	}
+	if len(results) > 0 {
+		sort.Strings(results)
+		if len(results) > limit && limit > 0 {
+			results = results[:limit]
+		}
+		return results
+	}
+	// 2) substring matches
+	for name := range c.ChampionMap {
+		if strings.Contains(preprocessString(name), typed) {
+			results = append(results, name)
+		}
+	}
+	if len(results) > 0 {
+		sort.Strings(results)
+		if len(results) > limit && limit > 0 {
+			results = results[:limit]
+		}
+		return results
+	}
+	// 3) fuzzy fallback: weighted Levenshtein, pick best match
+	type candidate struct {
+		name     string
+		weighted int
+	}
+	const (
+		prefixBonus    = 2
+		substringBonus = 1
+	)
+	var fuzzy []candidate
+	for name := range c.ChampionMap {
+		processed := preprocessString(name)
+		dist := levenshteinDistance(typed, processed)
+		if dist > c.LevenshteinThreshold+prefixBonus {
+			continue
+		}
+		weighted := dist
+		if len(processed) >= len(typed) && processed[:len(typed)] == typed {
+			weighted -= prefixBonus
+		} else if strings.Contains(processed, typed) {
+			weighted -= substringBonus
+		}
+		if weighted < 0 {
+			weighted = 0
+		}
+		if weighted <= c.LevenshteinThreshold {
+			fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
+		}
+	}
+	if len(fuzzy) == 0 {
+		return nil
+	}
    sort.Slice(fuzzy, func(i, j int) bool {
        if fuzzy[i].weighted != fuzzy[j].weighted {
            return fuzzy[i].weighted < fuzzy[j].weighted
@@ -271,5 +293,14 @@ func (c *Cache) Autocomplete(input string, limit int) []string {
        // break ties by reverse alphabetical so that "Ashe" beats "Ahri"
        return fuzzy[i].name > fuzzy[j].name
    })
-   return []string{fuzzy[0].name}
+   // Build ordered list of fuzzy suggestions
+   var suggestions []string
+   for _, cand := range fuzzy {
+       suggestions = append(suggestions, cand.name)
+   }
+   // Apply limit if specified
+   if limit > 0 && len(suggestions) > limit {
+       suggestions = suggestions[:limit]
+   }
+   return suggestions
 }
