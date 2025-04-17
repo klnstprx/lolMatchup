@@ -41,8 +41,11 @@ func (c *Cache) Load() error {
 	defer file.Close()
 
 	dec := gob.NewDecoder(file)
-	err = dec.Decode(c)
-	if err != nil {
+	// Protect cache state during decode
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	// Decode exported fields into the cache
+	if err := dec.Decode(c); err != nil {
 		return fmt.Errorf("failed to decode cache file: %w", err)
 	}
 	return nil
@@ -193,4 +196,80 @@ func (c *Cache) SetChampion(champion models.Champion) {
 		c.Champions = make(map[string]models.Champion)
 	}
 	c.Champions[champion.ID] = champion
+}
+
+// Autocomplete returns up to 'limit' champion names that best match the input using
+// a weighted Levenshtein distance, including prefix and substring bonuses.
+func (c *Cache) Autocomplete(input string, limit int) []string {
+   c.mu.RLock()
+   defer c.mu.RUnlock()
+
+   typed := preprocessString(input)
+   if typed == "" {
+       return nil
+   }
+   var results []string
+   // 1) prefix matches
+   for name := range c.ChampionMap {
+       if strings.HasPrefix(preprocessString(name), typed) {
+           results = append(results, name)
+       }
+   }
+   if len(results) > 0 {
+       sort.Strings(results)
+       if len(results) > limit && limit > 0 {
+           results = results[:limit]
+       }
+       return results
+   }
+   // 2) substring matches
+   for name := range c.ChampionMap {
+       if strings.Contains(preprocessString(name), typed) {
+           results = append(results, name)
+       }
+   }
+   if len(results) > 0 {
+       sort.Strings(results)
+       if len(results) > limit && limit > 0 {
+           results = results[:limit]
+       }
+       return results
+   }
+   // 3) fuzzy fallback: weighted Levenshtein, pick best match
+   type candidate struct { name string; weighted int }
+   const (
+       prefixBonus    = 2
+       substringBonus = 1
+   )
+   var fuzzy []candidate
+   for name := range c.ChampionMap {
+       processed := preprocessString(name)
+       dist := levenshteinDistance(typed, processed)
+       if dist > c.LevenshteinThreshold+prefixBonus {
+           continue
+       }
+       weighted := dist
+       if len(processed) >= len(typed) && processed[:len(typed)] == typed {
+           weighted -= prefixBonus
+       } else if strings.Contains(processed, typed) {
+           weighted -= substringBonus
+       }
+       if weighted < 0 {
+           weighted = 0
+       }
+       if weighted <= c.LevenshteinThreshold {
+           fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
+       }
+   }
+   if len(fuzzy) == 0 {
+       return nil
+   }
+   sort.Slice(fuzzy, func(i, j int) bool {
+       if fuzzy[i].weighted != fuzzy[j].weighted {
+           return fuzzy[i].weighted < fuzzy[j].weighted
+       }
+       // break ties by reverse alphabetical so that "Ashe" beats "Ahri"
+       return fuzzy[i].name > fuzzy[j].name
+   })
+   return []string{fuzzy[0].name}
 }
