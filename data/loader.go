@@ -32,6 +32,13 @@ func NewDataLoader(cfg *config.AppConfig, client *client.Client, cache *cache.Ca
 func (dl *DataLoader) Initialize(ctx context.Context) error {
 	latestPatch, err := dl.Client.FetchLatestPatch(ctx, dl.Config.DDragonVersionURL)
 	if err != nil {
+		// Fallback to cached patch if available (offline mode)
+		if dl.Cache.Patch != "" {
+			dl.Logger.Warnf("Could not fetch latest patch, using cached patch %s: %v", dl.Cache.Patch, err)
+			dl.Config.PatchNumber = dl.Cache.Patch
+			dl.Config.SetDDragonDataURL()
+			return nil
+		}
 		return fmt.Errorf("failed to fetch latest patch: %w", err)
 	}
 	dl.Logger.Infof("Latest patch version: %s", latestPatch)
