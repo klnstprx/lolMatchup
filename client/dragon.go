@@ -1,20 +1,24 @@
 package client
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
+   "context"
+   "encoding/json"
+   "fmt"
+   "errors"
+   "io"
+   "net/http"
 
-	"github.com/charmbracelet/log"
-	"github.com/klnstprx/lolMatchup/models"
+   "github.com/charmbracelet/log"
+   "github.com/klnstprx/lolMatchup/models"
 )
 
 type Client struct {
 	HTTPClient *http.Client
 	Logger     *log.Logger
 }
+
+// ErrChampionNotFound indicates the requested champion was not found in Data Dragon.
+var ErrChampionNotFound = errors.New("champion not found")
 
 // FetchLatestPatch retrieves the latest game version from the DDragon API.
 func (c *Client) FetchLatestPatch(ctx context.Context, ddragonVersionURL string) (string, error) {
@@ -106,25 +110,30 @@ func (c *Client) FetchChampionData(ctx context.Context, championID, ddragonURLDa
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return champion, fmt.Errorf("champion '%s' not found or returned status code %d",
-			championID, resp.StatusCode)
-	}
+   if resp.StatusCode != http.StatusOK {
+       if resp.StatusCode == http.StatusNotFound {
+           return champion, ErrChampionNotFound
+       }
+       return champion, fmt.Errorf("unexpected status code %d fetching champion data", resp.StatusCode)
+   }
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return champion, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	var root models.Root
-	if err = json.Unmarshal(body, &root); err != nil {
-		return champion, fmt.Errorf("failed to parse JSON data: %w", err)
-	}
-
-	// There's usually just one champion in the "Data" map; retrieve first.
-	for _, champ := range root.Data {
-		champion = champ
-		break
-	}
-	return champion, nil
+   var root models.Root
+   if err = json.Unmarshal(body, &root); err != nil {
+       return champion, fmt.Errorf("failed to parse JSON data: %w", err)
+   }
+   // If no data present, the champion was not found
+   if len(root.Data) == 0 {
+       return champion, ErrChampionNotFound
+   }
+   // There's usually just one champion in the "Data" map; retrieve first.
+   for _, champ := range root.Data {
+       champion = champ
+       break
+   }
+   return champion, nil
 }
