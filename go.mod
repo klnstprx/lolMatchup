@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
-	github.com/a-h/templ v0.3.833
+	github.com/a-h/templ v0.3.857
 	github.com/charmbracelet/log v0.4.1
 	github.com/gin-gonic/gin v1.10.0
 )
