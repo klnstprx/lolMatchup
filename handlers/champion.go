@@ -1,15 +1,17 @@
 package handlers
 
 import (
-	"net/http"
+   "errors"
+   "fmt"
+   "net/http"
 
-	"github.com/charmbracelet/log"
-	"github.com/gin-gonic/gin"
-	"github.com/klnstprx/lolMatchup/cache"
-	"github.com/klnstprx/lolMatchup/client"
-	"github.com/klnstprx/lolMatchup/components"
-	"github.com/klnstprx/lolMatchup/config"
-	"github.com/klnstprx/lolMatchup/renderer"
+   "github.com/charmbracelet/log"
+   "github.com/gin-gonic/gin"
+   "github.com/klnstprx/lolMatchup/cache"
+   "github.com/klnstprx/lolMatchup/client"
+   "github.com/klnstprx/lolMatchup/components"
+   "github.com/klnstprx/lolMatchup/config"
+   "github.com/klnstprx/lolMatchup/renderer"
 )
 
 type ChampionHandler struct {
@@ -49,12 +51,17 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 	if inCache {
 		h.Logger.Debug("Champion data loaded from cache", "championID", championID)
 	} else {
-		fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID, h.Config.DDragonURLData)
-		if fetchErr != nil {
-			h.Logger.Error("Failed to fetch champion detail", "error", fetchErr, "championID", championID)
-			c.String(http.StatusInternalServerError, "Error fetching champion data.")
-			return
-		}
+       fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID, h.Config.DDragonURLData)
+       if fetchErr != nil {
+           if errors.Is(fetchErr, client.ErrChampionNotFound) {
+               h.Logger.Debug("Champion not found", "input", inputName, "championID", championID)
+               c.String(http.StatusNotFound, fmt.Sprintf("Champion '%s' not found.", inputName))
+               return
+           }
+           h.Logger.Error("Failed to fetch champion detail", "error", fetchErr, "championID", championID)
+           c.String(http.StatusInternalServerError, "Error fetching champion data.")
+           return
+       }
 		h.Cache.SetChampion(fetchedChampion)
 		champion = fetchedChampion
 		h.Logger.Debug("Fetched champion data from DDragon", "championID", champion.ID)
