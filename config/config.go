@@ -29,14 +29,17 @@ type AppConfig struct {
 	Logger     *log.Logger  `toml:"-"` // Exclude from TOML
 	Cache      *cache.Cache `toml:"-"`
 	HTTPClient *http.Client `toml:"-"`
+	// Riot API configuration
+	RiotAPIKey string `toml:"riot_api_key"`
+	RiotRegion string `toml:"riot_region"`
 }
 
 // New returns an AppConfig with default values.
 func New() *AppConfig {
-   return &AppConfig{
-       // Default to localhost
-       ListenAddr:           "127.0.0.1",
-       Port:                 1337,
+	return &AppConfig{
+		// Default to localhost
+		ListenAddr:           "127.0.0.1",
+		Port:                 1337,
 		Debug:                true,
 		LanguageCode:         "en_US",
 		DDragonURL:           "https://ddragon.leagueoflegends.com/cdn/",
