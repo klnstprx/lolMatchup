@@ -148,4 +148,3 @@ func TestLoadInvalidCache(t *testing.T) {
 		t.Errorf("Champions changed after invalid load: got %+v, ok=%v, want %+v", got, ok, initialChamp)
 	}
 }
-

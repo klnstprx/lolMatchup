@@ -1,0 +1,28 @@
+# Configuration template for LoLMatchup - copy to `config.toml` and adjust values as needed
+
+# Server settings
+listen_addr = "127.0.0.1"      # Host/IP for the server (empty = localhost)
+port = 1337                     # Port on which the server listens
+
+# Localization
+language_code = "en_US"        # Data Dragon locale (e.g. en_US, es_MX)
+
+# Fuzzy search threshold (Levenshtein distance)
+levenshtein_threshold = 3
+
+# Data Dragon (static game data) endpoints
+ddragon_url = "https://ddragon.leagueoflegends.com/cdn/"
+ddragon_version_url = "https://ddragon.leagueoflegends.com/api/versions.json"
+
+# Enable debug logging (true/false)
+debug = true
+
+# HTTP client timeout in seconds
+http_client_timeout = 10
+
+# Local cache file path
+cache_path = "cache.gob"
+
+# Riot API configuration
+riot_api_key = "YOUR_RIOT_API_KEY_HERE"   # Obtain from Riot Developer Portal
+riot_region = "na1"                      # Regional routing value (e.g. na1, euw1, kr)
