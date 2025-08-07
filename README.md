@@ -138,28 +138,30 @@ Below is a high-level overview of the project structure:
 The application uses a TOML-based configuration file (config.toml) by default. An example configuration might look like:
 
 ```toml
-listen_addr         = ""
-port               = 1337
-patch_number       = "14.21.1"
-language_code      = "en_US"
-ddragon_url        = "https://ddragon.leagueoflegends.com/cdn/"
-ddragon_version_url= "https://ddragon.leagueoflegends.com/api/versions.json"
+listen_addr           = ""
+port                  = 1337
+language_code         = "en_US"
+ddragon_url           = "https://ddragon.leagueoflegends.com/cdn/"
+ddragon_version_url   = "https://ddragon.leagueoflegends.com/api/versions.json"
 levenshtein_threshold = 3
-debug              = true
-http_client_timeout= 10
-cache_path         = "cache.gob"
+debug                 = true
+http_client_timeout   = 10
+cache_path            = "cache.gob"
+riot_api_key          = "YOUR_RIOT_API_KEY_HERE"
+riot_region           = "na1"
 ```
 
 Key fields:  
 • listen_addr: The host/IP for the server. Leave empty for localhost.  
 • port: The port on which the server listens (default is 1337).  
-• patch_number: The version of the game data (often overwritten dynamically).  
 • language_code: Data localization language (e.g. "en_US").  
 • ddragon_url: Riot’s Data Dragon CDN base URL.  
 • ddragon_version_url: Endpoint for fetching available patch versions.  
 • debug: Enables debug mode for more verbose logs.  
 • http_client_timeout: Timeout for HTTP calls, in seconds.  
-• cache_path: Where to store champion data cache.
+• cache_path: Where to store champion data cache.  
+• riot_api_key: Riot Games API key for accessing live game and summoner endpoints.  
+• riot_region: Regional routing value for Riot API (e.g. "na1", "euw1").
 
 ### Logging
 

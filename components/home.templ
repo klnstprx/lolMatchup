@@ -14,7 +14,9 @@ templ navTemplate() {
 	<nav class="bg-gray-700 text-white p-2">
 		<div class="container mx-auto">
 			<ul class="flex space-x-4">
-				<li><a href="/" class="hover:underline">Home</a></li>
+				<li><a href="/champion-search" class="hover:underline">Champion Lookup</a></li>
+				<li><a href="/player-search" class="hover:underline">Player Lookup</a></li>
+				<li><a href="/livegame-search" class="hover:underline">Live Game Lookup</a></li>
 			</ul>
 		</div>
 	</nav>
@@ -44,27 +46,7 @@ templ layout(name string) {
 			@footerTemplate()
 			<!-- Include htmx -->
 			<script src="/static/htmx/htmx.min.js"></script>
+			<script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 		</body>
 	</html>
-}
-
-templ LiveGameForm() {
-    <form id="liveGameForm" hx-get="/livegame" hx-trigger="submit" hx-target="#liveGameResult" hx-swap="innerHTML" class="space-y-4">
-        <div>
-            <label class="block text-gray-700 font-bold mb-2">Summoner Name</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                   type="text" name="summoner" placeholder="Enter summoner name" />
-        </div>
-        <div>
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" type="submit">Search Live Game</button>
-        </div>
-    </form>
-    <div id="liveGameResult" class="mt-4"></div>
-}
-
-templ Home() {
-    @layout("Home") {
-        @ChampionForm()
-        @LiveGameForm()
-    }
 }

@@ -16,6 +16,7 @@ type Cache struct {
 	Patch                string
 	Champions            map[string]models.Champion
 	ChampionMap          map[string]string
+	ChampionKeyMap       map[string]string // numeric key to textual champion ID
 	LevenshteinThreshold int
 
 	mu sync.RWMutex
@@ -27,6 +28,7 @@ func New(path string, threshold int) *Cache {
 		Path:                 path,
 		Champions:            make(map[string]models.Champion),
 		ChampionMap:          make(map[string]string),
+		ChampionKeyMap:       make(map[string]string),
 		LevenshteinThreshold: threshold,
 	}
 }
@@ -45,9 +47,10 @@ func (c *Cache) Load() error {
 
 	dec := json.NewDecoder(file)
 	var persist struct {
-		Patch       string                     `json:"patch"`
-		Champions   map[string]models.Champion `json:"champions"`
-		ChampionMap map[string]string          `json:"champion_map"`
+		Patch          string                     `json:"patch"`
+		Champions      map[string]models.Champion `json:"champions"`
+		ChampionMap    map[string]string          `json:"champion_map"`
+		ChampionKeyMap map[string]string          `json:"champion_key_map"`
 	}
 	if err := dec.Decode(&persist); err != nil {
 		// On decode errors, ignore and start fresh
@@ -56,6 +59,7 @@ func (c *Cache) Load() error {
 	c.mu.Lock()
 	c.Patch = persist.Patch
 	c.ChampionMap = persist.ChampionMap
+	c.ChampionKeyMap = persist.ChampionKeyMap
 	c.Champions = persist.Champions
 	c.mu.Unlock()
 	return nil
@@ -74,13 +78,15 @@ func (c *Cache) Save() error {
 
 	enc := json.NewEncoder(file)
 	persist := struct {
-		Patch       string                     `json:"patch"`
-		Champions   map[string]models.Champion `json:"champions"`
-		ChampionMap map[string]string          `json:"champion_map"`
+		Patch          string                     `json:"patch"`
+		Champions      map[string]models.Champion `json:"champions"`
+		ChampionMap    map[string]string          `json:"champion_map"`
+		ChampionKeyMap map[string]string          `json:"champion_key_map"`
 	}{
-		Patch:       c.Patch,
-		Champions:   c.Champions,
-		ChampionMap: c.ChampionMap,
+		Patch:          c.Patch,
+		Champions:      c.Champions,
+		ChampionMap:    c.ChampionMap,
+		ChampionKeyMap: c.ChampionKeyMap,
 	}
 	if err := enc.Encode(&persist); err != nil {
 		return fmt.Errorf("failed to encode cache data: %w", err)
@@ -93,6 +99,20 @@ func (c *Cache) Invalidate() {
 	defer c.mu.Unlock()
 	c.Champions = make(map[string]models.Champion)
 	c.ChampionMap = make(map[string]string)
+}
+
+// SetChampionKeyMap sets the mapping from numeric key to textual champion ID.
+func (c *Cache) SetChampionKeyMap(m map[string]string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.ChampionKeyMap = m
+}
+
+// GetChampionKeyMap retrieves the numeric key -> textual champion ID map.
+func (c *Cache) GetChampionKeyMap() map[string]string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.ChampionKeyMap
 }
 
 // SearchChampionName returns the champion ID for the best match against "input."

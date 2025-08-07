@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/klnstprx/lolMatchup/cache"
 	"github.com/klnstprx/lolMatchup/client"
+	"github.com/a-h/templ"
 	"github.com/klnstprx/lolMatchup/components"
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/renderer"
@@ -67,7 +68,17 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 		h.Logger.Debug("Fetched champion data from DDragon", "championID", champion.ID)
 	}
 
-	// Render the champion data using templ and our custom renderer.
-	renderComp := renderer.New(ctx, http.StatusOK, components.ChampionComponent(champion, h.Config))
-	c.Render(http.StatusOK, renderComp)
+   // Render based on 'modal' or 'compact' query param
+   var comp templ.Component
+   if _, ok := c.GetQuery("modal"); ok {
+       // full component inside modal overlay
+       comp = components.ChampionModal(champion, h.Config)
+   } else if _, ok := c.GetQuery("compact"); ok {
+       // inline compact view
+       comp = components.ChampionCompact(champion, h.Config)
+   } else {
+       // default full component in place
+       comp = components.ChampionComponent(champion, h.Config)
+   }
+   c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, comp))
 }

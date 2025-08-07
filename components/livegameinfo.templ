@@ -1,0 +1,37 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+)
+
+// LiveGameInfo renders a grid of participants in the current game, showing champion avatars.
+templ LiveGameInfo(parts []map[string]string, cfg *config.AppConfig) {
+	<!-- Use items-start to prevent children from stretching to equal height -->
+	<div class="flex space-x-6 items-start">
+		<!-- Left: fixed half width -->
+		<div class="w-1/2 flex-shrink-0 grid grid-cols-1 gap-6">
+			for _, p := range parts {
+				<div
+					class="bg-white p-4 rounded shadow flex items-center space-x-4 cursor-pointer"
+					hx-trigger="click"
+					hx-get={ fmt.Sprintf("/champion?champion=%s&compact=1", p["championName"]) }
+					hx-target="#championDetail"
+					hx-swap="innerHTML"
+				>
+					<img
+						class="w-12 h-12 rounded-full"
+						src={ string(templ.URL(fmt.Sprintf("%s%s/img/champion/%s.png", cfg.DDragonURL, cfg.PatchNumber, p["championId"]))) }
+						alt={ p["championName"] }
+					/>
+					<div>
+						<p><strong>{ p["championName"] }</strong></p>
+						<p class="text-sm text-gray-600">{ p["riotId"] }</p>
+					</div>
+				</div>
+			}
+		</div>
+		<!-- Right: flexible details pane -->
+		<div id="championDetail" class="w-1/2"></div>
+	</div>
+}

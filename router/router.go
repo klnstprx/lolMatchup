@@ -32,13 +32,21 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 
 	// Handlers
 	championHandler := handlers.NewChampionHandler(cfg, apiClient)
-	homeHandler := handlers.NewHomeHandler(cfg, apiClient)
 	autocompleteHandler := handlers.NewAutocompleteHandler(cfg, apiClient)
+	playerHandler := handlers.NewPlayerHandler(cfg, apiClient)
 	liveGameHandler := handlers.NewLiveGameHandler(cfg, apiClient)
+	pageHandler := handlers.NewPageHandler(cfg)
 
-	r.GET("/", homeHandler.HomeGET)
+	// Page routes
+	r.GET("/", pageHandler.HomePageGET)
+	r.GET("/champion-search", pageHandler.ChampionPageGET)
+	r.GET("/player-search", pageHandler.PlayerPageGET)
+	r.GET("/livegame-search", pageHandler.LiveGamePageGET)
+
+	// AJAX/functional routes
 	r.GET("/champion", championHandler.ChampionGET)
 	r.GET("/autocomplete", autocompleteHandler.AutocompleteGET)
+	r.GET("/player", playerHandler.PlayerGET)
 	r.GET("/livegame", liveGameHandler.LiveGameGET)
 
 	return r

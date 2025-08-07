@@ -1,0 +1,6572 @@
+<li id="resource_1530" class="resource active" api-name="match-v5">
+
+      <!-- HEADING -->
+      <div class="heading">
+
+        
+
+        
+          <h4 style="color:#dc291e; margin-top:10px; text-transform: none;">The AMERICAS routing value serves NA, BR, LAN and LAS. The ASIA routing value serves KR and JP. The EUROPE routing value serves EUNE, EUW, ME1, TR and RU. The SEA routing value serves OCE, SG2, TW2 and VN2.<br><br></h4>
+        
+
+        <h2><a href="#match-v5"><span style="font-size:18px;">match-v5</span></a></h2>
+        <!-- Menu -->
+        <ul class="options">
+          <li><a href="#" onclick="Docs.collapseOperationsForResource('1530'); return false;">Collapse Operations</a></li>
+          <li><a href="#" onclick="Docs.expandOperationsForResource('1530'); return false;">Expand Operations</a></li>
+        </ul>
+      </div>
+      <ul class="endpoints" id="1530_endpoint_list" style="overflow: hidden;">
+        <li class="endpoint">
+          <ul class="operations" style="width:100%; margin:0px; padding:0px;">
+            
+
+
+    <li class="get operation" id="_getMatchIdsByPUUID">
+        <div class="heading">
+            <span class="http_method">
+              <a href="#match-v5/GET_getMatchIdsByPUUID" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatchIdsByPUUID');">GET</a>
+            </span>
+            <span class="path">
+              <a href="#match-v5/GET_getMatchIdsByPUUID" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatchIdsByPUUID');">/lol/match/v5/matches/by-puuid/{puuid}/ids</a>
+            </span>
+            <ul class="options">
+               <li><a href="#match-v5/GET_getMatchIdsByPUUID" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatchIdsByPUUID');">Get a list of match ids by puuid</a></li>
+            </ul>
+        </div>
+        
+<div class="content" id="match-v5_GET_getMatchIdsByPUUID_content" style="overflow: hidden;">
+  
+
+  
+
+  <div id="inputs-link" style="margin-bottom:10px;"><a href="#match-v5/GET_getMatchIdsByPUUID" onclick="Docs.jumpToResource('div#execute_inputs_match-v5_GET_getMatchIdsByPUUID')" style="font-size:16px; font-weight: bold">Jump to Inputs</a></div>
+
+  
+
+  
+
+  
+
+  <div class="api_block">
+     <h4>Response Classes</h4>
+     <div class="block response_body">
+      
+        <h4>Return value: List[string] </h4>
+      
+     </div>
+     
+<script>
+  function goToDefinition (definition) {
+    var element = document.getElementById(definition);
+    if(element) {
+      element.scrollIntoView();
+      window.scrollBy(0, -100);
+    }
+  }
+</script>
+
+
+<hr>
+
+  </div>
+
+  <div class="api_block">
+     <h4>Response Errors</h4>
+     <table class="table">
+  <thead>
+     <tr>
+        <th>HTTP Status Code</th>
+        <th>Reason</th>
+     </tr>
+  </thead>
+  <tbody>
+    
+       <tr class="odd">
+          <td>400</td>
+          <td>Bad request</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>401</td>
+          <td>Unauthorized</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>403</td>
+          <td>Forbidden</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>404</td>
+          <td>Data not found</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>405</td>
+          <td>Method not allowed</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>415</td>
+          <td>Unsupported media type</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>429</td>
+          <td>Rate limit exceeded</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>500</td>
+          <td>Internal server error</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>502</td>
+          <td>Bad gateway</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>503</td>
+          <td>Service unavailable</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>504</td>
+          <td>Gateway timeout</td>
+       </tr>
+     
+  </tbody>
+</table>
+
+  </div>
+
+  <div id="execute_inputs_match-v5_GET_getMatchIdsByPUUID">
+
+     <form accept-charset="UTF-8" class="sandbox">
+        <input type="hidden" name="apiName" value="match-v5">
+        <input type="hidden" name="apiSimpleName" class="executeApiNameVal" value="match-v5">
+        <input type="hidden" name="methodName" class="executeMethodNameVal" value="getMatchIdsByPUUID">
+        <input type="hidden" name="httpMethod" class="executeMethodGetVal" value="GET">
+
+        
+
+        
+          <!-- PATH PARAMS -->
+          <div class="api_block">
+  <h4>Path Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+        <tr>
+          <td class="code">
+             puuid
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="puuid" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              String
+            
+            </span>
+          </td>
+          <td></td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+          <!-- QUERY PARAMS -->
+          <div class="api_block">
+  <h4>Query Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+        <tr>
+          <td class="code">
+             startTime
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <input name="startTime" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              long
+            
+            </span>
+          </td>
+          <td>Epoch timestamp in seconds. The matchlist started storing timestamps on June 16th, 2021. Any matches played before June 16th, 2021 won't be included in the results if the startTime filter is set.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             endTime
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <input name="endTime" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              long
+            
+            </span>
+          </td>
+          <td>Epoch timestamp in seconds.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             queue
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <input name="queue" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              int
+            
+            </span>
+          </td>
+          <td>Filter the list of match ids by a specific queue id. This filter is mutually inclusive of the type filter meaning any match ids returned must match both the queue and type filters.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             type
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <select name="type" class="form-control">
+
+                
+                    <option></option>
+                
+
+                
+                  
+                    <option>ranked</option>
+                  
+                
+                  
+                    <option> normal</option>
+                  
+                
+                  
+                    <option> tourney</option>
+                  
+                
+                  
+                    <option> tutorial</option>
+                  
+                
+
+              </select>
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              string
+            
+            </span>
+          </td>
+          <td>Filter the list of match ids by the type of match. This filter is mutually inclusive of the queue filter meaning any match ids returned must match both the queue and type filters.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             start
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <input name="start" class="form-control" minlength="1" type="text" value="0">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              int
+            
+            </span>
+          </td>
+          <td>Defaults to 0. Start index.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             count
+             <div class="required"> optional </div>
+          </td>
+
+          <td>
+            
+              <input name="count" class="form-control" minlength="1" type="text" value="20">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              int
+            
+            </span>
+          </td>
+          <td>Defaults to 20. Valid values: 0 to 100. Number of match ids to return.</td>
+        </tr>
+      
+    
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+
+        
+
+        
+        <h4>Select Region to Execute Against</h4>
+        <select class="form-control" name="execute_against" style="width: 200px" id="execute_against_match-v5_GET_getMatchIdsByPUUID">
+            
+                
+            <option value="AMERICAS">AMERICAS</option>
+                
+            
+                
+            <option value="ASIA">ASIA</option>
+                
+            
+                
+            <option value="EUROPE">EUROPE</option>
+                
+            
+                
+            <option value="SEA">SEA</option>
+                
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+
+        
+        <h4>Select App to Execute Against</h4>
+        <select class="form-control" name="app" style="width: 200px" id="execute_against_match-v5_GET_getMatchIdsByPUUID">
+            
+              
+                <option value="710088" selected="true">Development API Key</option>
+              
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+        <h4>
+        Include API key
+        <a class="toggle_key_include_info" style="cursor: pointer">(?)</a>
+        </h4>
+
+        <div class="key_include_info hide" style="font-size:11px; font-style: italic;">
+          Including an API key as a <b>query</b> param allows for easy debugging in the browser.
+          <br>
+          Including an API key as a <b>header</b> param, avoids accidentally copy/pasting your API key in public.
+        </div>
+
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="0" checked="checked"> Query Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="1"> Header Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="2"> Not required
+          </label>
+        </div>
+        </div>
+        <hr>
+
+        
+          
+            <div class="sandbox_header">
+              <input id="execute_match-v5_GET_getMatchIdsByPUUID" type="button" value="Execute Request" class="btn btn-riot btn-riotred" onclick="executeRequest('match-v5', 'GET_getMatchIdsByPUUID')">
+              <input id="close_match-v5_GET_getMatchIdsByPUUID" type="button" value="Close" class="btn btn-riot" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatchIdsByPUUID');">
+            </div>
+            <div id="spinner_match-v5_GET_getMatchIdsByPUUID" class="hide"><center><img src="/static/img/katarina.55a01cf0560a.gif" width="30" height="30"></center></div>
+          
+
+        
+     
+  </div></form>
+
+  <div id="response_GET_getMatchIdsByPUUID" class="response">
+
+    <div id="response_url_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Request URL</h4>
+      <div id="response_url_match-v5_GET_getMatchIdsByPUUID" class="block request_url" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_body_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Request Body</h4>
+      <div id="request_body_match-v5_GET_getMatchIdsByPUUID" class="block request_body" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_headers_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Request Headers</h4>
+      <div id="response_reqheaders_match-v5_GET_getMatchIdsByPUUID" class="block request_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_code_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Response Code</h4>
+      <div id="response_rescode_match-v5_GET_getMatchIdsByPUUID" class="block response_code" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_headers_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Response Headers</h4>
+      <div id="response_resheaders_match-v5_GET_getMatchIdsByPUUID" class="block response_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_body_match-v5_GET_getMatchIdsByPUUID_container" class="hide">
+      <h4>Response Body</h4>
+      <div id="response_body_match-v5_GET_getMatchIdsByPUUID" class="block response_body" style="overflow: auto"></div>
+    </div>
+  </div>
+</div>
+
+    </div></li>
+
+    <li class="get operation" id="_getMatch">
+        <div class="heading">
+            <span class="http_method">
+              <a href="#match-v5/GET_getMatch" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatch');">GET</a>
+            </span>
+            <span class="path">
+              <a href="#match-v5/GET_getMatch" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatch');">/lol/match/v5/matches/{matchId}</a>
+            </span>
+            <ul class="options">
+               <li><a href="#match-v5/GET_getMatch" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatch');">Get a match by match id</a></li>
+            </ul>
+        </div>
+        
+<div class="content" id="match-v5_GET_getMatch_content" style="overflow: hidden;">
+  
+
+  
+
+  <div id="inputs-link" style="margin-bottom:10px;"><a href="#match-v5/GET_getMatch" onclick="Docs.jumpToResource('div#execute_inputs_match-v5_GET_getMatch')" style="font-size:16px; font-weight: bold">Jump to Inputs</a></div>
+
+  
+
+  
+
+  
+
+  <div class="api_block">
+     <h4>Response Classes</h4>
+     <div class="block response_body">
+      
+        <h4>Return value: MatchDto </h4>
+      
+     </div>
+     
+<script>
+  function goToDefinition (definition) {
+    var element = document.getElementById(definition);
+    if(element) {
+      element.scrollIntoView();
+      window.scrollBy(0, -100);
+    }
+  }
+</script>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-MatchDto" style="display: inline;">MatchDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>metadata</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-MetadataDto')">MetadataDto</a>
+               
+             </td>
+             <td>Match metadata.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>info</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-InfoDto')">InfoDto</a>
+               
+             </td>
+             <td>Match info.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-MetadataDto" style="display: inline;">MetadataDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>dataVersion</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Match data version.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>matchId</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Match id.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participants</td>
+             <td>
+               
+                 List[string]
+               
+             </td>
+             <td>A list of participant PUUIDs.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-InfoDto" style="display: inline;">InfoDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>endOfGameResult</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Refer to indicate if the game ended in termination.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameCreation</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Unix timestamp for when the game is created on the game server (i.e., the loading screen).
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameDuration</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Prior to patch 11.20, this field returns the game length in milliseconds calculated from gameEndTimestamp - gameStartTimestamp. Post patch 11.20, this field returns the max timePlayed of any participant in the game in seconds, which makes the behavior of this field consistent with that of match-v4. The best way to handling the change in this field is to treat the value as milliseconds if the gameEndTimestamp field isn't in the response and to treat the value as seconds if gameEndTimestamp is in the response.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameEndTimestamp</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Unix timestamp for when match ends on the game server. This timestamp can occasionally be significantly longer than when the match "ends". The most reliable way of determining the timestamp for the end of the match would be to add the max time played of any participant to the gameStartTimestamp. This field was added to match-v5 in patch 11.20 on Oct 5th, 2021.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameMode</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Refer to the Game Constants documentation.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameName</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameStartTimestamp</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Unix timestamp for when match starts on the game server.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameType</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameVersion</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>The first two parts can be used to determine the patch a game was played on.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>mapId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Refer to the Game Constants documentation.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participants</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ParticipantDto')">ParticipantDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>platformId</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Platform where the match was played.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>queueId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Refer to the Game Constants documentation.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teams</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-TeamDto')">TeamDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>tournamentCode</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Tournament code used to generate the match. This field was added to match-v5 in patch 11.13 on June 23rd, 2021.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-ParticipantDto" style="display: inline;">ParticipantDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>allInPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Yellow crossed swords
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>assistMePings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Green flag
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>assists</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>baronKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bountyLevel</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>champExperience</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>champLevel</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>championId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Prior to patch 11.4, on Feb 18th, 2021, this field returned invalid championIds. We recommend determining the champion based on the championName field for matches played prior to patch 11.4.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>championName</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>commandPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Blue generic ping (ALT+click)
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>championTransform</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>This field is currently only utilized for Kayn's transformations. (Legal values: 0 - None, 1 - Slayer, 2 - Assassin)
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>consumablesPurchased</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>challenges</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ChallengesDto')">ChallengesDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageDealtToBuildings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageDealtToObjectives</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageDealtToTurrets</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageSelfMitigated</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>deaths</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>detectorWardsPlaced</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>doubleKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>dragonKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>eligibleForProgression</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>enemyMissingPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Yellow questionmark
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>enemyVisionPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Red eyeball
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstBloodAssist</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstBloodKill</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstTowerAssist</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstTowerKill</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameEndedInEarlySurrender</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>This is an offshoot of the OneStone challenge. The code checks if a spell with the same instance ID does the final point of damage to at least 2 Champions. It doesn't matter if they're enemies, but you cannot hurt your friends.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameEndedInSurrender</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>holdPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>getBackPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Yellow circle with horizontal line
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>goldEarned</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>goldSpent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>individualPosition</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Both individualPosition and teamPosition are computed by the game server and are different versions of the most likely position played by a player. The individualPosition is the best guess for which position the player actually played in isolation of anything else. The teamPosition is the best guess for which position the player actually played if we add the constraint that each team must have one top player, one jungle, one middle, etc. Generally the recommendation is to use the teamPosition field over the individualPosition field.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>inhibitorKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>inhibitorTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>inhibitorsLost</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item0</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item1</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item2</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item3</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item4</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item5</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>item6</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>itemsPurchased</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killingSprees</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>kills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>lane</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>largestCriticalStrike</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>largestKillingSpree</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>largestMultiKill</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>longestTimeSpentLiving</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicDamageDealt</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicDamageDealtToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>missions</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-MissionsDto')">MissionsDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>neutralMinionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>neutralMinionsKilled = mNeutralMinionsKilled, which is incremented on kills of kPet and kJungleMonster
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>needVisionPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Green ward
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>nexusKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>nexusTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>nexusLost</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>objectivesStolen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>objectivesStolenAssists</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>onMyWayPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Blue arrow pointing at ground
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participantId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore0</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore1</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore2</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore3</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore4</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore5</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore6</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore7</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore8</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore9</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore10</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore11</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>pentaKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perks</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-PerksDto')">PerksDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageDealt</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageDealtToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>placement</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerAugment1</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerAugment2</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerAugment3</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerAugment4</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerSubteamId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>pushPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Green minion
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>profileIcon</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>puuid</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>quadraKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>riotIdGameName</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>riotIdTagline</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>role</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>sightWardsBoughtInGame</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell1Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell2Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell3Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell4Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>subteamPlacement</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summoner1Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summoner1Id</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summoner2Casts</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summoner2Id</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summonerId</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summonerLevel</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>summonerName</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamEarlySurrendered</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamPosition</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Both individualPosition and teamPosition are computed by the game server and are different versions of the most likely position played by a player. The individualPosition is the best guess for which position the player actually played in isolation of anything else. The teamPosition is the best guess for which position the player actually played if we add the constraint that each team must have one top player, one jungle, one middle, etc. Generally the recommendation is to use the teamPosition field over the individualPosition field.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>timeCCingOthers</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>timePlayed</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalAllyJungleMinionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageDealt</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageDealtToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageShieldedOnTeammates</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalEnemyJungleMinionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalHeal</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Whenever positive health is applied (which translates to all heals in the game but not things like regeneration), totalHeal is incremented by the amount of health received. This includes healing enemies, jungle monsters, yourself, etc
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalHealsOnTeammates</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Whenever positive health is applied (which translates to all heals in the game but not things like regeneration), totalHealsOnTeammates is incremented by the amount of health received.  This is post modified, so if you heal someone missing 5 health for 100 you will get +5 totalHealsOnTeammates
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalMinionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>totalMillionsKilled = mMinionsKilled, which is only incremented on kills of kTeamMinion, kMeleeLaneMinion, kSuperLaneMinion, kRangedLaneMinion and kSiegeLaneMinion
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalTimeCCDealt</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalTimeSpentDead</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalUnitsHealed</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>tripleKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageDealt</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageDealtToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretsLost</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>unrealKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>visionScore</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>visionClearedPings</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>visionWardsBoughtInGame</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>wardsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>wardsPlaced</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>win</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-ChallengesDto" style="display: inline;">ChallengesDto </h5>
+  
+  - Challenges DTO
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>12AssistStreakCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>baronBuffGoldAdvantageOverThreshold</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>controlWardTimeCoverageInRiverOrEnemyHalf</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>earliestBaron</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>earliestDragonTakedown</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>earliestElderDragon</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>earlyLaningPhaseGoldExpAdvantage</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>fasterSupportQuestCompletion</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>fastestLegendary</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>hadAfkTeammate</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>highestChampionDamage</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>highestCrowdControlScore</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>highestWardKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>junglerKillsEarlyJungle</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsOnLanersEarlyJungleAsJungler</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>laningPhaseGoldExpAdvantage</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>legendaryCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>maxCsAdvantageOnLaneOpponent</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>maxLevelLeadLaneOpponent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>mostWardsDestroyedOneSweeper</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>mythicItemUsed</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playedChampSelectPosition</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>soloTurretsLategame</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsFirst25Minutes</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teleportTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>thirdInhibitorDestroyedTime</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>threeWardsOneSweeperCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>visionScoreAdvantageLaneOpponent</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>InfernalScalePickup</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>fistBumpParticipation</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>voidMonsterKill</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>abilityUses</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>acesBefore15Minutes</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>alliedJungleMonsterKills</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>baronTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>blastConeOppositeOpponentCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bountyGold</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>buffsStolen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>completeSupportQuestInTime</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>controlWardsPlaced</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damagePerMinute</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageTakenOnTeamPercentage</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>dancedWithRiftHerald</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>deathsByEnemyChamps</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>dodgeSkillShotsSmallWindow</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>doubleAces</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>dragonTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>legendaryItemUsed</td>
+             <td>
+               
+                 List[int]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>effectiveHealAndShielding</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>elderDragonKillsWithOpposingSoul</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>elderDragonMultikills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>enemyChampionImmobilizations</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>enemyJungleMonsterKills</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>epicMonsterKillsNearEnemyJungler</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>epicMonsterKillsWithin30SecondsOfSpawn</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>epicMonsterSteals</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>epicMonsterStolenWithoutSmite</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstTurretKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>firstTurretKilledTime</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>flawlessAces</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>fullTeamTakedown</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameLength</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>getTakedownsInAllLanesEarlyJungleAsLaner</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>goldPerMinute</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>hadOpenNexus</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>immobilizeAndKillWithAlly</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>initialBuffCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>initialCrabCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>jungleCsBefore10Minutes</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>junglerTakedownsNearDamagedEpicMonster</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>kda</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killAfterHiddenWithAlly</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killedChampTookFullTeamDamageSurvived</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killingSprees</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killParticipation</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsNearEnemyTurret</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsOnOtherLanesEarlyJungleAsLaner</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsOnRecentlyHealedByAramPack</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsUnderOwnTurret</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>killsWithHelpFromEpicMonster</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>knockEnemyIntoTeamAndKill</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>kTurretsDestroyedBeforePlatesFall</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>landSkillShotsEarlyGame</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>laneMinionsFirst10Minutes</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>lostAnInhibitor</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>maxKillDeficit</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>mejaisFullStackInTime</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>moreEnemyJungleThanOpponent</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>multiKillOneSpell</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>This is an offshoot of the OneStone challenge. The code checks if a spell with the same instance ID does the final point of damage to at least 2 Champions. It doesn't matter if they're enemies, but you cannot hurt your friends.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>multikills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>multikillsAfterAggressiveFlash</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>multiTurretRiftHeraldCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>outerTurretExecutesBefore10Minutes</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>outnumberedKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>outnumberedNexusKill</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perfectDragonSoulsTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perfectGame</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>pickKillWithAlly</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>poroExplosions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>quickCleanse</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>quickFirstTurret</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>quickSoloKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>riftHeraldTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>saveAllyFromDeath</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>scuttleCrabKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>shortestTimeToAceFromFirstTakedown</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>skillshotsDodged</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>skillshotsHit</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>snowballsHit</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>soloBaronKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_DefeatAatrox</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_DefeatBriar</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_DefeatMiniBosses</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_EvolveWeapon</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_Have3Passives</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_KillEnemy</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_PickupGold</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_ReachLevel50</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_Survive15Min</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>SWARM_WinWith5EvolvedWeapons</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>soloKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>stealthWardsPlaced</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>survivedSingleDigitHpCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>survivedThreeImmobilizesInFight</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownOnFirstTurret</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsAfterGainingLevelAdvantage</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsBeforeJungleMinionSpawn</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsFirstXMinutes</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsInAlcove</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>takedownsInEnemyFountain</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamBaronKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamDamagePercentage</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamElderDragonKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamRiftHeraldKills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>tookLargeDamageSurvived</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretPlatesTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretsTakenWithRiftHerald</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>Any player who damages a tower that is destroyed within 30 seconds of a Rift Herald charge will receive credit. A player who does not damage the tower will not receive credit.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>turretTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>twentyMinionsIn3SecondsCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>twoWardsOneSweeperCount</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>unseenRecalls</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>visionScorePerMinute</td>
+             <td>
+               
+                 float
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>wardsGuarded</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>wardTakedowns</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>wardTakedownsBefore20M</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-MissionsDto" style="display: inline;">MissionsDto </h5>
+  
+  - Missions DTO
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>playerScore0</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore1</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore2</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore3</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore4</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore5</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore6</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore7</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore8</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore9</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore10</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>playerScore11</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-PerksDto" style="display: inline;">PerksDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>statPerks</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-PerkStatsDto')">PerkStatsDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>styles</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-PerkStyleDto')">PerkStyleDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-PerkStatsDto" style="display: inline;">PerkStatsDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>defense</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>flex</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>offense</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-PerkStyleDto" style="display: inline;">PerkStyleDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>description</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>selections</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-PerkStyleSelectionDto')">PerkStyleSelectionDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>style</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-PerkStyleSelectionDto" style="display: inline;">PerkStyleSelectionDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>perk</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>var1</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>var2</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>var3</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-TeamDto" style="display: inline;">TeamDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>bans</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-BanDto')">BanDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>objectives</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectivesDto')">ObjectivesDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>win</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-BanDto" style="display: inline;">BanDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>championId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>pickTurn</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-ObjectivesDto" style="display: inline;">ObjectivesDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>baron</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>champion</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>dragon</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>horde</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>inhibitor</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>riftHerald</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>tower</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getMatch-ObjectiveDto')">ObjectiveDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getMatch-ObjectiveDto" style="display: inline;">ObjectiveDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>first</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>kills</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+
+<hr>
+
+  </div>
+
+  <div class="api_block">
+     <h4>Response Errors</h4>
+     <table class="table">
+  <thead>
+     <tr>
+        <th>HTTP Status Code</th>
+        <th>Reason</th>
+     </tr>
+  </thead>
+  <tbody>
+    
+       <tr class="odd">
+          <td>400</td>
+          <td>Bad request</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>401</td>
+          <td>Unauthorized</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>403</td>
+          <td>Forbidden</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>404</td>
+          <td>Data not found</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>405</td>
+          <td>Method not allowed</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>415</td>
+          <td>Unsupported media type</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>429</td>
+          <td>Rate limit exceeded</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>500</td>
+          <td>Internal server error</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>502</td>
+          <td>Bad gateway</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>503</td>
+          <td>Service unavailable</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>504</td>
+          <td>Gateway timeout</td>
+       </tr>
+     
+  </tbody>
+</table>
+
+  </div>
+
+  <div id="execute_inputs_match-v5_GET_getMatch">
+
+     <form accept-charset="UTF-8" class="sandbox">
+        <input type="hidden" name="apiName" value="match-v5">
+        <input type="hidden" name="apiSimpleName" class="executeApiNameVal" value="match-v5">
+        <input type="hidden" name="methodName" class="executeMethodNameVal" value="getMatch">
+        <input type="hidden" name="httpMethod" class="executeMethodGetVal" value="GET">
+
+        
+
+        
+          <!-- PATH PARAMS -->
+          <div class="api_block">
+  <h4>Path Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+        <tr>
+          <td class="code">
+             matchId
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="matchId" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              String
+            
+            </span>
+          </td>
+          <td></td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+
+        
+
+        
+
+        
+        <h4>Select Region to Execute Against</h4>
+        <select class="form-control" name="execute_against" style="width: 200px" id="execute_against_match-v5_GET_getMatch">
+            
+                
+            <option value="AMERICAS">AMERICAS</option>
+                
+            
+                
+            <option value="ASIA">ASIA</option>
+                
+            
+                
+            <option value="EUROPE">EUROPE</option>
+                
+            
+                
+            <option value="SEA">SEA</option>
+                
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+
+        
+        <h4>Select App to Execute Against</h4>
+        <select class="form-control" name="app" style="width: 200px" id="execute_against_match-v5_GET_getMatch">
+            
+              
+                <option value="710088" selected="true">Development API Key</option>
+              
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+        <h4>
+        Include API key
+        <a class="toggle_key_include_info" style="cursor: pointer">(?)</a>
+        </h4>
+
+        <div class="key_include_info hide" style="font-size:11px; font-style: italic;">
+          Including an API key as a <b>query</b> param allows for easy debugging in the browser.
+          <br>
+          Including an API key as a <b>header</b> param, avoids accidentally copy/pasting your API key in public.
+        </div>
+
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="0" checked="checked"> Query Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="1"> Header Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="2"> Not required
+          </label>
+        </div>
+        </div>
+        <hr>
+
+        
+          
+            <div class="sandbox_header">
+              <input id="execute_match-v5_GET_getMatch" type="button" value="Execute Request" class="btn btn-riot btn-riotred" onclick="executeRequest('match-v5', 'GET_getMatch')">
+              <input id="close_match-v5_GET_getMatch" type="button" value="Close" class="btn btn-riot" onclick="Docs.toggleOperationForResource('match-v5_GET_getMatch');">
+            </div>
+            <div id="spinner_match-v5_GET_getMatch" class="hide"><center><img src="/static/img/katarina.55a01cf0560a.gif" width="30" height="30"></center></div>
+          
+
+        
+     
+  </div></form>
+
+  <div id="response_GET_getMatch" class="response">
+
+    <div id="response_url_match-v5_GET_getMatch_container" class="hide">
+      <h4>Request URL</h4>
+      <div id="response_url_match-v5_GET_getMatch" class="block request_url" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_body_match-v5_GET_getMatch_container" class="hide">
+      <h4>Request Body</h4>
+      <div id="request_body_match-v5_GET_getMatch" class="block request_body" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_headers_match-v5_GET_getMatch_container" class="hide">
+      <h4>Request Headers</h4>
+      <div id="response_reqheaders_match-v5_GET_getMatch" class="block request_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_code_match-v5_GET_getMatch_container" class="hide">
+      <h4>Response Code</h4>
+      <div id="response_rescode_match-v5_GET_getMatch" class="block response_code" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_headers_match-v5_GET_getMatch_container" class="hide">
+      <h4>Response Headers</h4>
+      <div id="response_resheaders_match-v5_GET_getMatch" class="block response_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_body_match-v5_GET_getMatch_container" class="hide">
+      <h4>Response Body</h4>
+      <div id="response_body_match-v5_GET_getMatch" class="block response_body" style="overflow: auto"></div>
+    </div>
+  </div>
+</div>
+
+    </div></li>
+
+    <li class="get operation" id="_getTimeline">
+        <div class="heading">
+            <span class="http_method">
+              <a href="#match-v5/GET_getTimeline" onclick="Docs.toggleOperationForResource('match-v5_GET_getTimeline');">GET</a>
+            </span>
+            <span class="path">
+              <a href="#match-v5/GET_getTimeline" onclick="Docs.toggleOperationForResource('match-v5_GET_getTimeline');">/lol/match/v5/matches/{matchId}/timeline</a>
+            </span>
+            <ul class="options">
+               <li><a href="#match-v5/GET_getTimeline" onclick="Docs.toggleOperationForResource('match-v5_GET_getTimeline');">Get a match timeline by match id</a></li>
+            </ul>
+        </div>
+        
+<div class="content" id="match-v5_GET_getTimeline_content" style="overflow: hidden;">
+  
+
+  
+
+  <div id="inputs-link" style="margin-bottom:10px;"><a href="#match-v5/GET_getTimeline" onclick="Docs.jumpToResource('div#execute_inputs_match-v5_GET_getTimeline')" style="font-size:16px; font-weight: bold">Jump to Inputs</a></div>
+
+  
+
+  
+
+  
+
+  <div class="api_block">
+     <h4>Response Classes</h4>
+     <div class="block response_body">
+      
+        <h4>Return value: TimelineDto </h4>
+      
+     </div>
+     
+<script>
+  function goToDefinition (definition) {
+    var element = document.getElementById(definition);
+    if(element) {
+      element.scrollIntoView();
+      window.scrollBy(0, -100);
+    }
+  }
+</script>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-TimelineDto" style="display: inline;">TimelineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>metadata</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-MetadataTimeLineDto')">MetadataTimeLineDto</a>
+               
+             </td>
+             <td>Match metadata.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>info</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-InfoTimeLineDto')">InfoTimeLineDto</a>
+               
+             </td>
+             <td>Match info.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-MetadataTimeLineDto" style="display: inline;">MetadataTimeLineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>dataVersion</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Match data version.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>matchId</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Match id.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participants</td>
+             <td>
+               
+                 List[string]
+               
+             </td>
+             <td>A list of participant PUUIDs.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-InfoTimeLineDto" style="display: inline;">InfoTimeLineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>endOfGameResult</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Refer to indicate if the game ended in termination.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>frameInterval</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participants</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-ParticipantTimeLineDto')">ParticipantTimeLineDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>frames</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-FramesTimeLineDto')">FramesTimeLineDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-ParticipantTimeLineDto" style="display: inline;">ParticipantTimeLineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>participantId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>puuid</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-FramesTimeLineDto" style="display: inline;">FramesTimeLineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>events</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-EventsTimeLineDto')">EventsTimeLineDto</a>]
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participantFrames</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-ParticipantFramesDto')">ParticipantFramesDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>timestamp</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-EventsTimeLineDto" style="display: inline;">EventsTimeLineDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>timestamp</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>realTimestamp</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>type</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-ParticipantFramesDto" style="display: inline;">ParticipantFramesDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>1-9</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-ParticipantFrameDto')">ParticipantFrameDto</a>
+               
+             </td>
+             <td>Key value mapping for each participant
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-ParticipantFrameDto" style="display: inline;">ParticipantFrameDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>championStats</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-ChampionStatsDto')">ChampionStatsDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>currentGold</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>damageStats</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-DamageStatsDto')">DamageStatsDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>goldPerSecond</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>jungleMinionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>level</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>minionsKilled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participantId</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>position</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1530-getTimeline-PositionDto')">PositionDto</a>
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>timeEnemySpentControlled</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalGold</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>xp</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-ChampionStatsDto" style="display: inline;">ChampionStatsDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>abilityHaste</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>abilityPower</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>armor</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>armorPen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>armorPenPercent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>attackDamage</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>attackSpeed</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bonusArmorPenPercent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bonusMagicPenPercent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>ccReduction</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>cooldownReduction</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>health</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>healthMax</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>healthRegen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>lifesteal</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicPen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicPenPercent</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicResist</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>movementSpeed</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>omnivamp</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalVamp</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>power</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>powerMax</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>powerRegen</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spellVamp</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-DamageStatsDto" style="display: inline;">DamageStatsDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>magicDamageDone</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicDamageDoneToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>magicDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageDone</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageDoneToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>physicalDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageDone</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageDoneToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>totalDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageDone</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageDoneToChampions</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>trueDamageTaken</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1530-getTimeline-PositionDto" style="display: inline;">PositionDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>x</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>y</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+
+<hr>
+
+  </div>
+
+  <div class="api_block">
+     <h4>Response Errors</h4>
+     <table class="table">
+  <thead>
+     <tr>
+        <th>HTTP Status Code</th>
+        <th>Reason</th>
+     </tr>
+  </thead>
+  <tbody>
+    
+       <tr class="odd">
+          <td>400</td>
+          <td>Bad request</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>401</td>
+          <td>Unauthorized</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>403</td>
+          <td>Forbidden</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>404</td>
+          <td>Data not found</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>405</td>
+          <td>Method not allowed</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>415</td>
+          <td>Unsupported media type</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>429</td>
+          <td>Rate limit exceeded</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>500</td>
+          <td>Internal server error</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>502</td>
+          <td>Bad gateway</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>503</td>
+          <td>Service unavailable</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>504</td>
+          <td>Gateway timeout</td>
+       </tr>
+     
+  </tbody>
+</table>
+
+  </div>
+
+  <div id="execute_inputs_match-v5_GET_getTimeline">
+
+     <form accept-charset="UTF-8" class="sandbox">
+        <input type="hidden" name="apiName" value="match-v5">
+        <input type="hidden" name="apiSimpleName" class="executeApiNameVal" value="match-v5">
+        <input type="hidden" name="methodName" class="executeMethodNameVal" value="getTimeline">
+        <input type="hidden" name="httpMethod" class="executeMethodGetVal" value="GET">
+
+        
+
+        
+          <!-- PATH PARAMS -->
+          <div class="api_block">
+  <h4>Path Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+        <tr>
+          <td class="code">
+             matchId
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="matchId" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              String
+            
+            </span>
+          </td>
+          <td></td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+
+        
+
+        
+
+        
+        <h4>Select Region to Execute Against</h4>
+        <select class="form-control" name="execute_against" style="width: 200px" id="execute_against_match-v5_GET_getTimeline">
+            
+                
+            <option value="AMERICAS">AMERICAS</option>
+                
+            
+                
+            <option value="ASIA">ASIA</option>
+                
+            
+                
+            <option value="EUROPE">EUROPE</option>
+                
+            
+                
+            <option value="SEA">SEA</option>
+                
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+
+        
+        <h4>Select App to Execute Against</h4>
+        <select class="form-control" name="app" style="width: 200px" id="execute_against_match-v5_GET_getTimeline">
+            
+              
+                <option value="710088" selected="true">Development API Key</option>
+              
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+        <h4>
+        Include API key
+        <a class="toggle_key_include_info" style="cursor: pointer">(?)</a>
+        </h4>
+
+        <div class="key_include_info hide" style="font-size:11px; font-style: italic;">
+          Including an API key as a <b>query</b> param allows for easy debugging in the browser.
+          <br>
+          Including an API key as a <b>header</b> param, avoids accidentally copy/pasting your API key in public.
+        </div>
+
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="0" checked="checked"> Query Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="1"> Header Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="2"> Not required
+          </label>
+        </div>
+        </div>
+        <hr>
+
+        
+          
+            <div class="sandbox_header">
+              <input id="execute_match-v5_GET_getTimeline" type="button" value="Execute Request" class="btn btn-riot btn-riotred" onclick="executeRequest('match-v5', 'GET_getTimeline')">
+              <input id="close_match-v5_GET_getTimeline" type="button" value="Close" class="btn btn-riot" onclick="Docs.toggleOperationForResource('match-v5_GET_getTimeline');">
+            </div>
+            <div id="spinner_match-v5_GET_getTimeline" class="hide"><center><img src="/static/img/katarina.55a01cf0560a.gif" width="30" height="30"></center></div>
+          
+
+        
+     
+  </div></form>
+
+  <div id="response_GET_getTimeline" class="response">
+
+    <div id="response_url_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Request URL</h4>
+      <div id="response_url_match-v5_GET_getTimeline" class="block request_url" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_body_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Request Body</h4>
+      <div id="request_body_match-v5_GET_getTimeline" class="block request_body" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_headers_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Request Headers</h4>
+      <div id="response_reqheaders_match-v5_GET_getTimeline" class="block request_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_code_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Response Code</h4>
+      <div id="response_rescode_match-v5_GET_getTimeline" class="block response_code" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_headers_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Response Headers</h4>
+      <div id="response_resheaders_match-v5_GET_getTimeline" class="block response_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_body_match-v5_GET_getTimeline_container" class="hide">
+      <h4>Response Body</h4>
+      <div id="response_body_match-v5_GET_getTimeline" class="block response_body" style="overflow: auto"></div>
+    </div>
+  </div>
+</div>
+
+    </div></li>
+
+
+          </ul>
+        </li>
+      </ul>
+    </li>

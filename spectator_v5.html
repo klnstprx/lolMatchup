@@ -1,0 +1,797 @@
+<li class="get operation" id="_getCurrentGameInfoByPuuid">
+        <div class="heading">
+            <span class="http_method">
+              <a href="#spectator-v5/GET_getCurrentGameInfoByPuuid" onclick="Docs.toggleOperationForResource('spectator-v5_GET_getCurrentGameInfoByPuuid');">GET</a>
+            </span>
+            <span class="path">
+              <a href="#spectator-v5/GET_getCurrentGameInfoByPuuid" onclick="Docs.toggleOperationForResource('spectator-v5_GET_getCurrentGameInfoByPuuid');">/lol/spectator/v5/active-games/by-summoner/{encryptedPUUID}</a>
+            </span>
+            <ul class="options">
+               <li><a href="#spectator-v5/GET_getCurrentGameInfoByPuuid" onclick="Docs.toggleOperationForResource('spectator-v5_GET_getCurrentGameInfoByPuuid');">Get current game information for the given puuid.</a></li>
+            </ul>
+        </div>
+        
+<div class="content" id="spectator-v5_GET_getCurrentGameInfoByPuuid_content" style="overflow: hidden; display: block;">
+  
+
+  
+
+  <div id="inputs-link" style="margin-bottom:10px;"><a href="#spectator-v5/GET_getCurrentGameInfoByPuuid" onclick="Docs.jumpToResource('div#execute_inputs_spectator-v5_GET_getCurrentGameInfoByPuuid')" style="font-size:16px; font-weight: bold">Jump to Inputs</a></div>
+
+  
+
+  
+
+  
+
+  <div class="api_block">
+     <h4>Response Classes</h4>
+     <div class="block response_body">
+      
+        <h4>Return value: CurrentGameInfo </h4>
+      
+     </div>
+     
+<script>
+  function goToDefinition (definition) {
+    var element = document.getElementById(definition);
+    if(element) {
+      element.scrollIntoView();
+      window.scrollBy(0, -100);
+    }
+  }
+</script>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-CurrentGameInfo" style="display: inline;">CurrentGameInfo </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>gameId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the game
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameType</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>The game type
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameStartTime</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The game start time represented in epoch milliseconds
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>mapId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the map
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameLength</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The amount of time in seconds that has passed since the game started
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>platformId</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>The ID of the platform on which the game is being played
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameMode</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>The game mode
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bannedChampions</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1563-getCurrentGameInfoByPuuid-BannedChampion')">BannedChampion</a>]
+               
+             </td>
+             <td>Banned champion information
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameQueueConfigId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The queue type (queue types are documented on the Game Constants page)
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>observers</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1563-getCurrentGameInfoByPuuid-Observer')">Observer</a>
+               
+             </td>
+             <td>The observer information
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>participants</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1563-getCurrentGameInfoByPuuid-CurrentGameParticipant')">CurrentGameParticipant</a>]
+               
+             </td>
+             <td>The participant information
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-BannedChampion" style="display: inline;">BannedChampion </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>pickTurn</td>
+             <td>
+               
+                 int
+               
+             </td>
+             <td>The turn during which the champion was banned
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>championId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the banned champion
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the team that banned the champion
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-Observer" style="display: inline;">Observer </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>encryptionKey</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Key used to decrypt the spectator grid game data for playback
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-CurrentGameParticipant" style="display: inline;">CurrentGameParticipant </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>championId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the champion played by this participant
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perks</td>
+             <td>
+               
+                 <a style="cursor: pointer" onclick="goToDefinition('1563-getCurrentGameInfoByPuuid-Perks')">Perks</a>
+               
+             </td>
+             <td>Perks/Runes Reforged Information
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>profileIconId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the profile icon used by this participant
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>bot</td>
+             <td>
+               
+                 boolean
+               
+             </td>
+             <td>Flag indicating whether or not this participant is a bot
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>teamId</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The team ID of this participant, indicating the participant's team
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>puuid</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>The encrypted puuid of this participant
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell1Id</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the first summoner spell used by this participant
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>spell2Id</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>The ID of the second summoner spell used by this participant
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameCustomizationObjects</td>
+             <td>
+               
+                 List[<a style="cursor: pointer" onclick="goToDefinition('1563-getCurrentGameInfoByPuuid-GameCustomizationObject')">GameCustomizationObject</a>]
+               
+             </td>
+             <td>List of Game Customizations
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-Perks" style="display: inline;">Perks </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>perkIds</td>
+             <td>
+               
+                 List[long]
+               
+             </td>
+             <td>IDs of the perks/runes assigned.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perkStyle</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Primary runes path
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>perkSubStyle</td>
+             <td>
+               
+                 long
+               
+             </td>
+             <td>Secondary runes path
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+<div class="block response_body">
+  <h5 id="1563-getCurrentGameInfoByPuuid-GameCustomizationObject" style="display: inline;">GameCustomizationObject </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>category</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Category identifier for Game Customization
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>content</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Game Customization content
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+
+<hr>
+
+  </div>
+
+  <div class="api_block">
+     <h4>Response Errors</h4>
+     <table class="table">
+  <thead>
+     <tr>
+        <th>HTTP Status Code</th>
+        <th>Reason</th>
+     </tr>
+  </thead>
+  <tbody>
+    
+       <tr class="odd">
+          <td>400</td>
+          <td>Bad request</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>401</td>
+          <td>Unauthorized</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>403</td>
+          <td>Forbidden</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>404</td>
+          <td>Data not found</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>405</td>
+          <td>Method not allowed</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>415</td>
+          <td>Unsupported media type</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>429</td>
+          <td>Rate limit exceeded</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>500</td>
+          <td>Internal server error</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>502</td>
+          <td>Bad gateway</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>503</td>
+          <td>Service unavailable</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>504</td>
+          <td>Gateway timeout</td>
+       </tr>
+     
+  </tbody>
+</table>
+
+  </div>
+
+  <div id="execute_inputs_spectator-v5_GET_getCurrentGameInfoByPuuid">
+
+     <form accept-charset="UTF-8" class="sandbox">
+        <input type="hidden" name="apiName" value="spectator-v5">
+        <input type="hidden" name="apiSimpleName" class="executeApiNameVal" value="spectator-v5">
+        <input type="hidden" name="methodName" class="executeMethodNameVal" value="getCurrentGameInfoByPuuid">
+        <input type="hidden" name="httpMethod" class="executeMethodGetVal" value="GET">
+
+        
+
+        
+          <!-- PATH PARAMS -->
+          <div class="api_block">
+  <h4>Path Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+        <tr>
+          <td class="code">
+             encryptedPUUID
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="encryptedPUUID" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              string
+            
+            </span>
+          </td>
+          <td>The puuid of the summoner.</td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+
+        
+
+        
+
+        
+        <h4>Select Region to Execute Against</h4>
+        <select class="form-control" name="execute_against" style="width: 200px" id="execute_against_spectator-v5_GET_getCurrentGameInfoByPuuid">
+            
+                
+            <option value="BR1">BR1</option>
+                
+            
+                
+            <option value="EUN1" selected="true">EUN1</option>
+                
+            
+                
+            <option value="EUW1">EUW1</option>
+                
+            
+                
+            <option value="JP1">JP1</option>
+                
+            
+                
+            <option value="KR">KR</option>
+                
+            
+                
+            <option value="LA1">LA1</option>
+                
+            
+                
+            <option value="LA2">LA2</option>
+                
+            
+                
+            <option value="ME1">ME1</option>
+                
+            
+                
+            <option value="NA1">NA1</option>
+                
+            
+                
+            <option value="OC1">OC1</option>
+                
+            
+                
+            <option value="RU">RU</option>
+                
+            
+                
+            <option value="SG2">SG2</option>
+                
+            
+                
+            <option value="TR1">TR1</option>
+                
+            
+                
+            <option value="TW2">TW2</option>
+                
+            
+                
+            <option value="VN2">VN2</option>
+                
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+
+        
+        <h4>Select App to Execute Against</h4>
+        <select class="form-control" name="app" style="width: 200px" id="execute_against_spectator-v5_GET_getCurrentGameInfoByPuuid">
+            
+              
+                <option value="710088" selected="true">Development API Key</option>
+              
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+        <h4>
+        Include API key
+        <a class="toggle_key_include_info" style="cursor: pointer">(?)</a>
+        </h4>
+
+        <div class="key_include_info hide" style="font-size:11px; font-style: italic;">
+          Including an API key as a <b>query</b> param allows for easy debugging in the browser.
+          <br>
+          Including an API key as a <b>header</b> param, avoids accidentally copy/pasting your API key in public.
+        </div>
+
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="0" checked="checked"> Query Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="1"> Header Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="2"> Not required
+          </label>
+        </div>
+        </div>
+        <hr>
+
+        
+          
+            <div class="sandbox_header">
+              <input id="execute_spectator-v5_GET_getCurrentGameInfoByPuuid" type="button" value="Execute Request" class="btn btn-riot btn-riotred" onclick="executeRequest('spectator-v5', 'GET_getCurrentGameInfoByPuuid')">
+              <input id="close_spectator-v5_GET_getCurrentGameInfoByPuuid" type="button" value="Close" class="btn btn-riot" onclick="Docs.toggleOperationForResource('spectator-v5_GET_getCurrentGameInfoByPuuid');">
+            </div>
+            <div id="spinner_spectator-v5_GET_getCurrentGameInfoByPuuid" class="hide"><center><img src="/static/img/katarina.55a01cf0560a.gif" width="30" height="30"></center></div>
+          
+
+        
+     
+  </div></form>
+
+  <div id="response_GET_getCurrentGameInfoByPuuid" class="response">
+
+    <div id="response_url_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Request URL</h4>
+      <div id="response_url_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block request_url" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_body_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Request Body</h4>
+      <div id="request_body_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block request_body" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_headers_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Request Headers</h4>
+      <div id="response_reqheaders_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block request_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_code_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Response Code</h4>
+      <div id="response_rescode_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block response_code" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_headers_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Response Headers</h4>
+      <div id="response_resheaders_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block response_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_body_spectator-v5_GET_getCurrentGameInfoByPuuid_container" class="hide">
+      <h4>Response Body</h4>
+      <div id="response_body_spectator-v5_GET_getCurrentGameInfoByPuuid" class="block response_body" style="overflow: auto"></div>
+    </div>
+  </div>
+</div>
+
+    </div></li>

@@ -1,0 +1,371 @@
+<li class="get operation" id="_getByRiotId">
+        <div class="heading">
+            <span class="http_method">
+              <a href="#account-v1/GET_getByRiotId" onclick="Docs.toggleOperationForResource('account-v1_GET_getByRiotId');">GET</a>
+            </span>
+            <span class="path">
+              <a href="#account-v1/GET_getByRiotId" onclick="Docs.toggleOperationForResource('account-v1_GET_getByRiotId');">/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}</a>
+            </span>
+            <ul class="options">
+               <li><a href="#account-v1/GET_getByRiotId" onclick="Docs.toggleOperationForResource('account-v1_GET_getByRiotId');">Get account by riot id</a></li>
+            </ul>
+        </div>
+        
+<div class="content" id="account-v1_GET_getByRiotId_content" style="overflow: hidden;">
+  
+
+  
+
+  <div id="inputs-link" style="margin-bottom:10px;"><a href="#account-v1/GET_getByRiotId" onclick="Docs.jumpToResource('div#execute_inputs_account-v1_GET_getByRiotId')" style="font-size:16px; font-weight: bold">Jump to Inputs</a></div>
+
+  
+
+  
+
+  
+
+  <div class="api_block">
+     <h4>Response Classes</h4>
+     <div class="block response_body">
+      
+        <h4>Return value: AccountDto </h4>
+      
+     </div>
+     
+<script>
+  function goToDefinition (definition) {
+    var element = document.getElementById(definition);
+    if(element) {
+      element.scrollIntoView();
+      window.scrollBy(0, -100);
+    }
+  }
+</script>
+
+<div class="block response_body">
+  <h5 id="1505-getByRiotId-AccountDto" style="display: inline;">AccountDto </h5>
+  
+  <br>
+  <table class="table">
+     <thead>
+        <tr>
+           <th>Name</th>
+           <th style="min-width:80px;">Data Type</th>
+           <th>Description</th>
+        </tr>
+     </thead>
+     <tbody>
+        
+             <tr>
+             <td>puuid</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>Encrypted PUUID. Exact length of 78 characters.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>gameName</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>This field may be excluded from the response if the account doesn't have a gameName.
+             
+             </td>
+          </tr>
+        
+             <tr>
+             <td>tagLine</td>
+             <td>
+               
+                 string
+               
+             </td>
+             <td>This field may be excluded from the response if the account doesn't have a tagLine.
+             
+             </td>
+          </tr>
+        
+     </tbody>
+  </table>
+</div>
+
+
+<hr>
+
+  </div>
+
+  <div class="api_block">
+     <h4>Response Errors</h4>
+     <table class="table">
+  <thead>
+     <tr>
+        <th>HTTP Status Code</th>
+        <th>Reason</th>
+     </tr>
+  </thead>
+  <tbody>
+    
+       <tr class="odd">
+          <td>400</td>
+          <td>Bad request</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>401</td>
+          <td>Unauthorized</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>403</td>
+          <td>Forbidden</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>404</td>
+          <td>Data not found</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>405</td>
+          <td>Method not allowed</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>415</td>
+          <td>Unsupported media type</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>429</td>
+          <td>Rate limit exceeded</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>500</td>
+          <td>Internal server error</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>502</td>
+          <td>Bad gateway</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>503</td>
+          <td>Service unavailable</td>
+       </tr>
+     
+       <tr class="odd">
+          <td>504</td>
+          <td>Gateway timeout</td>
+       </tr>
+     
+  </tbody>
+</table>
+
+  </div>
+
+  <div id="execute_inputs_account-v1_GET_getByRiotId">
+
+     <form accept-charset="UTF-8" class="sandbox">
+        <input type="hidden" name="apiName" value="account-v1">
+        <input type="hidden" name="apiSimpleName" class="executeApiNameVal" value="account-v1">
+        <input type="hidden" name="methodName" class="executeMethodNameVal" value="getByRiotId">
+        <input type="hidden" name="httpMethod" class="executeMethodGetVal" value="GET">
+
+        
+
+        
+          <!-- PATH PARAMS -->
+          <div class="api_block">
+  <h4>Path Parameters</h4>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th style="min-width:220px;">Value</th>
+        <th style="min-width:120px;">Data Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+    <tbody class="operation-params">
+    
+      
+        <tr>
+          <td class="code">
+             tagLine
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="tagLine" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              string
+            
+            </span>
+          </td>
+          <td>When querying for a player by their riot id, the gameName and tagLine query params are required.</td>
+        </tr>
+      
+    
+      
+        <tr>
+          <td class="code">
+             gameName
+             <div class="required"> required </div>
+          </td>
+
+          <td>
+            
+              <input name="gameName" class="form-control" minlength="1" type="text" value="">
+            
+          </td>
+
+          <td>
+            <span class="model-signature">
+            
+              string
+            
+            </span>
+          </td>
+          <td>When querying for a player by their riot id, the gameName and tagLine query params are required.</td>
+        </tr>
+      
+    
+    </tbody>
+  </table>
+</div>
+
+        
+
+        
+
+        
+
+        
+
+        
+        <h4>Select Region to Execute Against</h4>
+        <select class="form-control" name="execute_against" style="width: 200px" id="execute_against_account-v1_GET_getByRiotId">
+            
+                
+            <option value="AMERICAS">AMERICAS</option>
+                
+            
+                
+            <option value="ASIA">ASIA</option>
+                
+            
+                
+            <option value="EUROPE">EUROPE</option>
+                
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+
+        
+        <h4>Select App to Execute Against</h4>
+        <select class="form-control" name="app" style="width: 200px" id="execute_against_account-v1_GET_getByRiotId">
+            
+              
+                <option value="710088" selected="true">Development API Key</option>
+              
+            
+        </select>
+        
+
+        <div style="margin-top:15px">
+        <h4>
+        Include API key
+        <a class="toggle_key_include_info" style="cursor: pointer">(?)</a>
+        </h4>
+
+        <div class="key_include_info hide" style="font-size:11px; font-style: italic;">
+          Including an API key as a <b>query</b> param allows for easy debugging in the browser.
+          <br>
+          Including an API key as a <b>header</b> param, avoids accidentally copy/pasting your API key in public.
+        </div>
+
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="0" checked="checked"> Query Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="1"> Header Param
+          </label>
+        </div>
+        <div class="radio-default radio-inline btn-save">
+          <label for="" alt="test">
+            <input name="api_key_url" type="radio" value="2"> Not required
+          </label>
+        </div>
+        </div>
+        <hr>
+
+        
+          
+            <div class="sandbox_header">
+              <input id="execute_account-v1_GET_getByRiotId" type="button" value="Execute Request" class="btn btn-riot btn-riotred" onclick="executeRequest('account-v1', 'GET_getByRiotId')">
+              <input id="close_account-v1_GET_getByRiotId" type="button" value="Close" class="btn btn-riot" onclick="Docs.toggleOperationForResource('account-v1_GET_getByRiotId');">
+            </div>
+            <div id="spinner_account-v1_GET_getByRiotId" class="hide"><center><img src="/static/img/katarina.55a01cf0560a.gif" width="30" height="30"></center></div>
+          
+
+        
+     
+  </div></form>
+
+  <div id="response_GET_getByRiotId" class="response">
+
+    <div id="response_url_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Request URL</h4>
+      <div id="response_url_account-v1_GET_getByRiotId" class="block request_url" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_body_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Request Body</h4>
+      <div id="request_body_account-v1_GET_getByRiotId" class="block request_body" style="overflow: auto"></div>
+    </div>
+
+    <div id="request_headers_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Request Headers</h4>
+      <div id="response_reqheaders_account-v1_GET_getByRiotId" class="block request_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_code_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Response Code</h4>
+      <div id="response_rescode_account-v1_GET_getByRiotId" class="block response_code" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_headers_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Response Headers</h4>
+      <div id="response_resheaders_account-v1_GET_getByRiotId" class="block response_headers" style="overflow: auto"></div>
+    </div>
+
+    <div id="response_body_account-v1_GET_getByRiotId_container" class="hide">
+      <h4>Response Body</h4>
+      <div id="response_body_account-v1_GET_getByRiotId" class="block response_body" style="overflow: auto"></div>
+    </div>
+  </div>
+</div>
+
+    </div></li>
