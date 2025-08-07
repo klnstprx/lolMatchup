@@ -55,42 +55,44 @@ func (c *Client) FetchLatestPatch(ctx context.Context, ddragonVersionURL string)
 	return versions[0], nil
 }
 
-// FetchChampionNameIDMap retrieves a map of champion names -> champion IDs.
-func (c *Client) FetchChampionNameIDMap(ctx context.Context, ddragonURL, patchNumber, languageCode string) (map[string]string, error) {
+// FetchChampionNameIDMap retrieves maps of champion names -> textual IDs and numeric keys -> textual IDs.
+func (c *Client) FetchChampionNameIDMap(ctx context.Context, ddragonURL, patchNumber, languageCode string) (map[string]string, map[string]string, error) {
 	targetURL := fmt.Sprintf("%s%s/data/%s/champion.json", ddragonURL, patchNumber, languageCode)
 	c.Logger.Debug("Fetching champion name/ID map", "url", targetURL)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch champion list: %w", err)
+		return nil, nil, fmt.Errorf("failed to fetch champion list: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code %d fetching champion list", resp.StatusCode)
+		return nil, nil, fmt.Errorf("unexpected status code %d fetching champion list", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return nil, nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var championList models.ChampionList
 	if err = json.Unmarshal(body, &championList); err != nil {
-		return nil, fmt.Errorf("failed to parse JSON data: %w", err)
+		return nil, nil, fmt.Errorf("failed to parse JSON data: %w", err)
 	}
 
-	championMap := make(map[string]string, len(championList.Data))
+	nameMap := make(map[string]string, len(championList.Data))
+	keyMap := make(map[string]string, len(championList.Data))
 	for _, champ := range championList.Data {
-		championMap[champ.Name] = champ.ID
+		nameMap[champ.Name] = champ.ID
+		keyMap[champ.Key] = champ.ID
 	}
 
-	return championMap, nil
+	return nameMap, keyMap, nil
 }
 
 // FetchChampionData fetches detailed champion information for a given champion ID.

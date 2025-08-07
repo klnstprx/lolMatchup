@@ -1,0 +1,18 @@
+package components
+
+import (
+   "fmt"
+   "time"
+   "github.com/klnstprx/lolMatchup/client"
+)
+
+// PlayerComponent renders detailed info for a SummonerDTO.
+templ PlayerComponent(player client.SummonerDTO) {
+    <div class="max-w-md mx-auto p-6 bg-white shadow rounded">
+        <h2 class="text-2xl font-bold mb-4">{ player.Name }</h2>
+        <p><strong>Level:</strong> { fmt.Sprint(player.SummonerLevel) }</p>
+        <p><strong>PUUID:</strong> { player.PUUID }</p>
+        <p><strong>Account ID:</strong> { player.AccountID }</p>
+        <p><strong>Revision Date:</strong> { time.UnixMilli(player.RevisionDate).Format("2006-01-02 15:04:05") }</p>
+    </div>
+}

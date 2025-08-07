@@ -49,12 +49,13 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		dl.Cache.Invalidate()
 		dl.Cache.Patch = latestPatch
 
-		championMap, err := dl.Client.FetchChampionNameIDMap(ctx,
+		nameMap, keyMap, err := dl.Client.FetchChampionNameIDMap(ctx,
 			dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
 		if err != nil {
 			return fmt.Errorf("failed to fetch champion map: %w", err)
 		}
-		dl.Cache.SetChampionMap(championMap)
+		dl.Cache.SetChampionMap(nameMap)
+		dl.Cache.SetChampionKeyMap(keyMap)
 
 		if err := dl.Cache.Save(); err != nil {
 			dl.Logger.Errorf("Could not save cache: %v", err)
@@ -63,12 +64,13 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		dl.Logger.Info("Patch is up to date. Checking champion map in cache.")
 		if len(dl.Cache.ChampionMap) == 0 {
 			dl.Logger.Info("Champion map is empty; fetching from Data Dragon.")
-			championMap, err := dl.Client.FetchChampionNameIDMap(ctx,
+			nameMap, keyMap, err := dl.Client.FetchChampionNameIDMap(ctx,
 				dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
 			if err != nil {
 				return fmt.Errorf("failed to fetch champion map: %w", err)
 			}
-			dl.Cache.SetChampionMap(championMap)
+			dl.Cache.SetChampionMap(nameMap)
+			dl.Cache.SetChampionKeyMap(keyMap)
 
 			if err := dl.Cache.Save(); err != nil {
 				dl.Logger.Errorf("Could not save cache: %v", err)

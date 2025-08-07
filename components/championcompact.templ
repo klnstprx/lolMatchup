@@ -1,0 +1,39 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+)
+
+// ChampionCompact shows a brief champion card with a button to open full details in a popup.
+templ ChampionCompact(champion models.Champion, cfg *config.AppConfig) {
+	<div class="bg-white p-4 rounded shadow flex items-center space-x-4">
+		<div class="flex items-center space-x-4 w-1/2">
+			<img
+				class="w-12 h-12 rounded-full"
+				src={ fmt.Sprintf("%s%s/img/champion/%s.png", cfg.DDragonURL, cfg.PatchNumber, champion.ID) }
+				alt={ champion.Name }
+			/>
+			<div>
+				<p class="text-lg font-bold text-gray-900">{ champion.Name }</p>
+				<p class="text-sm italic text-gray-600">{ champion.Title }</p>
+			</div>
+		</div>
+		<div class="w-1/2">
+			<button
+				class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded"
+				hx-get={ fmt.Sprintf("/champion?champion=%s&modal=1", champion.Name) }
+				hx-target="body"
+				hx-swap="beforeend"
+			>
+				View Full Details
+			</button>
+		</div>
+	</div>
+	<!-- Popup container; content (full component) will be swapped here -->
+	<div
+		id="championPopup"
+		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden"
+	></div>
+}

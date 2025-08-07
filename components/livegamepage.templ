@@ -1,0 +1,28 @@
+package components
+
+templ LiveGameForm() {
+	<form id="liveGameForm" hx-get="/livegame" hx-trigger="submit" hx-target="#liveGameResult" hx-swap="innerHTML" class="space-y-4">
+		<div>
+			<label class="block text-gray-700 font-bold mb-2">Summoner (nickname#tag)</label>
+			<input
+				class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+				type="text"
+				name="riotID"
+				placeholder="Enter Summoner (e.g. Foo#NA1)"
+				required
+				autofocus
+			/>
+		</div>
+		<div>
+			<button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" type="submit">Search Live Game</button>
+		</div>
+	</form>
+	<div id="liveGameResult" class="mt-4"></div>
+}
+
+// LiveGamePage renders the standalone live game lookup form.
+templ LiveGamePage() {
+	@layout("Live Game Lookup") {
+		@LiveGameForm()
+	}
+}

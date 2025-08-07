@@ -2,146 +2,123 @@ package components
 
 import (
 	"fmt"
+	"html/template"
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/models"
 	"strconv"
-	"html/template"
 )
 
+// ChampionComponent shows full champion details in a two-column grid
 templ ChampionComponent(champion models.Champion, cfg *config.AppConfig) {
 	<div class="max-w-4xl mx-auto p-8">
-		<!-- Champion header card -->
-		<div class="bg-white shadow rounded-lg p-6 mb-8 flex items-center">
-			<img
-				class="w-24 h-24 rounded-full shadow-md"
-				src={ string(templ.URL(fmt.Sprintf("%s%s/img/champion/%s.png",
-					cfg.DDragonURL, cfg.PatchNumber, champion.ID))) }
-				alt={ champion.Name }
-			/>
-			<div class="ml-6">
-				<h1 class="text-3xl font-bold text-gray-900">{ champion.Name }</h1>
-				<h2 class="text-xl italic text-gray-600">{ champion.Title }</h2>
-			</div>
-		</div>
-		<!-- Stats card -->
-		<div class="bg-white shadow rounded-lg p-6 mb-8">
-			<h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Stats</h2>
-			<table class="min-w-full divide-y divide-gray-200">
-				<tbody class="divide-y divide-gray-100">
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">HP</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.HP, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">HP Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.HPPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">MP</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.MP, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">MP Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.MPPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Move Speed</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.MoveSpeed, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Armor</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.Armor, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Armor Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.ArmorPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Spell Block</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.SpellBlock, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Spell Block Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.SpellBlockPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Attack Range</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.AttackRange, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">HP Regen</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.HPRegen, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">HP Regen Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.HPRegenPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">MP Regen</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.MPRegen, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">MP Regen Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.MPRegenPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Crit</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.Crit, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Crit Per Level</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.CritPerLevel, 'f', 1, 64) }</td>
-					</tr>
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-3 font-medium text-gray-700">Attack Damage</td>
-						<td class="px-6 py-3 text-gray-800 text-right">{ strconv.FormatFloat(champion.Stats.AttackDamage, 'f', 1, 64) }</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<!-- Passive section card -->
-		<div class="bg-white shadow rounded-lg p-6 mb-8">
-			<h3 class="text-2xl font-semibold text-gray-800 mb-4">Passive: { champion.Passive.Name }</h3>
-			<div class="flex items-start space-x-4">
-				<img
-					class="w-20 h-20 rounded-full shadow-md"
-					src={ string(templ.URL(fmt.Sprintf("%s%s/img/passive/%s",
-						cfg.DDragonURL, cfg.PatchNumber, champion.Passive.Image.Full))) }
-					alt={ champion.Passive.Name }
-				/>
-				<p class="text-gray-700 leading-relaxed">
-					@templ.Raw(template.HTML(champion.Passive.Description))
-				</p>
-			</div>
-		</div>
-		<!-- Abilities section -->
-		<div>
-			<h3 class="text-2xl font-semibold text-gray-800 mb-4">Abilities</h3>
-			for _, spell := range champion.Spells {
-				<div class="bg-white shadow rounded-lg p-6 mb-6">
-					<div class="flex items-center mb-4">
-						<img
-							class="w-16 h-16 rounded shadow-md"
-							src={ string(templ.URL(fmt.Sprintf("%s%s/img/spell/%s",
-								cfg.DDragonURL, cfg.PatchNumber, spell.Image.Full))) }
-							alt={ spell.Name }
-						/>
-						<h4 class="text-xl font-semibold text-gray-800 ml-4">{ spell.Name }</h4>
-					</div>
-					<p class="text-gray-700">
-						//not too safe... please fix
-						@templ.Raw(template.HTML(spell.Description))
-					</p>
-					<div class="mt-2">
-						<span class="text-sm text-gray-500">Cooldown:</span>
-						<span class="text-sm font-semibold text-gray-800 ml-1">{ spell.CooldownBurn }</span>
-					</div>
-					<div class="mt-1">
-						<span class="text-sm text-gray-500">Cost:</span>
-						<span class="text-sm font-semibold text-gray-800 ml-1">{ spell.CostBurn }</span>
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+			<!-- LEFT: header & stats -->
+			<div class="space-y-6">
+				<!-- Champion header card -->
+				<div class="bg-white shadow rounded-lg p-6 flex items-center">
+					<img
+						class="w-24 h-24 rounded-full shadow-md"
+						src={ fmt.Sprintf("%s%s/img/champion/%s.png", cfg.DDragonURL, cfg.PatchNumber, champion.ID) }
+						alt={ champion.Name }
+					/>
+					<div class="ml-6">
+						<h1 class="text-3xl font-bold text-gray-900">{ champion.Name }</h1>
+						<h2 class="text-xl italic text-gray-600">{ champion.Title }</h2>
 					</div>
 				</div>
-			}
+				<!-- Stats card: grouped pairs -->
+				<div class="bg-white shadow rounded-lg p-6">
+					<h2 class="text-2xl font-semibold text-gray-800 mb-4 border-b pb-2">Stats</h2>
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+						<!-- HP -->
+						<div>
+							<div class="font-medium text-gray-700">HP: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.HP, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.HPPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- MP -->
+						<div>
+							<div class="font-medium text-gray-700">Mana: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.MP, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.MPPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- Armor -->
+						<div>
+							<div class="font-medium text-gray-700">Armor: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.Armor, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.ArmorPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- Spell Block -->
+						<div>
+							<div class="font-medium text-gray-700">Magic Resist: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.SpellBlock, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.SpellBlockPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- Attack Damage -->
+						<div>
+							<div class="font-medium text-gray-700">Attack Damage: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.AttackDamage, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.AttackDamagePerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- Move Speed -->
+						<div>
+							<div class="font-medium text-gray-700">Move Speed: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.MoveSpeed, 'f', 1, 64) }</span></div>
+						</div>
+						<!-- Attack Range -->
+						<div>
+							<div class="font-medium text-gray-700">Attack Range: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.AttackRange, 'f', 1, 64) }</span></div>
+						</div>
+						<!-- HP Regen -->
+						<div>
+							<div class="font-medium text-gray-700">HP Regen: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.HPRegen, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.HPRegenPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- MP Regen -->
+						<div>
+							<div class="font-medium text-gray-700">Mana Regen: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.MPRegen, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.MPRegenPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+						<!-- Crit -->
+						<div>
+							<div class="font-medium text-gray-700">Crit: <span class="text-gray-800">{ strconv.FormatFloat(champion.Stats.Crit, 'f', 1, 64) }</span></div>
+							<div class="text-xs text-gray-600">+{ strconv.FormatFloat(champion.Stats.CritPerLevel, 'f', 1, 64) }/lvl</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- RIGHT: Passive & Abilities -->
+			<div class="space-y-6">
+				<!-- Passive -->
+				<div class="bg-white shadow rounded-lg p-6">
+					<h3 class="text-2xl font-semibold text-gray-800 mb-4">Passive: { champion.Passive.Name }</h3>
+					<div class="flex items-start space-x-4">
+						<img
+							class="w-20 h-20 rounded-full shadow-md"
+							src={ fmt.Sprintf("%s%s/img/passive/%s", cfg.DDragonURL, cfg.PatchNumber, champion.Passive.Image.Full) }
+							alt={ champion.Passive.Name }
+						/>
+						<p class="text-gray-700 leading-relaxed">
+							@templ.Raw(template.HTML(champion.Passive.Description))
+						</p>
+					</div>
+				</div>
+				<!-- Abilities -->
+				<div class="bg-white shadow rounded-lg p-6">
+					<h3 class="text-2xl font-semibold text-gray-800 mb-4">Abilities</h3>
+					for _, spell := range champion.Spells {
+						<div class="mb-6">
+							<div class="flex items-center mb-4">
+								<img
+									class="w-16 h-16 rounded shadow-md"
+									src={ fmt.Sprintf("%s%s/img/spell/%s", cfg.DDragonURL, cfg.PatchNumber, spell.Image.Full) }
+									alt={ spell.Name }
+								/>
+								<h4 class="text-xl font-semibold text-gray-800 ml-4">{ spell.Name }</h4>
+							</div>
+							<p class="text-gray-700">
+								@templ.Raw(template.HTML(spell.Description))
+							</p>
+							<div class="mt-2 text-sm text-gray-500">Cooldown: <span class="font-semibold text-gray-800">{ spell.CooldownBurn }</span></div>
+							<div class="mt-1 text-sm text-gray-500">Cost: <span class="font-semibold text-gray-800">{ spell.CostBurn }</span></div>
+						</div>
+					}
+				</div>
+			</div>
 		</div>
 	</div>
 }

@@ -1,0 +1,12 @@
+package components
+
+// HomePage renders the landing page with links to lookup pages.
+templ HomePage() {
+    @layout("LoL Matchup") {
+        <div class="space-y-4">
+            <a href="/champion-search" class="text-blue-500 hover:underline">Champion Lookup</a>
+            <a href="/player-search" class="text-blue-500 hover:underline">Player Lookup</a>
+            <a href="/livegame-search" class="text-blue-500 hover:underline">Live Game Lookup</a>
+        </div>
+    }
+}
