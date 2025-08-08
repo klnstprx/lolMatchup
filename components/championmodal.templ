@@ -7,14 +7,19 @@ import (
 
 // ChampionModal wraps the full ChampionComponent in a Tailwind-styled modal.
 templ ChampionModal(champion models.Champion, cfg *config.AppConfig) {
-	<div id="modal" class="fixed inset-0 z-50 flex items-start justify-center pt-10 bg-black bg-opacity-50" onclick="this.remove()">
-		<!-- modal content constrained height and scrollable -->
-		<div
-			class="bg-white rounded-lg shadow-lg p-6 w-4/5 h-4/5 mx-4 relative overflow-auto"
-			onclick="event.stopPropagation()"
-		>
-			<button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl leading-none" onclick="document.getElementById('modal').remove()">&times;</button>
-			@ChampionComponent(champion, cfg)
-		</div>
-	</div>
+    <div id="modal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 sm:p-6 md:p-10" onclick="this.remove()">
+        <div
+            class="relative mx-auto h-[85vh] w-full max-w-5xl overflow-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-6"
+            onclick="event.stopPropagation()"
+        >
+            <button
+                class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+                onclick="document.getElementById('modal').remove()"
+                aria-label="Close"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.361a1 1 0 011.414 1.414L13.414 10.586l4.361 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.361-4.361-4.361-4.361a1 1 0 010-1.414z"/></svg>
+            </button>
+            @ChampionComponent(champion, cfg)
+        </div>
+    </div>
 }

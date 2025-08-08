@@ -50,5 +50,7 @@ func RenderSpellTooltip(spell models.Spell) template.HTML {
 		}
 		return m
 	})
+	reUnknown := regexp.MustCompile(`{{[^}]*}}`)
+	text = reUnknown.ReplaceAllString(text, "")
 	return template.HTML(text)
 }
