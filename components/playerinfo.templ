@@ -8,11 +8,27 @@ import (
 
 // PlayerComponent renders detailed info for a SummonerDTO.
 templ PlayerComponent(player client.SummonerDTO) {
-    <div class="max-w-md mx-auto p-6 bg-white shadow rounded">
-        <h2 class="text-2xl font-bold mb-4">{ player.Name }</h2>
-        <p><strong>Level:</strong> { fmt.Sprint(player.SummonerLevel) }</p>
-        <p><strong>PUUID:</strong> { player.PUUID }</p>
-        <p><strong>Account ID:</strong> { player.AccountID }</p>
-        <p><strong>Revision Date:</strong> { time.UnixMilli(player.RevisionDate).Format("2006-01-02 15:04:05") }</p>
+    <div class="mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-4">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600 text-white font-semibold">{ string([]rune(player.Name)[:1]) }</div>
+            <div class="min-w-0">
+                <h2 class="truncate text-xl font-bold text-slate-900">{ player.Name }</h2>
+                <p class="text-sm text-slate-600">Level { fmt.Sprint(player.SummonerLevel) }</p>
+            </div>
+        </div>
+        <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="rounded-lg bg-slate-50 p-3">
+                <div class="text-xs uppercase tracking-wide text-slate-500">PUUID</div>
+                <div class="truncate text-sm text-slate-900">{ player.PUUID }</div>
+            </div>
+            <div class="rounded-lg bg-slate-50 p-3">
+                <div class="text-xs uppercase tracking-wide text-slate-500">Account ID</div>
+                <div class="truncate text-sm text-slate-900">{ player.AccountID }</div>
+            </div>
+            <div class="rounded-lg bg-slate-50 p-3 sm:col-span-2">
+                <div class="text-xs uppercase tracking-wide text-slate-500">Last Updated</div>
+                <div class="text-sm text-slate-900">{ time.UnixMilli(player.RevisionDate).Format("2006-01-02 15:04:05") }</div>
+            </div>
+        </div>
     </div>
 }
