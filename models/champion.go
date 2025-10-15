@@ -52,10 +52,33 @@ type ChampionStats struct {
 }
 
 type ChampionAbility struct {
-	Name        string `json:"name"`
-	Icon        string `json:"icon"`
-	Description string `json:"blurb"`
-	Effects     []struct {
-		Description string `json:"description"`
-	} `json:"effects"`
+	Name        string    `json:"name"`
+	Icon        string    `json:"icon"`
+	Description string    `json:"blurb"`
+	Effects     []Effect  `json:"effects"`
+	Cost        *Cost     `json:"cost"`
+	Cooldown    *Cooldown `json:"cooldown"`
+}
+
+type Effect struct {
+	Description string     `json:"description"`
+	Leveling    []Leveling `json:"leveling"`
+}
+
+type Leveling struct {
+	Attribute string     `json:"attribute"`
+	Modifiers []Modifier `json:"modifiers"`
+}
+
+type Modifier struct {
+	Values []float64 `json:"values"`
+	Units  []string  `json:"units"`
+}
+
+type Cost struct {
+	Modifiers []Modifier `json:"modifiers"`
+}
+
+type Cooldown struct {
+	Modifiers []Modifier `json:"modifiers"`
 }
