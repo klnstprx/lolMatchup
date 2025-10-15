@@ -19,8 +19,7 @@ type AppConfig struct {
 	PatchNumber          string `toml:"-"` // Set dynamically upon initialization
 	LanguageCode         string `toml:"language_code"`
 	LevenshteinThreshold int    `toml:"levenshtein_threshold"`
-	DDragonURL           string `toml:"ddragon_url"`
-	DDragonURLData       string `toml:"-"` // Derived after patch is set
+	MerakiURL            string `toml:"meraki_url"`
 	DDragonVersionURL    string `toml:"ddragon_version_url"`
 	Debug                bool   `toml:"debug"`
 	HTTPClientTimeout    int    `toml:"http_client_timeout"`
@@ -42,7 +41,7 @@ func New() *AppConfig {
 		Port:                 1337,
 		Debug:                true,
 		LanguageCode:         "en_US",
-		DDragonURL:           "https://ddragon.leagueoflegends.com/cdn/",
+		MerakiURL:            "https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/",
 		DDragonVersionURL:    "https://ddragon.leagueoflegends.com/api/versions.json",
 		LevenshteinThreshold: 3,
 		CachePath:            "cache.gob",
@@ -107,11 +106,6 @@ func (cfg *AppConfig) logMap(prefix string, data map[string]interface{}) {
 			cfg.Logger.Infof("%s: %v", fullKey, v)
 		}
 	}
-}
-
-// SetDDragonDataURL builds the full URL for champion data after patch is known.
-func (cfg *AppConfig) SetDDragonDataURL() {
-	cfg.DDragonURLData = fmt.Sprintf("%s%s/data/%s/champion/", cfg.DDragonURL, cfg.PatchNumber, cfg.LanguageCode)
 }
 
 // setGinMode sets Gin to debug or release mode based on cfg.Debug.

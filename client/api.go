@@ -7,7 +7,18 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/charmbracelet/log"
+	"github.com/klnstprx/lolMatchup/models"
 )
+
+// Client is a unified client for all API interactions.
+type Client struct {
+	HTTPClient       *http.Client
+	Logger           *log.Logger
+	ChampionDataURL  string
+	DDragonVersionURL string
+}
 
 // SummonerDTO represents the data returned by the Summoner API.
 type SummonerDTO struct {
@@ -199,4 +210,111 @@ func (c *Client) FetchCurrentGameByPUUID(ctx context.Context, puuid, riotRegion,
 		return nil, fmt.Errorf("failed to parse spectator v5 JSON: %w", err)
 	}
 	return result, nil
+}
+
+// ErrChampionNotFound indicates the requested champion was not found.
+var ErrChampionNotFound = errors.New("champion not found")
+
+// FetchChampionData fetches detailed champion information for a given champion ID.
+func (c *Client) FetchChampionData(ctx context.Context, championID string) (models.Champion, error) {
+	var champion models.Champion
+	targetURL := fmt.Sprintf("%schampions/%s.json", c.ChampionDataURL, championID)
+	c.Logger.Debug("Fetching champion data", "url", targetURL, "champID", championID)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
+	if err != nil {
+		return champion, fmt.Errorf("failed to create request for champion %s: %w", championID, err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return champion, fmt.Errorf("failed to fetch data for champion %s: %w", championID, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
+			return champion, ErrChampionNotFound
+		}
+		return champion, fmt.Errorf("unexpected status code %d fetching champion data", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return champion, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	if err = json.Unmarshal(body, &champion); err != nil {
+		return champion, fmt.Errorf("failed to parse JSON data: %w", err)
+	}
+
+	return champion, nil
+}
+
+// FetchChampionList fetches a map of all champions.
+func (c *Client) FetchChampionList(ctx context.Context) (map[string]models.Champion, error) {
+	var champions map[string]models.Champion
+	targetURL := fmt.Sprintf("%schampions.json", c.ChampionDataURL)
+	c.Logger.Debug("Fetching champion list", "url", targetURL)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
+	if err != nil {
+		return champions, fmt.Errorf("failed to create request for champion list: %w", err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return champions, fmt.Errorf("failed to fetch champion list: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return champions, fmt.Errorf("unexpected status code %d fetching champion list", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return champions, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	if err = json.Unmarshal(body, &champions); err != nil {
+		return champions, fmt.Errorf("failed to parse JSON data: %w", err)
+	}
+
+	return champions, nil
+}
+
+// FetchLatestPatch retrieves the latest game version from the DDragon API.
+func (c *Client) FetchLatestPatch(ctx context.Context) (string, error) {
+	c.Logger.Debug("Fetching latest patch", "url", c.DDragonVersionURL)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.DDragonVersionURL, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create request: %w", err)
+	}
+
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch versions from DDragon: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected status code %d fetching versions", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var versions []string
+	if err = json.Unmarshal(body, &versions); err != nil {
+		return "", fmt.Errorf("failed to parse JSON data: %w", err)
+	}
+	if len(versions) == 0 {
+		return "", fmt.Errorf("no versions found in response")
+	}
+
+	return versions[0], nil
 }

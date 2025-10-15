@@ -31,3 +31,6 @@ go.work.sum
 tmp
 *.gob
 .air.toml
+
+# templ generated files
+components/*_templ.go
