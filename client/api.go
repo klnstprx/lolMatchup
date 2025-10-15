@@ -218,7 +218,7 @@ var ErrChampionNotFound = errors.New("champion not found")
 // FetchChampionData fetches detailed champion information for a given champion ID.
 func (c *Client) FetchChampionData(ctx context.Context, championID string) (models.Champion, error) {
 	var champion models.Champion
-	targetURL := fmt.Sprintf("%s%s.json", c.ChampionDataURL, championID)
+	targetURL := fmt.Sprintf("%schampions/%s.json", c.ChampionDataURL, championID)
 	c.Logger.Debug("Fetching champion data", "url", targetURL, "champID", championID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, targetURL, nil)
