@@ -54,8 +54,8 @@ func TestSaveLoadCache(t *testing.T) {
 	orig.Patch = "1.2.3"
 	champMap := map[string]string{"Ahri": "A", "Ashe": "B"}
 	orig.SetChampionMap(champMap)
-	champA := models.Champion{ID: "A", Key: "1", Name: "Ahri", Title: "TitleA"}
-	champB := models.Champion{ID: "B", Key: "2", Name: "Ashe", Title: "TitleB"}
+	champA := models.Champion{ID: 1, Key: "Ahri", Name: "Ahri", Title: "the Nine-Tailed Fox"}
+	champB := models.Champion{ID: 2, Key: "Ashe", Name: "Ashe", Title: "the Frost Archer"}
 	orig.SetChampion(champA)
 	orig.SetChampion(champB)
 
@@ -80,13 +80,13 @@ func TestSaveLoadCache(t *testing.T) {
 	}
 	// Check champions
 	for _, want := range []models.Champion{champA, champB} {
-		got, ok := loaded.GetChampionByID(want.ID)
+		got, ok := loaded.GetChampionByID(want.Key)
 		if !ok {
-			t.Errorf("Champion %s missing after Load", want.ID)
+			t.Errorf("Champion %s missing after Load", want.Key)
 			continue
 		}
 		if !reflect.DeepEqual(got, want) {
-			t.Errorf("Champion %s: got %+v, want %+v", want.ID, got, want)
+			t.Errorf("Champion %s: got %+v, want %+v", want.Key, got, want)
 		}
 	}
 }
@@ -100,7 +100,7 @@ func TestLoadNonexistentCache(t *testing.T) {
 	c.Patch = "orig"
 	initialMap := map[string]string{"X": "Y"}
 	c.ChampionMap = initialMap
-	initialChamp := models.Champion{ID: "X", Name: "X"}
+	initialChamp := models.Champion{ID: 1, Key: "X", Name: "X"}
 	c.Champions = map[string]models.Champion{"X": initialChamp}
 
 	// Load should not error and should not modify existing data
@@ -131,7 +131,7 @@ func TestLoadInvalidCache(t *testing.T) {
 	c.Patch = "orig"
 	initialMap := map[string]string{"X": "Y"}
 	c.ChampionMap = initialMap
-	initialChamp := models.Champion{ID: "X", Name: "X"}
+	initialChamp := models.Champion{ID: 1, Key: "X", Name: "X"}
 	c.Champions = map[string]models.Champion{"X": initialChamp}
 
 	if err := c.Load(); err != nil {
