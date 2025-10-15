@@ -20,12 +20,12 @@ type AutocompleteHandler struct {
 	Client *client.Client
 }
 
-func NewAutocompleteHandler(cfg *config.AppConfig, apiClient *client.Client) *AutocompleteHandler {
+func NewAutocompleteHandler(cfg *config.AppConfig, client *client.Client) *AutocompleteHandler {
 	return &AutocompleteHandler{
 		Logger: cfg.Logger,
 		Cache:  cfg.Cache,
 		Config: cfg,
-		Client: apiClient,
+		Client: client,
 	}
 }
 

@@ -41,10 +41,12 @@ func main() {
 		cfg.Logger.Warnf("Cache not loaded (possibly first run): %v", err)
 	}
 
-	// Create the Riot API client
+	// Create the API client
 	apiClient := &client.Client{
-		HTTPClient: cfg.HTTPClient,
-		Logger:     cfg.Logger,
+		HTTPClient:       cfg.HTTPClient,
+		Logger:           cfg.Logger,
+		ChampionDataURL:  cfg.MerakiURL,
+		DDragonVersionURL: cfg.DDragonVersionURL,
 	}
 
 	// Prepare data loader, fetch or refresh patch info

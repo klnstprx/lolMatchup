@@ -30,13 +30,12 @@ func NewDataLoader(cfg *config.AppConfig, client *client.Client, cache *cache.Ca
 
 // Initialize checks the latest patch from DDragon and refreshes champion data if needed.
 func (dl *DataLoader) Initialize(ctx context.Context) error {
-	latestPatch, err := dl.Client.FetchLatestPatch(ctx, dl.Config.DDragonVersionURL)
+	latestPatch, err := dl.Client.FetchLatestPatch(ctx)
 	if err != nil {
 		// Fallback to cached patch if available (offline mode)
 		if dl.Cache.Patch != "" {
 			dl.Logger.Warnf("Could not fetch latest patch, using cached patch %s: %v", dl.Cache.Patch, err)
 			dl.Config.PatchNumber = dl.Cache.Patch
-			dl.Config.SetDDragonDataURL()
 			return nil
 		}
 		return fmt.Errorf("failed to fetch latest patch: %w", err)
@@ -49,13 +48,15 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		dl.Cache.Invalidate()
 		dl.Cache.Patch = latestPatch
 
-		nameMap, keyMap, err := dl.Client.FetchChampionNameIDMap(ctx,
-			dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
+		champions, err := dl.Client.FetchChampionList(ctx)
 		if err != nil {
 			return fmt.Errorf("failed to fetch champion map: %w", err)
 		}
+		nameMap := make(map[string]string)
+		for _, champ := range champions {
+			nameMap[champ.Name] = champ.Key
+		}
 		dl.Cache.SetChampionMap(nameMap)
-		dl.Cache.SetChampionKeyMap(keyMap)
 
 		if err := dl.Cache.Save(); err != nil {
 			dl.Logger.Errorf("Could not save cache: %v", err)
@@ -63,14 +64,16 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 	} else {
 		dl.Logger.Info("Patch is up to date. Checking champion map in cache.")
 		if len(dl.Cache.ChampionMap) == 0 {
-			dl.Logger.Info("Champion map is empty; fetching from Data Dragon.")
-			nameMap, keyMap, err := dl.Client.FetchChampionNameIDMap(ctx,
-				dl.Config.DDragonURL, latestPatch, dl.Config.LanguageCode)
+			dl.Logger.Info("Champion map is empty; fetching from Meraki.")
+			champions, err := dl.Client.FetchChampionList(ctx)
 			if err != nil {
 				return fmt.Errorf("failed to fetch champion map: %w", err)
 			}
+			nameMap := make(map[string]string)
+			for _, champ := range champions {
+				nameMap[champ.Name] = champ.Key
+			}
 			dl.Cache.SetChampionMap(nameMap)
-			dl.Cache.SetChampionKeyMap(keyMap)
 
 			if err := dl.Cache.Save(); err != nil {
 				dl.Logger.Errorf("Could not save cache: %v", err)
@@ -78,6 +81,5 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		}
 	}
 
-	dl.Config.SetDDragonDataURL()
 	return nil
 }
