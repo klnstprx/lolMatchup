@@ -52,12 +52,16 @@ type ChampionStats struct {
 }
 
 type ChampionAbility struct {
-	Name        string    `json:"name"`
-	Icon        string    `json:"icon"`
-	Description string    `json:"blurb"`
-	Effects     []Effect  `json:"effects"`
-	Cost        *Cost     `json:"cost"`
-	Cooldown    *Cooldown `json:"cooldown"`
+	Name         string    `json:"name"`
+	Icon         string    `json:"icon"`
+	Description  string    `json:"blurb"`
+	Effects      []Effect  `json:"effects"`
+	Cost         *Cost     `json:"cost"`
+	Cooldown     *Cooldown `json:"cooldown"`
+	CastTime     *string   `json:"castTime"`
+	TargetRange  *string   `json:"targetRange"`
+	EffectRadius *string   `json:"effectRadius"`
+	Speed        *string   `json:"speed"`
 }
 
 type Effect struct {
