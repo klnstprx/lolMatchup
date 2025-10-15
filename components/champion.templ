@@ -1,12 +1,14 @@
 package components
 
 import (
+	"fmt"
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/models"
 	"strconv"
 	"strings"
 )
 
+// formatFloats converts a slice of floats to a "v1 / v2 / v3" string.
 func formatFloats(values []float64, prec int) string {
 	s := make([]string, len(values))
 	for i, v := range values {
@@ -15,6 +17,7 @@ func formatFloats(values []float64, prec int) string {
 	return strings.Join(s, " / ")
 }
 
+// formatModifierUnit finds the first non-empty unit string.
 func formatModifierUnit(units []string) string {
 	for _, u := range units {
 		if u != "" {
@@ -24,160 +27,142 @@ func formatModifierUnit(units []string) string {
 	return ""
 }
 
+// formatLeveling combines multiple modifiers for a single attribute into one string,
+// e.g., "60 / 90 / 120 (+ 35% AP)".
+func formatLeveling(leveling models.Leveling) string {
+	var parts []string
+	baseDamageIndex := -1
+
+	// First, find and format the base damage part.
+	for i, modifier := range leveling.Modifiers {
+		// Heuristic: The modifier with no unit or a non-"%" unit is the base damage.
+		unit := formatModifierUnit(modifier.Units)
+		if !strings.Contains(unit, "%") {
+			parts = append(parts, formatFloats(modifier.Values, -1))
+			baseDamageIndex = i
+			break
+		}
+	}
+
+	// Then, format the scaling parts.
+	for i, modifier := range leveling.Modifiers {
+		if i == baseDamageIndex {
+			continue // Skip the base damage we already added.
+		}
+		unit := formatModifierUnit(modifier.Units)
+		// Assuming scaling values are single values, not per-level arrays.
+		if len(modifier.Values) > 0 {
+			val := strconv.FormatFloat(modifier.Values[0], 'f', -1, 64)
+			parts = append(parts, fmt.Sprintf("(+ %s%s)", val, unit))
+		}
+	}
+
+	return strings.Join(parts, " ")
+}
+
 // ChampionComponent shows full champion details in a two-column grid
 templ ChampionComponent(champion models.Champion, cfg *config.AppConfig) {
-    <div class="mx-auto max-w-6xl px-4 py-6 sm:py-8">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <!-- LEFT: header & stats -->
-            <div class="space-y-6">
-                <!-- Champion header card -->
-                <div class="flex items-center rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <img
-                        class="h-20 w-20 rounded-full shadow-md ring-1 ring-slate-200 sm:h-24 sm:w-24"
-                        src={ champion.Icon }
-                        alt={ champion.Name }
-                    />
-                    <div class="ml-6 min-w-0">
-                        <h1 class="truncate text-2xl font-bold text-slate-900 sm:text-3xl">{ champion.Name }</h1>
-                        <h2 class="truncate text-lg italic text-slate-600 sm:text-xl">{ champion.Title }</h2>
-                    </div>
-                </div>
-                <!-- Stats card: grouped pairs -->
-                <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 class="mb-4 border-b pb-2 text-xl font-semibold text-slate-900">Stats</h2>
-                    <div class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-2 md:grid-cols-2">
-                        <!-- HP -->
-                        <div>
-                            <div class="font-medium text-slate-700">HP: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.Health.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.Health.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- MP -->
-                        <div>
-                            <div class="font-medium text-slate-700">Mana: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.Mana.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.Mana.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- Armor -->
-                        <div>
-                            <div class="font-medium text-slate-700">Armor: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.Armor.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.Armor.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- Spell Block -->
-                        <div>
-                            <div class="font-medium text-slate-700">Magic Resist: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.MagicResistance.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.MagicResistance.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- Attack Damage -->
-                        <div>
-                            <div class="font-medium text-slate-700">Attack Damage: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.AttackDamage.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.AttackDamage.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- Move Speed -->
-                        <div>
-                            <div class="font-medium text-slate-700">Move Speed: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.Movespeed.Flat, 'f', 1, 64) }</span></div>
-                        </div>
-                        <!-- Attack Range -->
-                        <div>
-                            <div class="font-medium text-slate-700">Attack Range: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.AttackRange.Flat, 'f', 1, 64) }</span></div>
-                        </div>
-                        <!-- HP Regen -->
-                        <div>
-                            <div class="font-medium text-slate-700">HP Regen: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.HealthRegen.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.HealthRegen.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                        <!-- MP Regen -->
-                        <div>
-                            <div class="font-medium text-slate-700">Mana Regen: <span class="text-slate-900">{ strconv.FormatFloat(champion.Stats.ManaRegen.Flat, 'f', 1, 64) }</span></div>
-                            <div class="text-xs text-slate-500">+{ strconv.FormatFloat(champion.Stats.ManaRegen.PerLevel, 'f', 1, 64) }/lvl</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- RIGHT: Passive & Abilities -->
-            <div class="space-y-6">
-                <!-- Passive -->
-                if passive, ok := champion.Abilities["P"]; ok && len(passive) > 0 {
-                    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <div class="flex items-start gap-4">
-                            <img
-								class="h-16 w-16 flex-shrink-0 rounded-full shadow-md ring-1 ring-slate-200 sm:h-20 sm:w-20"
-                                src={ passive[0].Icon }
-                                alt={ passive[0].Name }
-                            />
-							<div class="flex-1">
-								<h3 class="mb-2 text-xl font-semibold text-slate-900">Passive: { passive[0].Name }</h3>
-								<div class="space-y-3 text-slate-700">
-									if passive[0].Description != "" {
-										<p class="text-sm italic">{ passive[0].Description }</p>
-									}
-									for _, effect := range passive[0].Effects {
-										<p class="text-sm">{ effect.Description }</p>
-									}
-									if passive[0].Cooldown != nil && len(passive[0].Cooldown.Modifiers) > 0 {
-										<div class="mt-2 text-sm">
-											<span class="font-semibold text-slate-600">Cooldown:</span>
-											for _, modifier := range passive[0].Cooldown.Modifiers {
-												<span class="ml-2 font-mono text-slate-800">{ formatFloats(modifier.Values, 1) }s</span>
-											}
-										</div>
-									}
-								</div>
-							</div>
-                        </div>
-                    </div>
-                }
-                <!-- Abilities -->
-                <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h3 class="mb-4 text-xl font-semibold text-slate-900">Abilities</h3>
-                    for _, key := range []string{"Q", "W", "E", "R"} {
-                        if ability, ok := champion.Abilities[key]; ok && len(ability) > 0 {
-							<div class="mb-6 border-b border-slate-200 pb-6 last:mb-0 last:border-b-0 last:pb-0">
-                                <div class="mb-3 flex items-center">
-                                    <img
-                                        class="h-14 w-14 rounded shadow-md ring-1 ring-slate-200 sm:h-16 sm:w-16"
-                                        src={ ability[0].Icon }
-                                        alt={ ability[0].Name }
-                                    />
-                                    <h4 class="ml-4 text-lg font-semibold text-slate-900 sm:text-xl">{ ability[0].Name }</h4>
-                                </div>
-								if ability[0].Description != "" {
-									<p class="mb-3 text-sm italic text-slate-600">{ ability[0].Description }</p>
+	<div class="mx-auto max-w-4xl px-4 py-6 sm:py-8">
+		<!-- Champion Header & Stats -->
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+			<div class="flex items-center rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+				<img
+					class="h-20 w-20 rounded-full shadow-md ring-1 ring-slate-200 sm:h-24 sm:w-24"
+					src={ champion.Icon }
+					alt={ champion.Name }
+				/>
+				<div class="ml-6 min-w-0">
+					<h1 class="truncate text-2xl font-bold text-slate-900 sm:text-3xl">{ champion.Name }</h1>
+					<h2 class="truncate text-lg italic text-slate-600 sm:text-xl">{ champion.Title }</h2>
+				</div>
+			</div>
+			<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+				<h2 class="mb-4 border-b pb-2 text-xl font-semibold text-slate-900">Stats</h2>
+				<div class="grid grid-cols-2 gap-4 text-sm">
+					<div>
+						<div class="font-medium text-slate-700">HP: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.Health.Flat) }</span></div>
+						<div class="text-xs text-slate-500">+{ fmt.Sprintf("%.1f", champion.Stats.Health.PerLevel) }/lvl</div>
+					</div>
+					<div>
+						<div class="font-medium text-slate-700">Mana: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.Mana.Flat) }</span></div>
+						<div class="text-xs text-slate-500">+{ fmt.Sprintf("%.1f", champion.Stats.Mana.PerLevel) }/lvl</div>
+					</div>
+					<div>
+						<div class="font-medium text-slate-700">Armor: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.Armor.Flat) }</span></div>
+						<div class="text-xs text-slate-500">+{ fmt.Sprintf("%.1f", champion.Stats.Armor.PerLevel) }/lvl</div>
+					</div>
+					<div>
+						<div class="font-medium text-slate-700">Magic Resist: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.MagicResistance.Flat) }</span></div>
+						<div class="text-xs text-slate-500">+{ fmt.Sprintf("%.1f", champion.Stats.MagicResistance.PerLevel) }/lvl</div>
+					</div>
+					<div>
+						<div class="font-medium text-slate-700">Attack Damage: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.AttackDamage.Flat) }</span></div>
+						<div class="text-xs text-slate-500">+{ fmt.Sprintf("%.1f", champion.Stats.AttackDamage.PerLevel) }/lvl</div>
+					</div>
+					<div>
+						<div class="font-medium text-slate-700">Move Speed: <span class="text-slate-900">{ fmt.Sprintf("%.1f", champion.Stats.Movespeed.Flat) }</span></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Abilities Section -->
+		<div class="mt-8 space-y-6">
+			for _, key := range []string{"P", "Q", "W", "E", "R"} {
+				if ability, ok := champion.Abilities[key]; ok && len(ability) > 0 {
+					<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+						<!-- Header Section -->
+						<div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 p-4">
+							<h3 class="text-xl font-bold text-purple-700">{ ability[0].Name }</h3>
+							<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+								if ability[0].Cost != nil && len(ability[0].Cost.Modifiers) > 0 {
+									<span>Cost: <span class="font-semibold">{ formatFloats(ability[0].Cost.Modifiers[0].Values, -1) } { formatModifierUnit(ability[0].Cost.Modifiers[0].Units) }</span></span>
 								}
-								<!-- Cost and Cooldown -->
-								<div class="mb-4 grid grid-cols-2 gap-4 text-sm">
-									if ability[0].Cooldown != nil && len(ability[0].Cooldown.Modifiers) > 0 && len(ability[0].Cooldown.Modifiers[0].Values) > 0 {
-										<div>
-											<span class="font-semibold text-slate-600">Cooldown:</span>
-											<span class="ml-2 font-mono text-slate-800">{ formatFloats(ability[0].Cooldown.Modifiers[0].Values, -1) }s</span>
+								if ability[0].Cooldown != nil && len(ability[0].Cooldown.Modifiers) > 0 {
+									<span>Cooldown: <span class="font-semibold">{ formatFloats(ability[0].Cooldown.Modifiers[0].Values, -1) }s</span></span>
+								}
+								if ability[0].CastTime != nil && *ability[0].CastTime != "" {
+									<span>Cast Time: <span class="font-semibold">{ *ability[0].CastTime }</span></span>
+								}
+								if ability[0].TargetRange != nil && *ability[0].TargetRange != "" {
+									<span>Range: <span class="font-semibold">{ *ability[0].TargetRange }</span></span>
+								}
+								if ability[0].EffectRadius != nil && *ability[0].EffectRadius != "" {
+									<span>Radius: <span class="font-semibold">{ *ability[0].EffectRadius }</span></span>
+								}
+								if ability[0].Speed != nil && *ability[0].Speed != "" {
+									<span>Speed: <span class="font-semibold">{ *ability[0].Speed }</span></span>
+								}
+							</div>
+						</div>
+						<!-- Main Content Area -->
+						<div class="grid grid-cols-12 gap-6 p-4">
+							<!-- Left Column: Icon -->
+							<div class="col-span-2">
+								<img src={ ability[0].Icon } alt={ ability[0].Name } class="h-20 w-20 rounded-md shadow"/>
+							</div>
+							<!-- Middle Column: Description -->
+							<div class="col-span-6 space-y-3 text-sm text-slate-700">
+								for _, effect := range ability[0].Effects {
+									if effect.Description != "" {
+										<p>{ effect.Description }</p>
+									}
+								}
+							</div>
+							<!-- Right Column: Damage/Effects -->
+							<div class="col-span-4 space-y-2 text-sm">
+								for _, effect := range ability[0].Effects {
+									for _, leveling := range effect.Leveling {
+										<div class="text-right">
+											<p class="font-semibold uppercase text-slate-500">{ leveling.Attribute }:</p>
+											<p class="font-mono text-purple-700">{ formatLeveling(leveling) }</p>
 										</div>
 									}
-									if ability[0].Cost != nil && len(ability[0].Cost.Modifiers) > 0 && len(ability[0].Cost.Modifiers[0].Values) > 0 {
-										<div>
-											<span class="font-semibold text-slate-600">Cost:</span>
-											<span class="ml-2 font-mono text-slate-800">{ formatFloats(ability[0].Cost.Modifiers[0].Values, -1) } { formatModifierUnit(ability[0].Cost.Modifiers[0].Units) }</span>
-										</div>
-									}
-								</div>
-								<!-- Effects and Leveling Data -->
-								<div class="space-y-3">
-									for _, effect := range ability[0].Effects {
-										if effect.Description != "" {
-											<p class="text-sm text-slate-700">{ effect.Description }</p>
-										}
-										for _, leveling := range effect.Leveling {
-											<div class="ml-4 mt-2 border-l-2 border-slate-200 pl-4 text-xs">
-												<p class="font-semibold text-slate-600">{ leveling.Attribute }:</p>
-												for _, modifier := range leveling.Modifiers {
-													<p class="font-mono text-slate-800">{ formatFloats(modifier.Values, -1) } { formatModifierUnit(modifier.Units) }</p>
-												}
-											</div>
-										}
-									}
-								</div>
-                            </div>
-                        }
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
 }
