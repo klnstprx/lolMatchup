@@ -29,20 +29,20 @@ func headerTemplate(name string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"bg-gray-800 text-white p-4\"><div class=\"container mx-auto flex justify-between items-center\"><div class=\"text-xl font-semibold\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<header class=\"sticky top-0 z-40 bg-gradient-to-r from-slate-900 to-indigo-900 text-white shadow\"><div class=\"container mx-auto px-4\"><div class=\"flex h-16 items-center justify-between\"><a href=\"/\" class=\"flex items-center space-x-2\"><span class=\"inline-flex h-8 w-8 items-center justify-center rounded bg-indigo-600 text-white font-bold\">LM</span> <span class=\"text-lg font-semibold tracking-wide\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 7, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 9, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div></div></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span></a><div class=\"hidden md:block\"><ul class=\"flex items-center space-x-6 text-sm\"><li><a href=\"/champion-search\" class=\"hover:text-indigo-300 transition-colors\">Champion Lookup</a></li><li><a href=\"/player-search\" class=\"hover:text-indigo-300 transition-colors\">Player Lookup</a></li><li><a href=\"/livegame-search\" class=\"hover:text-indigo-300 transition-colors\">Live Game Lookup</a></li></ul></div></div></div></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -71,7 +71,7 @@ func navTemplate() templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<nav class=\"bg-gray-700 text-white p-2\"><div class=\"container mx-auto\"><ul class=\"flex space-x-4\"><li><a href=\"/champion-search\" class=\"hover:underline\">Champion Lookup</a></li><li><a href=\"/player-search\" class=\"hover:underline\">Player Lookup</a></li><li><a href=\"/livegame-search\" class=\"hover:underline\">Live Game Lookup</a></li></ul></div></nav>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<nav class=\"md:hidden bg-slate-800 text-slate-100\"><div class=\"container mx-auto px-4 py-2\"><ul class=\"grid grid-cols-3 gap-2 text-center text-sm\"><li><a href=\"/champion-search\" class=\"block rounded bg-slate-700 py-2 hover:bg-slate-600\">Champions</a></li><li><a href=\"/player-search\" class=\"block rounded bg-slate-700 py-2 hover:bg-slate-600\">Players</a></li><li><a href=\"/livegame-search\" class=\"block rounded bg-slate-700 py-2 hover:bg-slate-600\">Live</a></li></ul></div></nav>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -100,7 +100,7 @@ func footerTemplate() templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<footer class=\"bg-gray-800 text-white p-4 bottom-0\"><div class=\"container mx-auto text-center\">&copy; 2025 LoL Matchup. All rights reserved.</div></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<footer class=\"mt-16 bg-slate-900 text-slate-300\"><div class=\"container mx-auto px-4 py-6 text-center text-sm\">&copy; 2025 LoL Matchup</div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -129,24 +129,24 @@ func layout(name string) templ.Component {
 			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<html><head><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 36, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/home.templ`, Line: 48, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</title><!-- Include Tailwind CSS --><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"flex flex-col min-h-screen\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</title><script src=\"https://cdn.tailwindcss.com\"></script></head><body class=\"flex min-h-screen flex-col bg-slate-50\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = headerTemplate(name).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = headerTemplate("LoL Matchup").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -154,7 +154,7 @@ func layout(name string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<main class=\"container mx-auto my-8 flex-grow\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<main class=\"container mx-auto my-10 flex-grow px-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -170,7 +170,7 @@ func layout(name string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<!-- Include htmx --><script src=\"/static/htmx/htmx.min.js\"></script><script src=\"https://unpkg.com/hyperscript.org@0.9.14\"></script></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<script src=\"/static/htmx/htmx.min.js\"></script><script src=\"https://unpkg.com/hyperscript.org@0.9.14\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

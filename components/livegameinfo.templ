@@ -20,7 +20,7 @@ templ LiveGameInfo(parts []map[string]string, cfg *config.AppConfig) {
                 >
                     <img
                         class="h-10 w-10 rounded-full ring-1 ring-slate-200 sm:h-12 sm:w-12"
-                        src={ string(templ.URL(fmt.Sprintf("%s%s/img/champion/%s.png", cfg.DDragonURL, cfg.PatchNumber, p["championId"]))) }
+                        src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, p["championId"]))) }
                         alt={ p["championName"] }
                     />
                     <div class="min-w-0">

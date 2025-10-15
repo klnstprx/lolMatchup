@@ -22,12 +22,12 @@ type ChampionHandler struct {
 	Config *config.AppConfig
 }
 
-func NewChampionHandler(cfg *config.AppConfig, apiClient *client.Client) *ChampionHandler {
+func NewChampionHandler(cfg *config.AppConfig, client *client.Client) *ChampionHandler {
 	return &ChampionHandler{
 		Cache:  cfg.Cache,
 		Logger: cfg.Logger,
 		Config: cfg,
-		Client: apiClient,
+		Client: client,
 	}
 }
 
@@ -52,7 +52,7 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 	if inCache {
 		h.Logger.Debug("Champion data loaded from cache", "championID", championID)
 	} else {
-		fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID, h.Config.DDragonURLData)
+		fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID)
 		if fetchErr != nil {
 			if errors.Is(fetchErr, client.ErrChampionNotFound) {
 				h.Logger.Debug("Champion not found", "input", inputName, "championID", championID)
@@ -65,20 +65,20 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 		}
 		h.Cache.SetChampion(fetchedChampion)
 		champion = fetchedChampion
-		h.Logger.Debug("Fetched champion data from DDragon", "championID", champion.ID)
+		h.Logger.Debug("Fetched champion data", "championID", champion.ID)
 	}
 
-   // Render based on 'modal' or 'compact' query param
-   var comp templ.Component
-   if _, ok := c.GetQuery("modal"); ok {
-       // full component inside modal overlay
-       comp = components.ChampionModal(champion, h.Config)
-   } else if _, ok := c.GetQuery("compact"); ok {
-       // inline compact view
-       comp = components.ChampionCompact(champion, h.Config)
-   } else {
-       // default full component in place
-       comp = components.ChampionComponent(champion, h.Config)
-   }
-   c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, comp))
+	// Render based on 'modal' or 'compact' query param
+	var comp templ.Component
+	if _, ok := c.GetQuery("modal"); ok {
+		// full component inside modal overlay
+		comp = components.ChampionModal(champion, h.Config)
+	} else if _, ok := c.GetQuery("compact"); ok {
+		// inline compact view
+		comp = components.ChampionCompact(champion, h.Config)
+	} else {
+		// default full component in place
+		comp = components.ChampionComponent(champion, h.Config)
+	}
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, comp))
 }

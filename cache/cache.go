@@ -234,7 +234,7 @@ func (c *Cache) SetChampion(champion models.Champion) {
 	if c.Champions == nil {
 		c.Champions = make(map[string]models.Champion)
 	}
-	c.Champions[champion.ID] = champion
+	c.Champions[champion.Key] = champion
 }
 
 // Autocomplete returns up to 'limit' champion names that best match the input using

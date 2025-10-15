@@ -29,7 +29,7 @@ func ChampionForm() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form id=\"championForm\" hx-get=\"/champion\" hx-trigger=\"submit\" hx-target=\"#championResult\" hx-swap=\"innerHTML\" class=\"space-y-4\"><div><label class=\"block text-gray-700 font-bold mb-2\">Champion Name</label> <input class=\"shadow appearance-none border rounded w-full py-2 px-3 text-gray-700\n\t\t\t\t\t\tleading-tight focus:outline-none focus:shadow-outline\" type=\"text\" name=\"champion\" placeholder=\"Enter champion name\" hx-get=\"/autocomplete\" hx-trigger=\"keyup changed delay:300ms\" hx-target=\"#autocompleteResults\" hx-swap=\"innerHTML\" autocomplete=\"off\" spellcheck=\"false\" autocorrect=\"off\" autocapitalize=\"none\"></div><div id=\"autocompleteResults\"></div><div><!-- Submitting the form triggers hx-get=\"/champion\" for final output. --><button class=\"bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded\" type=\"submit\">Submit</button></div></form><!-- Final champion response output appears here --><div id=\"championResult\" class=\"mt-4\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow\"><h2 class=\"text-xl font-semibold text-slate-900\">Champion Lookup</h2><p class=\"mt-1 text-sm text-slate-600\">Start typing a champion name and pick from suggestions. Submit to view full details.</p><form id=\"championForm\" hx-get=\"/champion\" hx-trigger=\"submit\" hx-target=\"#championResult\" hx-swap=\"innerHTML\" hx-indicator=\".htmx-indicator\" class=\"mt-6 space-y-4\"><div><label class=\"mb-2 block text-sm font-medium text-slate-700\">Champion Name</label> <input class=\"block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500\" type=\"text\" name=\"champion\" placeholder=\"e.g. Ahri\" hx-get=\"/autocomplete\" hx-trigger=\"keyup changed delay:300ms\" hx-target=\"#autocompleteResults\" hx-swap=\"innerHTML\" autocomplete=\"off\" spellcheck=\"false\" autocorrect=\"off\" autocapitalize=\"none\"></div><div id=\"autocompleteResults\"></div><div class=\"flex items-center gap-3\"><button class=\"inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500\" type=\"submit\">Search</button><div class=\"htmx-indicator inline-flex items-center gap-2 text-sm text-slate-500\"><svg class=\"h-4 w-4 animate-spin text-slate-400\" viewBox=\"0 0 24 24\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\" fill=\"none\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z\"></path></svg> Loading…</div></div></form><div id=\"championResult\" class=\"mt-6\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -70,7 +70,7 @@ func ChampionAutocomplete(matches []string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul class=\"border border-gray-200 bg-white rounded shadow-md w-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<ul class=\"w-full rounded-md border border-slate-200 bg-white shadow-sm\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,7 +85,7 @@ func ChampionAutocomplete(matches []string) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"px-3 py-2 hover:bg-gray-100 cursor-pointer\" onclick=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<li class=\"cursor-pointer px-3 py-2 hover:bg-slate-50\" onclick=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -101,7 +101,7 @@ func ChampionAutocomplete(matches []string) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(m)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/autocomplete.templ`, Line: 65, Col: 8}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/autocomplete.templ`, Line: 62, Col: 23}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
