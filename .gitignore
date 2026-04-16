@@ -32,5 +32,13 @@ tmp
 *.gob
 .air.toml
 
+# Cache data
+cache.json
+
 # templ generated files
 components/*_templ.go
+
+# Reference docs and sample data (keep locally, not tracked)
+*.html
+riven.json
+todo.md

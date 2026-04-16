@@ -36,6 +36,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	cfg.Validate(cfg.Logger)
+
 	// Load cache from disk if present
 	if err := cfg.Cache.Load(); err != nil {
 		cfg.Logger.Warnf("Cache not loaded (possibly first run): %v", err)
@@ -43,9 +45,9 @@ func main() {
 
 	// Create the API client
 	apiClient := &client.Client{
-		HTTPClient:       cfg.HTTPClient,
-		Logger:           cfg.Logger,
-		ChampionDataURL:  cfg.MerakiURL,
+		HTTPClient:        cfg.HTTPClient,
+		Logger:            cfg.Logger,
+		ChampionDataURL:   cfg.MerakiURL,
 		DDragonVersionURL: cfg.DDragonVersionURL,
 	}
 

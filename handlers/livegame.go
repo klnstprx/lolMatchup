@@ -54,7 +54,7 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	acct, err := h.Client.FetchAccountByRiotID(ctx, gameName, tagLine, h.Config.RiotRegion, h.Config.RiotAPIKey)
 	if err != nil {
 		switch {
-		case err == client.ErrAccountNotFound:
+		case errors.Is(err, client.ErrAccountNotFound):
 			c.String(http.StatusNotFound, fmt.Sprintf("Account '%s#%s' not found.", gameName, tagLine))
 			h.Logger.Debug("Account not found", "riotID", gameName+"#"+tagLine)
 			return
@@ -73,7 +73,7 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	activeGame, err := h.Client.FetchCurrentGameByPUUID(ctx, acct.PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey)
 	if err != nil {
 		switch {
-		case err == client.ErrGameNotFound:
+		case errors.Is(err, client.ErrGameNotFound):
 			c.String(http.StatusNotFound, fmt.Sprintf("Account '%s#%s' is not currently in a game.", gameName, tagLine))
 			h.Logger.Debug("No active game for account", "riotID", gameName+"#"+tagLine)
 			return
@@ -88,70 +88,43 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 		}
 	}
 
-	// Extract participants and their champion selection
-	rawParts, ok := activeGame["participants"].([]interface{})
-	if !ok {
-		h.Logger.Error("Unexpected game payload: participants missing or invalid")
-		c.String(http.StatusInternalServerError, "Invalid game data format.")
-		return
+	// Find the user's team
+	var userTeamID int64
+	for _, p := range activeGame.Participants {
+		if p.RiotID == riotID {
+			userTeamID = p.TeamID
+			break
+		}
 	}
-	// Build participant list: lookup numeric championId → textual ID → champion Name
+
+	// Build opponent list: lookup numeric championId -> textual ID -> display name
 	keyMap := h.Config.Cache.GetChampionKeyMap() // numeric key -> textual ID
 	nameMap := h.Config.Cache.GetChampionMap()   // champion Name -> textual ID
-	// invert nameMap to get textual ID -> champion Name
 	textualToName := make(map[string]string, len(nameMap))
 	for name, id := range nameMap {
 		textualToName[id] = name
 	}
-	var parts []map[string]string
-	var userTeamID int
-	// check team of the player
-	for _, r := range rawParts {
-		if m, ok := r.(map[string]interface{}); ok {
-			if fmt.Sprintf("%s", m["riotId"]) == riotID {
-				// teamId in json is float64
-				if t, ok := m["teamId"].(float64); ok {
-					userTeamID = int(t)
-				}
-				break
 
-			}
+	var parts []map[string]string
+	for _, p := range activeGame.Participants {
+		if p.TeamID == userTeamID {
+			continue
 		}
-	}
-	for _, r := range rawParts {
-		if m, ok := r.(map[string]interface{}); ok {
-			tval, _ := m["teamId"].(float64)
-			if int(tval) == userTeamID {
-				continue
-			}
-			// Summoner name
-			summ := fmt.Sprintf("%v", m["riotId"])
-			// Champion numeric ID may be a float64; convert to integer string
-			var numKey string
-			switch v := m["championId"].(type) {
-			case float64:
-				numKey = strconv.Itoa(int(v))
-			default:
-				numKey = fmt.Sprintf("%v", v)
-			}
-			// Lookup textual champion ID
-			textID, found := keyMap[numKey]
-			if !found {
-				h.Logger.Error("Champion ID missing from keyMap", "championId", numKey)
-				textID = numKey
-			}
-			// Lookup display name from textual ID
-			champName, foundName := textualToName[textID]
-			if !foundName {
-				// Fallback to textual ID if no display name
-				champName = textID
-			}
-			parts = append(parts, map[string]string{
-				"riotId":       summ,
-				"championId":   textID,
-				"championName": champName,
-			})
+		numKey := strconv.FormatInt(p.ChampionID, 10)
+		textID, found := keyMap[numKey]
+		if !found {
+			h.Logger.Error("Champion ID missing from keyMap", "championId", numKey)
+			textID = numKey
 		}
+		champName, foundName := textualToName[textID]
+		if !foundName {
+			champName = textID
+		}
+		parts = append(parts, map[string]string{
+			"riotId":       p.RiotID,
+			"championId":   textID,
+			"championName": champName,
+		})
 	}
 
 	// Render using templ component

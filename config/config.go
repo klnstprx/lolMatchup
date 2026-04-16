@@ -44,8 +44,24 @@ func New() *AppConfig {
 		MerakiURL:            "https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/",
 		DDragonVersionURL:    "https://ddragon.leagueoflegends.com/api/versions.json",
 		LevenshteinThreshold: 3,
-		CachePath:            "cache.gob",
+		CachePath:            "cache.json",
 		HTTPClientTimeout:    10,
+	}
+}
+
+// Validate checks configuration for common issues and logs warnings.
+func (cfg *AppConfig) Validate(logger *log.Logger) {
+	if cfg.RiotAPIKey == "" || cfg.RiotAPIKey == "YOUR_RIOT_API_KEY_HERE" {
+		logger.Warn("Riot API key is missing or placeholder — player lookup and live game features will not work")
+	}
+	validRegions := map[string]bool{
+		"na1": true, "br1": true, "la1": true, "la2": true,
+		"euw1": true, "eun1": true, "ru": true, "tr1": true,
+		"kr": true, "jp1": true,
+		"oc1": true, "sg2": true, "tw2": true, "vn2": true,
+	}
+	if cfg.RiotRegion != "" && !validRegions[cfg.RiotRegion] {
+		logger.Warnf("Riot region %q is not a recognized region", cfg.RiotRegion)
 	}
 }
 

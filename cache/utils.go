@@ -55,12 +55,3 @@ func levenshteinDistance(a, b string) int {
 	}
 	return dp[la][lb]
 }
-
-func min(a, b, c int) int {
-	if a < b && a < c {
-		return a
-	} else if b < c {
-		return b
-	}
-	return c
-}

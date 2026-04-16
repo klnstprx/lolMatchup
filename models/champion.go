@@ -1,12 +1,12 @@
 package models
 
 type Champion struct {
-	ID    int    `json:"id"`
-	Key   string `json:"key"`
-	Name  string `json:"name"`
-	Title string `json:"title"`
-	Icon  string `json:"icon"`
-	Stats ChampionStats `json:"stats"`
+	ID        int                          `json:"id"`
+	Key       string                       `json:"key"`
+	Name      string                       `json:"name"`
+	Title     string                       `json:"title"`
+	Icon      string                       `json:"icon"`
+	Stats     ChampionStats                `json:"stats"`
 	Abilities map[string][]ChampionAbility `json:"abilities"`
 }
 
@@ -52,10 +52,37 @@ type ChampionStats struct {
 }
 
 type ChampionAbility struct {
-	Name        string `json:"name"`
-	Icon        string `json:"icon"`
-	Description string `json:"blurb"`
-	Effects     []struct {
-		Description string `json:"description"`
-	} `json:"effects"`
+	Name         string    `json:"name"`
+	Icon         string    `json:"icon"`
+	Description  string    `json:"blurb"`
+	Effects      []Effect  `json:"effects"`
+	Cost         *Cost     `json:"cost"`
+	Cooldown     *Cooldown `json:"cooldown"`
+	CastTime     *string   `json:"castTime"`
+	TargetRange  *string   `json:"targetRange"`
+	EffectRadius *string   `json:"effectRadius"`
+	Speed        *string   `json:"speed"`
+}
+
+type Effect struct {
+	Description string     `json:"description"`
+	Leveling    []Leveling `json:"leveling"`
+}
+
+type Leveling struct {
+	Attribute string     `json:"attribute"`
+	Modifiers []Modifier `json:"modifiers"`
+}
+
+type Modifier struct {
+	Values []float64 `json:"values"`
+	Units  []string  `json:"units"`
+}
+
+type Cost struct {
+	Modifiers []Modifier `json:"modifiers"`
+}
+
+type Cooldown struct {
+	Modifiers []Modifier `json:"modifiers"`
 }

@@ -3,11 +3,13 @@ package data
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/charmbracelet/log"
 	"github.com/klnstprx/lolMatchup/cache"
 	"github.com/klnstprx/lolMatchup/client"
 	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
 )
 
 // DataLoader handles obtaining the latest patch and champion data, caching as needed.
@@ -52,11 +54,9 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to fetch champion map: %w", err)
 		}
-		nameMap := make(map[string]string)
-		for _, champ := range champions {
-			nameMap[champ.Name] = champ.Key
-		}
+		nameMap, keyMap := buildChampionMaps(champions)
 		dl.Cache.SetChampionMap(nameMap)
+		dl.Cache.SetChampionKeyMap(keyMap)
 
 		if err := dl.Cache.Save(); err != nil {
 			dl.Logger.Errorf("Could not save cache: %v", err)
@@ -69,11 +69,9 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 			if err != nil {
 				return fmt.Errorf("failed to fetch champion map: %w", err)
 			}
-			nameMap := make(map[string]string)
-			for _, champ := range champions {
-				nameMap[champ.Name] = champ.Key
-			}
+			nameMap, keyMap := buildChampionMaps(champions)
 			dl.Cache.SetChampionMap(nameMap)
+			dl.Cache.SetChampionKeyMap(keyMap)
 
 			if err := dl.Cache.Save(); err != nil {
 				dl.Logger.Errorf("Could not save cache: %v", err)
@@ -82,4 +80,15 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// buildChampionMaps returns a name->key map and a numeric ID->key map from champion data.
+func buildChampionMaps(champions map[string]models.Champion) (nameMap, keyMap map[string]string) {
+	nameMap = make(map[string]string, len(champions))
+	keyMap = make(map[string]string, len(champions))
+	for _, champ := range champions {
+		nameMap[champ.Name] = champ.Key
+		keyMap[strconv.Itoa(champ.ID)] = champ.Key
+	}
+	return nameMap, keyMap
 }

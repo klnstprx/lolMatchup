@@ -39,7 +39,7 @@
 
 - Commits: short imperative subject; optional Conventional Commits (`feat:`, `fix:`, `refactor:`). Examples: `feat: add live game support`, `fix: cache eviction on update`.
 - PRs: include a clear description, linked issues, test plan (`go test` output), and screenshots/GIFs for UI changes.
-- Generated code: commit both `*.templ` and `*_templ.go` to keep builds reproducible.
+- Generated code: do NOT commit `*_templ.go` files (they are gitignored). Always run `templ generate` before building.
 
 ## Security & Configuration
 
