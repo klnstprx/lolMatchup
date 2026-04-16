@@ -99,6 +99,7 @@ func (c *Cache) Invalidate() {
 	defer c.mu.Unlock()
 	c.Champions = make(map[string]models.Champion)
 	c.ChampionMap = make(map[string]string)
+	c.ChampionKeyMap = make(map[string]string)
 }
 
 // SetChampionKeyMap sets the mapping from numeric key to textual champion ID.

@@ -10,8 +10,10 @@ language_code = "en_US"        # Data Dragon locale (e.g. en_US, es_MX)
 # Fuzzy search threshold (Levenshtein distance)
 levenshtein_threshold = 3
 
-# Data Dragon (static game data) endpoints
-ddragon_url = "https://ddragon.leagueoflegends.com/cdn/"
+# Champion data endpoint (Meraki Analytics CDN)
+meraki_url = "https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/"
+
+# Data Dragon version endpoint (used for patch detection)
 ddragon_version_url = "https://ddragon.leagueoflegends.com/api/versions.json"
 
 # Enable debug logging (true/false)
@@ -21,7 +23,7 @@ debug = true
 http_client_timeout = 10
 
 # Local cache file path
-cache_path = "cache.gob"
+cache_path = "cache.json"
 
 # Riot API configuration
 riot_api_key = "YOUR_RIOT_API_KEY_HERE"   # Obtain from Riot Developer Portal

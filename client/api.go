@@ -87,42 +87,6 @@ type AccountDTO struct {
 // ErrAccountNotFound indicates the account (riot id) was not found.
 var ErrAccountNotFound = errors.New("account not found")
 
-// FetchActiveGame retrieves the active game for a given encryptedSummonerID.
-func (c *Client) FetchActiveGame(ctx context.Context, encryptedSummonerID, riotRegion, riotAPIKey string) (map[string]interface{}, error) {
-	url := fmt.Sprintf("https://%s.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/%s", riotRegion, encryptedSummonerID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create active game request: %w", err)
-	}
-	// Use header authentication for Riot API key
-	req.Header.Set("X-Riot-Token", riotAPIKey)
-	resp, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to fetch active game: %w", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		// capture response body for debugging
-		data, _ := io.ReadAll(resp.Body)
-		switch resp.StatusCode {
-		case http.StatusNotFound:
-			return nil, ErrGameNotFound
-		case http.StatusForbidden:
-			return nil, fmt.Errorf("%w: %s", ErrPermissionDenied, string(data))
-		}
-		return nil, fmt.Errorf("unexpected status code %d fetching active game: %s", resp.StatusCode, string(data))
-	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read active game response: %w", err)
-	}
-	var result map[string]interface{}
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("failed to parse active game JSON: %w", err)
-	}
-	return result, nil
-}
-
 // FetchAccountByRiotID retrieves account information (incl. puuid) via gameName/tagLine.
 func (c *Client) FetchAccountByRiotID(ctx context.Context, gameName, tagLine, riotRegion, riotAPIKey string) (AccountDTO, error) {
 	var acct AccountDTO
