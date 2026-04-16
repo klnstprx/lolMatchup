@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 	"github.com/klnstprx/lolMatchup/cache"
 	"github.com/klnstprx/lolMatchup/client"
-	"github.com/a-h/templ"
 	"github.com/klnstprx/lolMatchup/components"
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/renderer"

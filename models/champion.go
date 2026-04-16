@@ -1,12 +1,12 @@
 package models
 
 type Champion struct {
-	ID    int    `json:"id"`
-	Key   string `json:"key"`
-	Name  string `json:"name"`
-	Title string `json:"title"`
-	Icon  string `json:"icon"`
-	Stats ChampionStats `json:"stats"`
+	ID        int                          `json:"id"`
+	Key       string                       `json:"key"`
+	Name      string                       `json:"name"`
+	Title     string                       `json:"title"`
+	Icon      string                       `json:"icon"`
+	Stats     ChampionStats                `json:"stats"`
 	Abilities map[string][]ChampionAbility `json:"abilities"`
 }
 

@@ -45,9 +45,9 @@ func main() {
 
 	// Create the API client
 	apiClient := &client.Client{
-		HTTPClient:       cfg.HTTPClient,
-		Logger:           cfg.Logger,
-		ChampionDataURL:  cfg.MerakiURL,
+		HTTPClient:        cfg.HTTPClient,
+		Logger:            cfg.Logger,
+		ChampionDataURL:   cfg.MerakiURL,
 		DDragonVersionURL: cfg.DDragonVersionURL,
 	}
 
