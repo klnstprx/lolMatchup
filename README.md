@@ -42,7 +42,7 @@ lolMatchup/
 
 ### Prerequisites
 
-- **Go** 1.24+
+- **Go** 1.26+
 - **templ** CLI (`go install github.com/a-h/templ/cmd/templ@latest`)
 - **Git**
 
