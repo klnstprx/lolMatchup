@@ -43,7 +43,7 @@ func (h *PlayerHandler) PlayerGET(c *gin.Context) {
 	}
 	player, err := h.Client.FetchSummonerByName(ctx, parts[0], h.Config.RiotRegion, h.Config.RiotAPIKey)
 	if err != nil {
-		if err == client.ErrSummonerNotFound {
+		if errors.Is(err, client.ErrSummonerNotFound) {
 			c.String(http.StatusNotFound, fmt.Sprintf("Summoner '%s' not found.", riotID))
 			h.Logger.Debug("summoner not found", "riotID", riotID)
 			return

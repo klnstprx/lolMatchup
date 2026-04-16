@@ -16,12 +16,12 @@ import (
 func newTestAutocompleteHandler() *AutocompleteHandler {
 	c := cache.New("", 3)
 	c.SetChampionMap(map[string]string{
-		"Aatrox":   "Aatrox",
-		"Ahri":     "Ahri",
-		"Ashe":     "Ashe",
-		"Akali":    "Akali",
+		"Aatrox":     "Aatrox",
+		"Ahri":       "Ahri",
+		"Ashe":       "Ashe",
+		"Akali":      "Akali",
 		"Blitzcrank": "Blitzcrank",
-		"Brand":    "Brand",
+		"Brand":      "Brand",
 	})
 	return &AutocompleteHandler{
 		Logger: log.New(os.Stderr),
@@ -33,11 +33,11 @@ func TestAutocompleteGET(t *testing.T) {
 	h := newTestAutocompleteHandler()
 
 	tests := []struct {
-		name           string
-		query          string
-		wantStatus     int
-		wantEmpty      bool   // expect empty/minimal body (no suggestions)
-		wantContains   string // substring expected in body if non-empty
+		name         string
+		query        string
+		wantStatus   int
+		wantEmpty    bool   // expect empty/minimal body (no suggestions)
+		wantContains string // substring expected in body if non-empty
 	}{
 		{
 			name:       "empty query returns empty suggestions",
