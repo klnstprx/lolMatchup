@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -111,7 +112,7 @@ func (h *PlayerHandler) lookupPlayer(ctx context.Context, riotID string) *compon
 		leagueEntries = entries
 	}
 
-	matches, fullMatches, loaded, total := h.fetchMatchHistory(ctx, acct.PUUID)
+	matches, fullMatches, loaded, total := h.fetchMatchHistory(ctx, acct.PUUID, 0)
 	matchups := computeMatchupStats(fullMatches, acct.PUUID)
 	championPool := computeChampionPool(matches, 5)
 
@@ -131,11 +132,33 @@ func (h *PlayerHandler) lookupPlayer(ctx context.Context, riotID string) *compon
 
 const matchHistoryCount = 10
 
+// PlayerMatchesGET handles paginated match history requests via HTMX.
+// Returns the next page of match items plus a new "Load More" button.
+func (h *PlayerHandler) PlayerMatchesGET(c *gin.Context) {
+	ctx := c.Request.Context()
+	puuid := strings.TrimSpace(c.Query("puuid"))
+	if puuid == "" {
+		renderError(c, http.StatusBadRequest, "Missing puuid parameter.")
+		return
+	}
+	start, err := strconv.Atoi(c.DefaultQuery("start", "0"))
+	if err != nil || start < 0 {
+		start = 0
+	}
+
+	matches, _, loaded, _ := h.fetchMatchHistory(ctx, puuid, start)
+
+	hasMore := loaded == matchHistoryCount
+	nextStart := start + loaded
+	cmp := components.MatchHistoryPage(matches, puuid, h.Config, nextStart, hasMore)
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+}
+
 // fetchMatchHistory retrieves recent matches for a player and extracts summaries.
 // Returns condensed summaries, full match DTOs, and counts of loaded/total matches.
 // Errors are logged but not surfaced — match history is non-critical.
-func (h *PlayerHandler) fetchMatchHistory(ctx context.Context, puuid string) ([]models.MatchSummary, []models.MatchDTO, int, int) {
-	ids, err := h.Client.FetchMatchIDs(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey, matchHistoryCount)
+func (h *PlayerHandler) fetchMatchHistory(ctx context.Context, puuid string, start int) ([]models.MatchSummary, []models.MatchDTO, int, int) {
+	ids, err := h.Client.FetchMatchIDs(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey, matchHistoryCount, start)
 	if err != nil {
 		h.Logger.Warn("failed to fetch match IDs", "error", err)
 		return nil, nil, 0, 0

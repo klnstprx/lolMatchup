@@ -361,7 +361,7 @@ func TestFetchMatchIDs(t *testing.T) {
 					Body:       io.NopCloser(strings.NewReader(tt.body)),
 				},
 			})
-			ids, err := c.FetchMatchIDs(context.Background(), "puuid", "euw1", "k", 3)
+			ids, err := c.FetchMatchIDs(context.Background(), "puuid", "euw1", "k", 3, 0)
 			if tt.wantErr {
 				if err == nil {
 					t.Fatal("expected error, got nil")

@@ -242,7 +242,7 @@ func (h *LiveGameHandler) enrichOpponents(ctx context.Context, opponents []compo
 func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentChampName string) models.OpponentEnrichment {
 	var e models.OpponentEnrichment
 
-	ids, err := h.Client.FetchMatchIDs(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey, enrichMatchCount)
+	ids, err := h.Client.FetchMatchIDs(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey, enrichMatchCount, 0)
 	if err != nil {
 		h.Logger.Debug("enrichment: failed to fetch match IDs", "puuid", puuid, "error", err)
 		return e

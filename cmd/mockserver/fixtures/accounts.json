@@ -4,29 +4,34 @@
     "gameName": "Zanzarah",
     "tagLine": "1996"
   },
-  "cäps#euw": {
+  "c\u00e4ps#euw": {
     "puuid": "G8dxCAbtwhUKjHTWASoVpb4VdT-UoW47a9AHIgH0e3Kf_xrd5sYBRLdDkxZDtClqT0ejH4ujv4TOkQ",
-    "gameName": "Cäps",
+    "gameName": "C\u00e4ps",
     "tagLine": "EUW"
   },
   "caps#euw": {
     "puuid": "G8dxCAbtwhUKjHTWASoVpb4VdT-UoW47a9AHIgH0e3Kf_xrd5sYBRLdDkxZDtClqT0ejH4ujv4TOkQ",
-    "gameName": "Cäps",
+    "gameName": "C\u00e4ps",
     "tagLine": "EUW"
   },
-  "jânkos#euw": {
+  "j\u00e2nkos#euw": {
     "puuid": "9cJO4zghZzIdregimmDznZk-MNXMGn12M9Esy9NTu1HknLHY8lTj3IMsC_0rcqZMuvqJWBA_yZo-1Q",
-    "gameName": "Jânkos",
+    "gameName": "J\u00e2nkos",
     "tagLine": "EUW"
   },
   "jankos#euw": {
     "puuid": "9cJO4zghZzIdregimmDznZk-MNXMGn12M9Esy9NTu1HknLHY8lTj3IMsC_0rcqZMuvqJWBA_yZo-1Q",
-    "gameName": "Jânkos",
+    "gameName": "J\u00e2nkos",
     "tagLine": "EUW"
   },
   "faker#t1": {
     "puuid": "av3HPIBaMhGFASz6b-Uty0UVqckIQbPCvu8yw5WAwmXUZ9wyCnOV91mUSeNfjSYfiS5CpYmH-JPPNA",
     "gameName": "Faker",
     "tagLine": "T1 "
+  },
+  "eepy edward#1337": {
+    "puuid": "2KFHMSl0sgPO0lRev6cZkRjRAlTcG2200UhY8xKRK2tX7XxFbftqnnpgjaxrCFi1nb3Zk9wglmVKNw",
+    "gameName": "eepy edward",
+    "tagLine": "1337"
   }
 }

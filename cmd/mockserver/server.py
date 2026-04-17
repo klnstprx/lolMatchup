@@ -116,8 +116,9 @@ def match_ids_by_puuid(puuid: str):
     ids = MATCH_IDS.get(puuid)
     if ids is None:
         return jsonify([])
+    start = request.args.get("start", default=0, type=int)
     count = request.args.get("count", default=20, type=int)
-    return jsonify(ids[:count])
+    return jsonify(ids[start:start + count])
 
 
 @app.route("/lol/match/v5/matches/<match_id>")

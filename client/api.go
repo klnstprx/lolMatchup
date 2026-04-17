@@ -165,13 +165,14 @@ func (c *Client) FetchCurrentGameByPUUID(ctx context.Context, puuid, riotRegion,
 }
 
 // FetchMatchIDs retrieves recent match IDs for a player by PUUID (match-v5, cluster routing).
-func (c *Client) FetchMatchIDs(ctx context.Context, puuid, riotRegion, riotAPIKey string, count int) ([]string, error) {
+// The start parameter controls the offset for pagination.
+func (c *Client) FetchMatchIDs(ctx context.Context, puuid, riotRegion, riotAPIKey string, count, start int) ([]string, error) {
 	cluster, ok := RegionToCluster[riotRegion]
 	if !ok {
 		cluster = riotRegion
 	}
 	var ids []string
-	reqURL := fmt.Sprintf("%s/lol/match/v5/matches/by-puuid/%s/ids?count=%d", c.riotURL(cluster), url.PathEscape(puuid), count)
+	reqURL := fmt.Sprintf("%s/lol/match/v5/matches/by-puuid/%s/ids?count=%d&start=%d", c.riotURL(cluster), url.PathEscape(puuid), count, start)
 	if err := c.doJSON(ctx, reqURL, riotAPIKey, &ids); err != nil {
 		return nil, err
 	}

@@ -54,6 +54,7 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	// Routes that call Riot API — rate limited, no cache (real-time data)
 	riotLimiter := middleware.RateLimitMiddleware(rate.Limit(15), 20)
 	r.GET("/player", riotLimiter, playerHandler.PlayerGET)
+	r.GET("/player/matches", riotLimiter, playerHandler.PlayerMatchesGET)
 	r.GET("/player/livegame", riotLimiter, liveGameHandler.PlayerLiveGameGET)
 	r.GET("/livegame", riotLimiter, liveGameHandler.LiveGameGET)
 	r.GET("/match", riotLimiter, matchHandler.MatchGET)

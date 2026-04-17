@@ -74,6 +74,100 @@ func queueName(queueID int) string {
 	}
 }
 
+// matchItem renders a single match summary as a <details> accordion item.
+templ matchItem(m models.MatchSummary, puuid string, cfg *config.AppConfig) {
+	<details name="match-accordion">
+		<summary
+			class={
+				"list-none cursor-pointer rounded-lg border-l-4 bg-white p-3 shadow-sm transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden",
+				templ.KV("border-emerald-500", m.Win),
+				templ.KV("border-red-400", !m.Win),
+			}
+		>
+			<!-- Top row: champion, result, KDA, CS, duration -->
+			<div class="flex items-center gap-3">
+				@ChampionIcon(m.ChampionName, cfg.PatchNumber, "h-10 w-10", "ring-1 ring-slate-200")
+				<div class="min-w-0 flex-1">
+					<div class="flex items-center gap-2">
+						<span
+							class={
+								"text-xs font-bold",
+								templ.KV("text-emerald-600", m.Win),
+								templ.KV("text-red-500", !m.Win),
+							}
+						>
+							if m.Win {
+								W
+							} else {
+								L
+							}
+						</span>
+						<span class="text-sm font-semibold text-slate-900">{ m.ChampionName }</span>
+						if positionShort(m.Position) != "" && positionShort(m.Position) != "Invalid" {
+							@Badge(positionShort(m.Position), "neutral")
+						}
+						<span class="ml-auto text-xs text-slate-400">{ timeAgo(m.GameStartTime) }</span>
+					</div>
+					<div class="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+						<span class="font-medium text-slate-700">
+							{ fmt.Sprint(m.Kills) }/{ fmt.Sprint(m.Deaths) }/{ fmt.Sprint(m.Assists) }
+						</span>
+						<span>{ fmt.Sprint(m.CS) } CS</span>
+						<span>{ formatDuration(m.GameDuration) }</span>
+						<span class="text-slate-400">{ queueName(m.QueueID) }</span>
+					</div>
+				</div>
+			</div>
+			<!-- Bottom row: items -->
+			<div class="mt-2 flex items-center gap-1">
+				for _, itemID := range m.Items {
+					if itemID > 0 {
+						<img
+							class="h-6 w-6 rounded"
+							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/item/%d.png", cfg.PatchNumber, itemID))) }
+							alt={ fmt.Sprintf("Item %d", itemID) }
+						/>
+					}
+				}
+				<div class="ml-auto flex items-center gap-3 text-[11px] text-slate-400">
+					<span>{ fmt.Sprintf("%dk dmg", m.Damage/1000) }</span>
+					<span>{ fmt.Sprintf("%dk gold", m.Gold/1000) }</span>
+				</div>
+			</div>
+		</summary>
+		<!-- Match detail panel: lazy-loaded on toggle via HTMX -->
+		<div
+			id={ fmt.Sprintf("match-%s", m.MatchID) }
+			class="match-detail-panel"
+			hx-get={ fmt.Sprintf("/match?id=%s&puuid=%s", m.MatchID, puuid) }
+			hx-trigger="toggle from:closest details"
+			hx-swap="innerHTML"
+		>
+			<div class="mt-1 flex items-center justify-center gap-1 py-2 text-sm text-slate-400">
+				@Spinner("h-4 w-4")
+				Loading match details…
+			</div>
+		</div>
+	</details>
+}
+
+// loadMoreButton renders the "Load More" button for match history pagination.
+templ loadMoreButton(puuid string, nextStart int) {
+	<div
+		id="match-load-more"
+		hx-get={ fmt.Sprintf("/player/matches?puuid=%s&start=%d", puuid, nextStart) }
+		hx-trigger="click"
+		hx-swap="outerHTML"
+		hx-indicator="find .load-more-spinner"
+		class="mt-2 flex cursor-pointer items-center justify-center rounded-lg border border-dashed border-slate-300 py-2.5 text-sm text-slate-500 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600"
+	>
+		<span class="load-more-default">Load older matches</span>
+		<span class="load-more-spinner htmx-indicator">
+			@Spinner("h-4 w-4")
+		</span>
+	</div>
+}
+
 // MatchHistory renders a list of recent match summaries.
 // Uses native <details> elements with a shared name for exclusive accordion behavior.
 templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppConfig) {
@@ -82,83 +176,25 @@ templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppC
 		if len(matches) == 0 {
 			<p class="text-sm text-slate-400">No recent matches found.</p>
 		} else {
-			<div class="space-y-2">
+			<div id="match-history-list" class="space-y-2">
 				for _, m := range matches {
-					<details name="match-accordion">
-						<summary
-							class={
-								"list-none cursor-pointer rounded-lg border-l-4 bg-white p-3 shadow-sm transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden",
-								templ.KV("border-emerald-500", m.Win),
-								templ.KV("border-red-400", !m.Win),
-							}
-						>
-							<!-- Top row: champion, result, KDA, CS, duration -->
-							<div class="flex items-center gap-3">
-								@ChampionIcon(m.ChampionName, cfg.PatchNumber, "h-10 w-10", "ring-1 ring-slate-200")
-								<div class="min-w-0 flex-1">
-									<div class="flex items-center gap-2">
-										<span
-											class={
-												"text-xs font-bold",
-												templ.KV("text-emerald-600", m.Win),
-												templ.KV("text-red-500", !m.Win),
-											}
-										>
-											if m.Win {
-												W
-											} else {
-												L
-											}
-										</span>
-										<span class="text-sm font-semibold text-slate-900">{ m.ChampionName }</span>
-										if positionShort(m.Position) != "" && positionShort(m.Position) != "Invalid" {
-											@Badge(positionShort(m.Position), "neutral")
-										}
-										<span class="ml-auto text-xs text-slate-400">{ timeAgo(m.GameStartTime) }</span>
-									</div>
-									<div class="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
-										<span class="font-medium text-slate-700">
-											{ fmt.Sprint(m.Kills) }/{ fmt.Sprint(m.Deaths) }/{ fmt.Sprint(m.Assists) }
-										</span>
-										<span>{ fmt.Sprint(m.CS) } CS</span>
-										<span>{ formatDuration(m.GameDuration) }</span>
-										<span class="text-slate-400">{ queueName(m.QueueID) }</span>
-									</div>
-								</div>
-							</div>
-							<!-- Bottom row: items -->
-							<div class="mt-2 flex items-center gap-1">
-								for _, itemID := range m.Items {
-									if itemID > 0 {
-										<img
-											class="h-6 w-6 rounded"
-											src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/item/%d.png", cfg.PatchNumber, itemID))) }
-											alt={ fmt.Sprintf("Item %d", itemID) }
-										/>
-									}
-								}
-								<div class="ml-auto flex items-center gap-3 text-[11px] text-slate-400">
-									<span>{ fmt.Sprintf("%dk dmg", m.Damage/1000) }</span>
-									<span>{ fmt.Sprintf("%dk gold", m.Gold/1000) }</span>
-								</div>
-							</div>
-						</summary>
-						<!-- Match detail panel: lazy-loaded on toggle via HTMX -->
-						<div
-							id={ fmt.Sprintf("match-%s", m.MatchID) }
-							class="match-detail-panel"
-							hx-get={ fmt.Sprintf("/match?id=%s&puuid=%s", m.MatchID, puuid) }
-							hx-trigger="toggle from:closest details"
-							hx-swap="innerHTML"
-						>
-							<div class="mt-1 flex items-center justify-center gap-1 py-2 text-sm text-slate-400">
-								@Spinner("h-4 w-4")
-								Loading match details…
-							</div>
-						</div>
-					</details>
+					@matchItem(m, puuid, cfg)
+				}
+				if len(matches) >= 10 {
+					@loadMoreButton(puuid, len(matches))
 				}
 			</div>
 		}
 	</div>
+}
+
+// MatchHistoryPage renders a page of match history items for HTMX pagination.
+// Returned as a fragment that replaces the "Load More" button.
+templ MatchHistoryPage(matches []models.MatchSummary, puuid string, cfg *config.AppConfig, nextStart int, hasMore bool) {
+	for _, m := range matches {
+		@matchItem(m, puuid, cfg)
+	}
+	if hasMore {
+		@loadMoreButton(puuid, nextStart)
+	}
 }
