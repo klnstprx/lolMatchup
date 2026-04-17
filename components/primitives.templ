@@ -18,3 +18,38 @@ templ ChampionIcon(championID, patch, sizeClass, extraClass string) {
 		alt={ championID }
 	/>
 }
+
+// badgeClasses returns Tailwind classes for a badge variant.
+func badgeClasses(variant string) string {
+	base := "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold"
+	switch variant {
+	case "success":
+		return base + " bg-emerald-100 text-emerald-700"
+	case "danger":
+		return base + " bg-red-100 text-red-700"
+	case "warning":
+		return base + " bg-amber-100 text-amber-700"
+	case "info":
+		return base + " bg-blue-100 text-blue-700"
+	default: // "neutral"
+		return base + " bg-slate-100 text-slate-600"
+	}
+}
+
+// Badge renders a styled inline badge with consistent sizing.
+// Variant: "success", "danger", "warning", "info", "neutral".
+templ Badge(text, variant string) {
+	<span class={ badgeClasses(variant) }>{ text }</span>
+}
+
+// SkeletonLine renders a pulsing placeholder bar for loading states.
+// widthClass should be a Tailwind width like "w-24" or "w-full".
+templ SkeletonLine(widthClass string) {
+	<div class={ "h-4 rounded bg-slate-200 animate-pulse", widthClass }></div>
+}
+
+// SkeletonCircle renders a pulsing placeholder circle for avatar loading states.
+// sizeClass should be Tailwind sizing like "h-16 w-16".
+templ SkeletonCircle(sizeClass string) {
+	<div class={ "rounded-full bg-slate-200 animate-pulse", sizeClass }></div>
+}

@@ -24,18 +24,18 @@ type MatchInfo struct {
 
 // MatchParticipant holds per-player stats within a match.
 type MatchParticipant struct {
-	PUUID                       string `json:"puuid"`
-	RiotIDGameName              string `json:"riotIdGameName"`
-	RiotIDTagline               string `json:"riotIdTagline"`
-	TeamID                      int    `json:"teamId"`
-	ChampionName                string `json:"championName"`
-	ChampionID                  int    `json:"championId"`
-	Win                         bool   `json:"win"`
-	Kills                       int    `json:"kills"`
-	Deaths                      int    `json:"deaths"`
-	Assists                     int    `json:"assists"`
-	ChampLevel                  int    `json:"champLevel"`
-	IndividualPosition          string `json:"individualPosition"`
+	PUUID              string `json:"puuid"`
+	RiotIDGameName     string `json:"riotIdGameName"`
+	RiotIDTagline      string `json:"riotIdTagline"`
+	TeamID             int    `json:"teamId"`
+	ChampionName       string `json:"championName"`
+	ChampionID         int    `json:"championId"`
+	Win                bool   `json:"win"`
+	Kills              int    `json:"kills"`
+	Deaths             int    `json:"deaths"`
+	Assists            int    `json:"assists"`
+	ChampLevel         int    `json:"champLevel"`
+	IndividualPosition string `json:"individualPosition"`
 
 	// CS
 	TotalMinionsKilled   int `json:"totalMinionsKilled"`
@@ -126,7 +126,10 @@ type OpponentEnrichment struct {
 	WinStreak          int
 	LossStreak         int
 	MostPlayedPosition string
-	PossiblyOffRole    bool // true if current inferred role differs from most-played role
+	PossiblyOffRole    bool    // true if current inferred role differs from most-played role
+	TotalGames         int     // total matches analyzed
+	RecentWinRate      float64 // overall win rate across recent matches (0.0-1.0)
+	IsOTP              bool    // true if >= 60% of recent games on one champion
 }
 
 // MatchSummary is a condensed view of a player's performance in a match,

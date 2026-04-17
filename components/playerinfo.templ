@@ -6,12 +6,64 @@ import (
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/models"
 	"net/url"
+	"strings"
 	"time"
 )
 
+// queueDisplayName maps Riot queue type strings to user-friendly names.
+func queueDisplayName(queueType string) string {
+	switch queueType {
+	case "RANKED_SOLO_5x5":
+		return "Solo/Duo"
+	case "RANKED_FLEX_SR":
+		return "Flex"
+	default:
+		return queueType
+	}
+}
+
+// tierColorClass returns a Tailwind text color class for a ranked tier.
+func tierColorClass(tier string) string {
+	switch strings.ToUpper(tier) {
+	case "IRON":
+		return "text-stone-500"
+	case "BRONZE":
+		return "text-amber-800"
+	case "SILVER":
+		return "text-slate-400"
+	case "GOLD":
+		return "text-yellow-600"
+	case "PLATINUM":
+		return "text-cyan-600"
+	case "EMERALD":
+		return "text-emerald-600"
+	case "DIAMOND":
+		return "text-blue-500"
+	case "MASTER":
+		return "text-purple-600"
+	case "GRANDMASTER":
+		return "text-red-600"
+	case "CHALLENGER":
+		return "text-amber-400"
+	default:
+		return "text-slate-600"
+	}
+}
+
+// tierTitle returns a properly cased tier + rank string (e.g. "Gold II").
+func tierTitle(tier, rank string) string {
+	t := strings.ToUpper(tier)
+	cased := strings.ToUpper(tier[:1]) + strings.ToLower(tier[1:])
+	// Master+ tiers have no subdivision
+	if t == "MASTER" || t == "GRANDMASTER" || t == "CHALLENGER" {
+		return cased
+	}
+	return cased + " " + rank
+}
+
 // PlayerComponent renders a player profile card with account and summoner data,
 // followed by live game status (async), matchup stats, and match history.
-templ PlayerComponent(acct client.AccountDTO, player client.SummonerDTO, matches []models.MatchSummary, matchups []models.MatchupRecord, cfg *config.AppConfig, matchesLoaded, matchesTotal int, fetchedAt time.Time) {
+templ PlayerComponent(acct client.AccountDTO, player client.SummonerDTO, matches []models.MatchSummary, matchups []models.MatchupRecord, cfg *config.AppConfig, matchesLoaded, matchesTotal int, fetchedAt time.Time, leagueEntries []models.LeagueEntryDTO, championPool []models.ChampionPoolEntry) {
 	<div class="player-result-container">
 		<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
 			<!-- Profile header -->
@@ -67,6 +119,75 @@ templ PlayerComponent(acct client.AccountDTO, player client.SummonerDTO, matches
 					</div>
 				</dl>
 			</div>
+			<!-- Ranked info -->
+			if len(leagueEntries) > 0 {
+				<div class="border-t border-slate-100 px-6 py-4">
+					<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Ranked</h3>
+					<div class="space-y-3">
+						for _, entry := range leagueEntries {
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									<span class={ "text-sm font-bold", tierColorClass(entry.Tier) }>
+										{ tierTitle(entry.Tier, entry.Rank) }
+									</span>
+									<span class="text-xs text-slate-400">{ queueDisplayName(entry.QueueType) }</span>
+								</div>
+								<div class="text-right">
+									<span class="text-sm font-semibold text-slate-700">{ fmt.Sprint(entry.LeaguePoints) } LP</span>
+									<span class="ml-2 text-xs text-slate-500">
+										{ fmt.Sprintf("%dW %dL", entry.Wins, entry.Losses) }
+										if entry.Wins+entry.Losses > 0 {
+											<span class={
+												templ.KV("text-emerald-600", entry.Wins >= entry.Losses),
+												templ.KV("text-red-500", entry.Wins < entry.Losses),
+											}>
+												{ fmt.Sprintf("(%d%%)", entry.Wins*100/(entry.Wins+entry.Losses)) }
+											</span>
+										}
+									</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			} else {
+				<div class="border-t border-slate-100 px-6 py-3">
+					<p class="text-sm text-slate-400">Unranked this season</p>
+				</div>
+			}
+			<!-- Champion pool -->
+			if len(championPool) > 0 {
+				<div class="border-t border-slate-100 px-6 py-4">
+					<h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Champion Pool</h3>
+					<div class="space-y-2">
+						for _, cp := range championPool {
+							<div class="flex items-center gap-3">
+								@ChampionIcon(cp.ChampionName, cfg.PatchNumber, "h-8 w-8", "ring-1 ring-slate-200")
+								<div class="min-w-0 flex-1">
+									<span class="text-sm font-medium text-slate-900">{ cp.ChampionName }</span>
+								</div>
+								<div class="flex items-center gap-3 text-xs">
+									if cp.Games == 1 {
+									<span class="text-slate-500">1 game</span>
+								} else {
+									<span class="text-slate-500">{ fmt.Sprint(cp.Games) } games</span>
+								}
+									<span class={
+										"font-semibold",
+										templ.KV("text-emerald-600", cp.WinRate >= 0.5),
+										templ.KV("text-red-500", cp.WinRate < 0.5),
+									}>
+										{ fmt.Sprintf("%d%%", int(cp.WinRate*100)) }
+									</span>
+									<span class="text-slate-400">
+										{ fmt.Sprintf("%.1f/%.1f/%.1f", cp.AvgKills, cp.AvgDeaths, cp.AvgAssists) }
+									</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			}
 		</div>
 		<!-- Live game status: loaded asynchronously, then polls every 30s -->
 		<div
@@ -86,6 +207,21 @@ templ PlayerComponent(acct client.AccountDTO, player client.SummonerDTO, matches
 			</div>
 		}
 		@MatchupStats(matchups, cfg)
+		<!-- Recent results sparkline -->
+		if len(matches) > 0 {
+			<div class="mt-6 mb-1">
+				<h3 class="mb-2 text-lg font-semibold text-slate-900">Recent Results</h3>
+				<div class="flex gap-1">
+					for _, m := range matches {
+						<div class={
+							"h-3 w-3 rounded-full",
+							templ.KV("bg-emerald-500", m.Win),
+							templ.KV("bg-red-400", !m.Win),
+						}></div>
+					}
+				</div>
+			</div>
+		}
 		@MatchHistory(matches, acct.PUUID, cfg)
 	</div>
 }

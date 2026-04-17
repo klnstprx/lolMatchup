@@ -1,23 +1,27 @@
 {
   "5O4UWTGk3J65dGoWrf1SDPumvDNqAw4Yv5nVAk3klS-IeT3Wv3nOuoH16RLv6dbUVldHWvKJX9_DYQ": {
+    "id": "mock-summoner-id-1",
     "puuid": "5O4UWTGk3J65dGoWrf1SDPumvDNqAw4Yv5nVAk3klS-IeT3Wv3nOuoH16RLv6dbUVldHWvKJX9_DYQ",
     "profileIconId": 7050,
     "revisionDate": 1776333026000,
     "summonerLevel": 722
   },
   "G8dxCAbtwhUKjHTWASoVpb4VdT-UoW47a9AHIgH0e3Kf_xrd5sYBRLdDkxZDtClqT0ejH4ujv4TOkQ": {
+    "id": "mock-summoner-id-2",
     "puuid": "G8dxCAbtwhUKjHTWASoVpb4VdT-UoW47a9AHIgH0e3Kf_xrd5sYBRLdDkxZDtClqT0ejH4ujv4TOkQ",
     "profileIconId": 7,
     "revisionDate": 1617117470000,
     "summonerLevel": 31
   },
   "9cJO4zghZzIdregimmDznZk-MNXMGn12M9Esy9NTu1HknLHY8lTj3IMsC_0rcqZMuvqJWBA_yZo-1Q": {
+    "id": "mock-summoner-id-3",
     "puuid": "9cJO4zghZzIdregimmDznZk-MNXMGn12M9Esy9NTu1HknLHY8lTj3IMsC_0rcqZMuvqJWBA_yZo-1Q",
     "profileIconId": 4834,
     "revisionDate": 1700000000000,
     "summonerLevel": 450
   },
   "av3HPIBaMhGFASz6b-Uty0UVqckIQbPCvu8yw5WAwmXUZ9wyCnOV91mUSeNfjSYfiS5CpYmH-JPPNA": {
+    "id": "mock-summoner-id-4",
     "puuid": "av3HPIBaMhGFASz6b-Uty0UVqckIQbPCvu8yw5WAwmXUZ9wyCnOV91mUSeNfjSYfiS5CpYmH-JPPNA",
     "profileIconId": 6,
     "revisionDate": 1700000000000,

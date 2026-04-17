@@ -50,8 +50,8 @@ func TestPageHandlers(t *testing.T) {
 		handler gin.HandlerFunc
 	}{
 		{"HomePageGET", "/", h.HomePageGET},
-		{"ChampionPageGET", "/champion", ch.ChampionPageGET},
-		{"PlayerPageGET", "/player", ph.PlayerPageGET},
+		{"ChampionGET empty", "/champion", ch.ChampionGET},
+		{"PlayerGET empty", "/player", ph.PlayerGET},
 	}
 
 	for _, tt := range tests {
@@ -95,29 +95,29 @@ func TestSearchGET(t *testing.T) {
 			wantRedirect: "/",
 		},
 		{
-			name:         "champion query redirects to champion search",
+			name:         "champion query redirects to champion route",
 			query:        "Ahri",
 			wantStatus:   http.StatusFound,
-			wantRedirect: "/champion-search?champion=Ahri",
+			wantRedirect: "/champion?champion=Ahri",
 		},
 		{
-			name:         "player query redirects to player search",
+			name:         "player query redirects to player route",
 			query:        "Faker#KR",
 			wantStatus:   http.StatusFound,
-			wantRedirect: "/player-search?riotID=Faker%23KR",
+			wantRedirect: "/player?riotID=Faker%23KR",
 		},
 		{
 			name:       "HTMX champion query proxies to champion handler",
 			query:      "Ahri",
 			htmx:       true,
-			wantStatus: http.StatusInternalServerError, // no API server → fetch error
+			wantStatus: http.StatusOK, // error rendered inline in response body
 			wantBody:   true,
 		},
 		{
 			name:       "HTMX player query proxies to player handler",
 			query:      "Faker#KR",
 			htmx:       true,
-			wantStatus: http.StatusInternalServerError, // no API server → fetch error
+			wantStatus: http.StatusOK, // error rendered inline in response body
 			wantBody:   true,
 		},
 	}

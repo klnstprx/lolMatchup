@@ -94,7 +94,7 @@ templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppC
 						>
 							<!-- Top row: champion, result, KDA, CS, duration -->
 							<div class="flex items-center gap-3">
-								@ChampionIcon(m.ChampionName, cfg.PatchNumber, "h-9 w-9", "ring-1 ring-slate-200")
+								@ChampionIcon(m.ChampionName, cfg.PatchNumber, "h-10 w-10", "ring-1 ring-slate-200")
 								<div class="min-w-0 flex-1">
 									<div class="flex items-center gap-2">
 										<span
@@ -112,7 +112,7 @@ templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppC
 										</span>
 										<span class="text-sm font-semibold text-slate-900">{ m.ChampionName }</span>
 										if positionShort(m.Position) != "" && positionShort(m.Position) != "Invalid" {
-											<span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">{ positionShort(m.Position) }</span>
+											@Badge(positionShort(m.Position), "neutral")
 										}
 										<span class="ml-auto text-xs text-slate-400">{ timeAgo(m.GameStartTime) }</span>
 									</div>

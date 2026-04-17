@@ -207,7 +207,7 @@ func (h *LiveGameHandler) buildViewData(game models.CurrentGameInfo, riotID stri
 }
 
 const (
-	enrichMatchCount = 5
+	enrichMatchCount = 8
 	enrichTimeout    = 10 * time.Second
 	enrichParallel   = 5
 )
@@ -248,9 +248,13 @@ func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentC
 		return e
 	}
 
+	e.TotalGames = len(ids)
 	positionCounts := make(map[string]int)
+	champCounts := make(map[string]int)
 	streakCounting := true
 	var lastWin *bool
+	totalWins := 0
+	matchesFetched := 0
 
 	for _, matchID := range ids {
 		match, fetchErr := h.Client.FetchMatch(ctx, matchID, h.Config.RiotRegion, h.Config.RiotAPIKey)
@@ -261,6 +265,15 @@ func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentC
 			if p.PUUID != puuid {
 				continue
 			}
+			matchesFetched++
+
+			// Overall win tracking
+			if p.Win {
+				totalWins++
+			}
+
+			// Champion frequency tracking
+			champCounts[p.ChampionName]++
 
 			// Champion-specific stats
 			if p.ChampionName == currentChampName {
@@ -302,6 +315,22 @@ func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentC
 		}
 	}
 
+	// Overall win rate
+	if matchesFetched > 0 {
+		e.RecentWinRate = float64(totalWins) / float64(matchesFetched)
+	}
+
+	// OTP detection: one champion dominates >= 60% of games
+	maxChampGames := 0
+	for _, count := range champCounts {
+		if count > maxChampGames {
+			maxChampGames = count
+		}
+	}
+	if matchesFetched >= 5 && float64(maxChampGames)/float64(matchesFetched) >= 0.6 {
+		e.IsOTP = true
+	}
+
 	// Determine most played position
 	maxCount := 0
 	for pos, count := range positionCounts {
@@ -312,14 +341,9 @@ func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentC
 	}
 
 	// Off-role detection: if they have enough data and never played this
-	// position recently, they may be off-role. We approximate by checking
-	// if the champion was never seen in their recent matches — meaning
-	// they might be on an unfamiliar role. A more accurate check would
-	// compare spectator-assigned position vs most-played, but spectator-v5
-	// doesn't provide position assignments.
-	// Instead: if they have a clear main role (>= 3 of 5 games) and
-	// zero games on the current champion, flag as possibly off-role.
-	if e.ChampionGames == 0 && len(ids) >= enrichMatchCount && maxCount >= 3 {
+	// champion recently, they may be off-role. If they have a clear main
+	// role (>= 3 games) and zero games on the current champion, flag it.
+	if e.ChampionGames == 0 && matchesFetched >= 5 && maxCount >= 3 {
 		e.PossiblyOffRole = true
 	}
 

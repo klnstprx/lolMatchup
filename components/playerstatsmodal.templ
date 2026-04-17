@@ -53,7 +53,7 @@ templ PlayerStatsModal(sc models.PlayerStatsContext) {
 					<h2 class="text-xl font-bold text-slate-900">{ sc.Player.ChampionName }</h2>
 					<a
 						class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
-						href={ templ.URL("/player-search?riotID=" + url.QueryEscape(sc.Player.RiotIDGameName+"#"+sc.Player.RiotIDTagline)) }
+						href={ templ.URL("/player?riotID=" + url.QueryEscape(sc.Player.RiotIDGameName+"#"+sc.Player.RiotIDTagline)) }
 					>{ sc.Player.RiotIDGameName }#{ sc.Player.RiotIDTagline }</a>
 					<div class="mt-1 flex items-center gap-2">
 						<span class={

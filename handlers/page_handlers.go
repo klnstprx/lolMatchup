@@ -62,12 +62,12 @@ func (p *PageHandler) SearchGET(c *gin.Context) {
 		return
 	}
 
-	// Non-HTMX: redirect to standalone pages
+	// Non-HTMX: redirect to canonical routes
 	var target string
 	if isPlayer {
-		target = "/player-search?riotID=" + url.QueryEscape(q)
+		target = "/player?riotID=" + url.QueryEscape(q)
 	} else {
-		target = "/champion-search?champion=" + url.QueryEscape(q)
+		target = "/champion?champion=" + url.QueryEscape(q)
 	}
 	c.Redirect(http.StatusFound, target)
 }

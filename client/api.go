@@ -97,6 +97,7 @@ var (
 	ErrAccountNotFound  = errors.New("account not found")
 	ErrChampionNotFound = errors.New("champion not found")
 	ErrMatchNotFound    = errors.New("match not found")
+	ErrLeagueNotFound   = errors.New("league entries not found")
 )
 
 // RegionToCluster maps Riot API regional routing values to their continental cluster.
@@ -189,6 +190,18 @@ func (c *Client) FetchMatch(ctx context.Context, matchID, riotRegion, riotAPIKey
 		return match, mapAPIError(err, ErrMatchNotFound)
 	}
 	return match, nil
+}
+
+// FetchLeagueEntries retrieves ranked league entries for a player by PUUID.
+// Uses regional routing (same as Summoner v4). Returns an empty slice for unranked players.
+func (c *Client) FetchLeagueEntries(ctx context.Context, puuid, riotRegion, riotAPIKey string) ([]models.LeagueEntryDTO, error) {
+	var entries []models.LeagueEntryDTO
+	reqURL := fmt.Sprintf("%s/lol/league/v4/entries/by-puuid/%s",
+		c.riotURL(riotRegion), url.PathEscape(puuid))
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &entries); err != nil {
+		return nil, mapAPIError(err, ErrLeagueNotFound)
+	}
+	return entries, nil
 }
 
 // FetchChampionData fetches detailed champion information for a given champion ID.

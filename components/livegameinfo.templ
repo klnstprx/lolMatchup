@@ -6,6 +6,49 @@ import (
 	"github.com/klnstprx/lolMatchup/models"
 )
 
+// threatBorderClass returns Tailwind border/bg classes based on opponent threat level.
+func threatBorderClass(e *models.OpponentEnrichment) string {
+	if e == nil {
+		return "border-slate-200 bg-white"
+	}
+	score := 0
+	// Positive signals (opponent is dangerous)
+	if e.ChampionGames > 0 && e.ChampionWins > e.ChampionLosses {
+		score += 2
+	}
+	if e.WinStreak >= 3 {
+		score++
+	}
+	if e.IsOTP {
+		score += 2
+	}
+	if e.RecentWinRate > 0.6 {
+		score++
+	}
+	// Negative signals (opponent is weak)
+	if e.ChampionGames == 0 {
+		score -= 2
+	}
+	if e.LossStreak >= 3 {
+		score -= 2
+	}
+	if e.PossiblyOffRole {
+		score--
+	}
+	if e.RecentWinRate > 0 && e.RecentWinRate < 0.4 {
+		score--
+	}
+
+	switch {
+	case score >= 3:
+		return "border-red-300 bg-red-50/30"
+	case score <= -2:
+		return "border-emerald-300 bg-emerald-50/30"
+	default:
+		return "border-slate-200 bg-white"
+	}
+}
+
 // OpponentView holds display data for one opponent in a live game.
 type OpponentView struct {
 	RiotID       string
@@ -48,7 +91,7 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 			<p class="text-sm text-slate-500">Select a champion to view their abilities and stats.</p>
 			for _, p := range parts {
 				<div
-					class="group flex cursor-pointer items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/50"
+					class={ "group flex cursor-pointer items-center gap-4 rounded-xl border p-4 shadow-sm transition-colors hover:border-indigo-300 hover:bg-indigo-50/50", threatBorderClass(p.Enrichment) }
 					hx-trigger="click"
 					hx-get={ fmt.Sprintf("/champion?champion=%s&detail=1", p.ChampionName) }
 					hx-target="#championDetail"
@@ -58,39 +101,41 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 					@ChampionIcon(p.ChampionID, cfg.PatchNumber, "h-10 w-10 sm:h-12 sm:w-12", "ring-1 ring-slate-200")
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-base font-semibold text-slate-900">{ p.ChampionName }</p>
-						<p class="truncate text-sm text-slate-500">{ p.RiotID }</p>
-						<!-- Enrichment badges -->
+						<p class="truncate text-xs text-slate-400">{ p.RiotID }</p>
+						<!-- Champion stats line -->
 						if p.Enrichment != nil {
-							<div class="mt-1 flex flex-wrap gap-1">
-								if p.Enrichment.ChampionGames > 0 {
-									<span
-										class={
-											"inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium",
-											templ.KV("bg-emerald-50 text-emerald-700", p.Enrichment.ChampionWins >= p.Enrichment.ChampionLosses),
-											templ.KV("bg-red-50 text-red-700", p.Enrichment.ChampionWins < p.Enrichment.ChampionLosses),
-										}
-									>
-										{ fmt.Sprintf("%dW %dL on %s", p.Enrichment.ChampionWins, p.Enrichment.ChampionLosses, p.ChampionName) }
-									</span>
-								} else {
-									<span class="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-										First-timing { p.ChampionName }
-									</span>
+							if p.Enrichment.ChampionGames > 0 {
+								<p class={
+									"mt-0.5 text-sm font-medium",
+									templ.KV("text-emerald-700", p.Enrichment.ChampionWins >= p.Enrichment.ChampionLosses),
+									templ.KV("text-red-600", p.Enrichment.ChampionWins < p.Enrichment.ChampionLosses),
+								}>
+									{ fmt.Sprintf("%dW %dL", p.Enrichment.ChampionWins, p.Enrichment.ChampionLosses) }
+									if p.Enrichment.ChampionGames > 0 {
+										<span class="text-slate-400 font-normal">
+											{ fmt.Sprintf("(%d%%)", p.Enrichment.ChampionWins*100/p.Enrichment.ChampionGames) }
+										</span>
+									}
+								</p>
+							} else {
+								<p class="mt-0.5 text-sm text-slate-400">No games on { p.ChampionName }</p>
+							}
+							<!-- Badges -->
+							<div class="mt-1.5 flex flex-wrap gap-1.5">
+								if p.Enrichment.ChampionGames == 0 {
+									@Badge("FIRST TIMER", "warning")
+								}
+								if p.Enrichment.IsOTP {
+									@Badge("OTP", "danger")
 								}
 								if p.Enrichment.WinStreak >= 3 {
-									<span class="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-										{ fmt.Sprintf("%d Win Streak", p.Enrichment.WinStreak) }
-									</span>
+									@Badge(fmt.Sprintf("HOT STREAK %d", p.Enrichment.WinStreak), "danger")
 								}
 								if p.Enrichment.LossStreak >= 3 {
-									<span class="inline-flex items-center rounded bg-red-50 px-1.5 py-0.5 text-[10px] font-medium text-red-700">
-										{ fmt.Sprintf("%d Loss Streak", p.Enrichment.LossStreak) }
-									</span>
+									@Badge(fmt.Sprintf("TILTED %d", p.Enrichment.LossStreak), "success")
 								}
 								if p.Enrichment.PossiblyOffRole {
-									<span class="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-										Off-role?
-									</span>
+									@Badge("OFF-ROLE", "warning")
 								}
 							</div>
 						}

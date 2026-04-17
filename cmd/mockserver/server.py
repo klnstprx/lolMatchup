@@ -8,6 +8,7 @@ Riot API Mock Server for lolMatchup development.
 Serves fixture data for the Riot API endpoints used by the app:
   - Account v1:   GET /riot/account/v1/accounts/by-riot-id/<gameName>/<tagLine>
   - Summoner v4:  GET /lol/summoner/v4/summoners/by-puuid/<puuid>
+  - League v4:    GET /lol/league/v4/entries/by-puuid/<puuid>
   - Spectator v5: GET /lol/spectator/v5/active-games/by-summoner/<puuid>
   - Match v5:     GET /lol/match/v5/matches/by-puuid/<puuid>/ids
   - Match v5:     GET /lol/match/v5/matches/<matchId>
@@ -58,6 +59,7 @@ SUMMONERS: dict = load_fixture("summoners.json")
 SPECTATOR: dict = load_fixture("spectator.json")
 MATCH_IDS: dict = load_fixture("match_ids.json")
 MATCHES: dict = load_match_fixtures()
+LEAGUE_ENTRIES: dict = load_fixture("league_entries.json")
 
 
 def riot_404(message: str = "Data not found"):
@@ -101,6 +103,14 @@ def spectator_by_puuid(puuid: str):
     return jsonify(game)
 
 
+@app.route("/lol/league/v4/entries/by-puuid/<puuid>")
+def league_entries(puuid: str):
+    entries = LEAGUE_ENTRIES.get(puuid)
+    if entries is None:
+        return jsonify([])  # Empty array = unranked
+    return jsonify(entries)
+
+
 @app.route("/lol/match/v5/matches/by-puuid/<puuid>/ids")
 def match_ids_by_puuid(puuid: str):
     ids = MATCH_IDS.get(puuid)
@@ -124,6 +134,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print(f"Mock Riot API server listening on http://localhost:{args.port}")
-    print(f"Fixtures loaded: {len(ACCOUNTS)} accounts, {len(SUMMONERS)} summoners, {len(SPECTATOR)} spectator games, {len(MATCHES)} matches")
+    print(f"Fixtures loaded: {len(ACCOUNTS)} accounts, {len(SUMMONERS)} summoners, {len(SPECTATOR)} spectator games, {len(MATCHES)} matches, {len(LEAGUE_ENTRIES)} league entries")
     print(f"\nSet in config.toml: riot_api_base_url = \"http://localhost:{args.port}\"")
     app.run(host="127.0.0.1", port=args.port, debug=False)

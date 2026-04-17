@@ -18,7 +18,7 @@ type SearchFormConfig struct {
 // SearchForm renders a configurable search form card.
 // When AutocompleteURL is set, the input sends keyup requests for suggestions.
 templ SearchForm(cfg SearchFormConfig) {
-	<div class="rounded-xl border border-slate-200 bg-white p-6 shadow">
+	<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
 		<h2 class="text-xl font-semibold text-slate-900">{ cfg.Title }</h2>
 		<p class="mt-1 text-sm text-slate-600">{ cfg.Subtitle }</p>
 		<form

@@ -86,7 +86,9 @@ func TestChampionGET_MissingParam(t *testing.T) {
 			r := gin.New()
 			r.GET("/champion", h.ChampionGET)
 
+			// HTMX request: expects 400 error fragment
 			req := httptest.NewRequest(http.MethodGet, tt.query, nil)
+			req.Header.Set("HX-Request", "true")
 			w := httptest.NewRecorder()
 			r.ServeHTTP(w, req)
 
@@ -97,6 +99,24 @@ func TestChampionGET_MissingParam(t *testing.T) {
 				t.Errorf("expected body to mention required champion name, got: %s", w.Body.String())
 			}
 		})
+	}
+}
+
+func TestChampionGET_MissingParam_FullPage(t *testing.T) {
+	h := newTestChampionHandler(nil)
+	r := gin.New()
+	r.GET("/champion", h.ChampionGET)
+
+	// Non-HTMX request: renders empty search page
+	req := httptest.NewRequest(http.MethodGet, "/champion", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", w.Code)
+	}
+	if !strings.Contains(w.Body.String(), "Champion Lookup") {
+		t.Errorf("expected body to contain 'Champion Lookup', got: %s", w.Body.String())
 	}
 }
 
@@ -113,6 +133,7 @@ func TestChampionGET_CacheHit(t *testing.T) {
 	r.GET("/champion", h.ChampionGET)
 
 	req := httptest.NewRequest(http.MethodGet, "/champion?champion=Aatrox", nil)
+	req.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
@@ -138,6 +159,7 @@ func TestChampionGET_FetchFromAPI(t *testing.T) {
 	r.GET("/champion", h.ChampionGET)
 
 	req := httptest.NewRequest(http.MethodGet, "/champion?champion=Aatrox", nil)
+	req.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
@@ -161,12 +183,14 @@ func TestChampionGET_NotFound(t *testing.T) {
 	r := gin.New()
 	r.GET("/champion", h.ChampionGET)
 
+	// HTMX: returns error fragment
 	req := httptest.NewRequest(http.MethodGet, "/champion?champion=NonExistent", nil)
+	req.Header.Set("HX-Request", "true")
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
-	if w.Code != http.StatusNotFound {
-		t.Errorf("expected status 404, got %d; body: %s", w.Code, w.Body.String())
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d; body: %s", w.Code, w.Body.String())
 	}
 	if !strings.Contains(w.Body.String(), "not found") {
 		t.Errorf("expected body to mention 'not found', got: %s", w.Body.String())

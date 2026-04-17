@@ -24,7 +24,7 @@ templ ChampionAutocomplete(matches []cache.AutocompleteResult, query string, pat
 			for _, m := range matches {
 				<li>
 					<a
-						href={ templ.URL(fmt.Sprintf("/champion-search?champion=%s", m.Name)) }
+						href={ templ.URL(fmt.Sprintf("/champion?champion=%s", m.Name)) }
 						class="flex items-center gap-2 px-3 py-2 hover:bg-slate-50"
 					>
 						@ChampionIcon(m.Key, patchNumber, "h-6 w-6", "")

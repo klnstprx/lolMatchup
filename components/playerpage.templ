@@ -18,6 +18,8 @@ type PlayerResult struct {
 	FetchedAt     time.Time
 	MatchesLoaded int
 	MatchesTotal  int
+	LeagueEntries []models.LeagueEntryDTO
+	ChampionPool  []models.ChampionPoolEntry
 }
 
 // PlayerFormConfig returns the SearchFormConfig for the player lookup form.
@@ -45,7 +47,7 @@ templ PlayerPage(prefill string, result *PlayerResult) {
 				if result != nil && result.Error != "" {
 					@ErrorMessage(result.Error)
 				} else if result != nil {
-					@PlayerComponent(result.Account, result.Summoner, result.Matches, result.Matchups, result.Config, result.MatchesLoaded, result.MatchesTotal, result.FetchedAt)
+					@PlayerComponent(result.Account, result.Summoner, result.Matches, result.Matchups, result.Config, result.MatchesLoaded, result.MatchesTotal, result.FetchedAt, result.LeagueEntries, result.ChampionPool)
 				}
 			</div>
 		</div>

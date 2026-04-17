@@ -1,0 +1,33 @@
+{
+  "5O4UWTGk3J65dGoWrf1SDPumvDNqAw4Yv5nVAk3klS-IeT3Wv3nOuoH16RLv6dbUVldHWvKJX9_DYQ": [
+    {
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "GOLD",
+      "rank": "II",
+      "leaguePoints": 45,
+      "wins": 87,
+      "losses": 79,
+      "hotStreak": false
+    },
+    {
+      "queueType": "RANKED_FLEX_SR",
+      "tier": "SILVER",
+      "rank": "I",
+      "leaguePoints": 72,
+      "wins": 23,
+      "losses": 18,
+      "hotStreak": true
+    }
+  ],
+  "9cJO4zghZzIdregimmDznZk-MNXMGn12M9Esy9NTu1HknLHY8lTj3IMsC_0rcqZMuvqJWBA_yZo-1Q": [
+    {
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "PLATINUM",
+      "rank": "IV",
+      "leaguePoints": 12,
+      "wins": 156,
+      "losses": 148,
+      "hotStreak": false
+    }
+  ]
+}

@@ -45,20 +45,9 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	championCache := middleware.CacheControl("public, max-age=3600")
 	autocompleteCache := middleware.CacheControl("public, max-age=30")
 
-	// Page routes
+	// Page routes — content-negotiated (HTMX fragment or full page)
 	r.GET("/", pageCache, pageHandler.HomePageGET)
 	r.GET("/search", pageHandler.SearchGET)
-	r.GET("/champion-search", pageCache, championHandler.ChampionPageGET)
-
-	// Legacy redirects — player and livegame searches now go through the homepage
-	r.GET("/player-search", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/")
-	})
-	r.GET("/livegame-search", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/")
-	})
-
-	// Champion data changes per patch — cache for 1 hour
 	r.GET("/champion", championCache, championHandler.ChampionGET)
 	r.GET("/autocomplete", autocompleteCache, autocompleteHandler.AutocompleteGET)
 
@@ -70,5 +59,21 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	r.GET("/match", riotLimiter, matchHandler.MatchGET)
 	r.GET("/match/player", riotLimiter, matchHandler.MatchPlayerGET)
 
+	// Legacy redirects — preserve query string for old bookmarks
+	r.GET("/champion-search", redirectWithQuery("/champion"))
+	r.GET("/player-search", redirectWithQuery("/player"))
+	r.GET("/livegame-search", redirectWithQuery("/"))
+
 	return r
+}
+
+// redirectWithQuery returns a handler that redirects to target, preserving the query string.
+func redirectWithQuery(target string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		dest := target
+		if qs := c.Request.URL.RawQuery; qs != "" {
+			dest += "?" + qs
+		}
+		c.Redirect(http.StatusMovedPermanently, dest)
+	}
 }

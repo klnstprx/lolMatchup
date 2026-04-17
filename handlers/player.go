@@ -31,75 +31,45 @@ func NewPlayerHandler(cfg *config.AppConfig, apiClient *client.Client) *PlayerHa
 	return &PlayerHandler{Logger: cfg.Logger, Client: apiClient, Config: cfg}
 }
 
-// PlayerPageGET renders the player search page. If a riotID query param is present,
-// it performs the lookup server-side and renders the page with results pre-populated.
-func (h *PlayerHandler) PlayerPageGET(c *gin.Context) {
-	ctx := c.Request.Context()
-	prefill := c.Query("riotID")
-
-	var result *components.PlayerResult
-	if prefill != "" {
-		result = h.lookupPlayer(ctx, prefill)
-	}
-
-	cmp := components.PlayerPage(prefill, result)
-	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
-}
-
-// PlayerGET handles /player requests, returning player info via templ component.
+// PlayerGET handles /player requests with content negotiation.
+// HTMX requests get a PlayerComponent fragment.
+// Full page requests get the player search page with results pre-populated.
 func (h *PlayerHandler) PlayerGET(c *gin.Context) {
 	ctx := c.Request.Context()
-	riotID, ok := c.GetQuery("riotID")
-	if !ok || riotID == "" {
-		renderError(c, http.StatusBadRequest, "Summoner identifier is required (nickname#tag).")
-		h.Logger.Error("riotID query param missing", "url", c.Request.URL.String())
-		return
-	}
-	parts := strings.SplitN(riotID, "#", 2)
-	if len(parts) != 2 {
-		renderError(c, http.StatusBadRequest, "Invalid format for Summoner; use nickname#tag.")
-		h.Logger.Error("invalid riotID format", "riotID", riotID)
-		return
-	}
-	gameName, tagLine := parts[0], parts[1]
+	riotID := strings.TrimSpace(c.Query("riotID"))
+	isHTMX := c.GetHeader("HX-Request") == "true"
 
-	// Step 1: Resolve Riot ID to PUUID via account-v1
-	acct, err := h.Client.FetchAccountByRiotID(ctx, gameName, tagLine, h.Config.RiotRegion, h.Config.RiotAPIKey)
-	if err != nil {
-		switch {
-		case errors.Is(err, client.ErrAccountNotFound):
-			renderError(c, http.StatusNotFound, fmt.Sprintf("Account '%s' not found.", riotID))
-			h.Logger.Debug("account not found", "riotID", riotID)
-			return
-		case errors.Is(err, client.ErrPermissionDenied):
-			renderError(c, http.StatusForbidden, "Permission denied: check your Riot API key and region.")
-			h.Logger.Error("permission denied fetching account info", "error", err)
-			return
-		default:
-			h.Logger.Error("error fetching account info", "error", err)
-			renderError(c, http.StatusInternalServerError, "Error fetching account data.")
+	// No query param: show empty search page or error for HTMX
+	if riotID == "" {
+		if isHTMX {
+			renderError(c, http.StatusBadRequest, "Summoner identifier is required (nickname#tag).")
+			h.Logger.Error("riotID query param missing", "url", c.Request.URL.String())
 			return
 		}
-	}
-
-	// Step 2: Fetch summoner data by PUUID via summoner-v4
-	player, err := h.Client.FetchSummonerByPUUID(ctx, acct.PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey)
-	if err != nil {
-		if errors.Is(err, client.ErrSummonerNotFound) {
-			renderError(c, http.StatusNotFound, fmt.Sprintf("Summoner '%s' not found.", riotID))
-			h.Logger.Debug("summoner not found", "riotID", riotID)
-			return
-		}
-		h.Logger.Error("error fetching summoner info", "error", err)
-		renderError(c, http.StatusInternalServerError, "Error fetching summoner data.")
+		cmp := components.PlayerPage("", nil)
+		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 		return
 	}
-	// Step 3: Fetch match history and compute matchup stats
-	matches, fullMatches, loaded, total := h.fetchMatchHistory(ctx, acct.PUUID)
-	matchups := computeMatchupStats(fullMatches, acct.PUUID)
-	fetchedAt := time.Now()
 
-	cmp := components.PlayerComponent(acct, player, matches, matchups, h.Config, loaded, total, fetchedAt)
+	// Lookup player (returns result with Error set on failure)
+	result := h.lookupPlayer(ctx, riotID)
+
+	if isHTMX {
+		if result.Error != "" {
+			renderError(c, http.StatusOK, result.Error)
+			return
+		}
+		cmp := components.PlayerComponent(
+			result.Account, result.Summoner, result.Matches, result.Matchups,
+			result.Config, result.MatchesLoaded, result.MatchesTotal, result.FetchedAt,
+			result.LeagueEntries, result.ChampionPool,
+		)
+		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+		return
+	}
+
+	// Full page: wrap in PlayerPage layout
+	cmp := components.PlayerPage(riotID, result)
 	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 }
 
@@ -134,8 +104,16 @@ func (h *PlayerHandler) lookupPlayer(ctx context.Context, riotID string) *compon
 		return &components.PlayerResult{Error: "Error fetching summoner data."}
 	}
 
+	var leagueEntries []models.LeagueEntryDTO
+	if entries, err := h.Client.FetchLeagueEntries(ctx, acct.PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey); err != nil {
+		h.Logger.Debug("player page lookup: league error", "riotID", riotID, "error", err)
+	} else {
+		leagueEntries = entries
+	}
+
 	matches, fullMatches, loaded, total := h.fetchMatchHistory(ctx, acct.PUUID)
 	matchups := computeMatchupStats(fullMatches, acct.PUUID)
+	championPool := computeChampionPool(matches, 5)
 
 	return &components.PlayerResult{
 		Account:       acct,
@@ -146,6 +124,8 @@ func (h *PlayerHandler) lookupPlayer(ctx context.Context, riotID string) *compon
 		FetchedAt:     time.Now(),
 		MatchesLoaded: loaded,
 		MatchesTotal:  total,
+		LeagueEntries: leagueEntries,
+		ChampionPool:  championPool,
 	}
 }
 
@@ -226,6 +206,60 @@ func (h *PlayerHandler) fetchMatchHistory(ctx context.Context, puuid string) ([]
 		}
 	}
 	return summaries, fullMatches, len(summaries), len(ids)
+}
+
+// computeChampionPool aggregates champion stats from match summaries.
+// Returns the top N champions sorted by games played descending.
+func computeChampionPool(matches []models.MatchSummary, topN int) []models.ChampionPoolEntry {
+	type acc struct {
+		champID int
+		games   int
+		wins    int
+		kills   float64
+		deaths  float64
+		assists float64
+	}
+	stats := make(map[string]*acc)
+	for _, m := range matches {
+		a, ok := stats[m.ChampionName]
+		if !ok {
+			a = &acc{champID: m.ChampionID}
+			stats[m.ChampionName] = a
+		}
+		a.games++
+		if m.Win {
+			a.wins++
+		}
+		a.kills += float64(m.Kills)
+		a.deaths += float64(m.Deaths)
+		a.assists += float64(m.Assists)
+	}
+
+	pool := make([]models.ChampionPoolEntry, 0, len(stats))
+	for name, a := range stats {
+		n := float64(a.games)
+		pool = append(pool, models.ChampionPoolEntry{
+			ChampionName: name,
+			ChampionID:   a.champID,
+			Games:        a.games,
+			Wins:         a.wins,
+			WinRate:      float64(a.wins) / n,
+			AvgKills:     a.kills / n,
+			AvgDeaths:    a.deaths / n,
+			AvgAssists:   a.assists / n,
+		})
+	}
+
+	sort.Slice(pool, func(i, j int) bool {
+		if pool[i].Games != pool[j].Games {
+			return pool[i].Games > pool[j].Games
+		}
+		return pool[i].ChampionName < pool[j].ChampionName
+	})
+	if topN > 0 && len(pool) > topN {
+		pool = pool[:topN]
+	}
+	return pool
 }
 
 // computeMatchupStats aggregates lane matchup records from full match data.
