@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/klnstprx/lolMatchup/models"
@@ -18,6 +20,17 @@ type Client struct {
 	Logger            *log.Logger
 	ChampionDataURL   string
 	DDragonVersionURL string
+	RiotAPIBaseURL    string // when non-empty, overrides Riot API hostname for mock/dev use
+}
+
+// riotURL builds the base URL for Riot API calls. When RiotAPIBaseURL is set,
+// it is used directly (ignoring hostPrefix). Otherwise, the standard
+// https://{hostPrefix}.api.riotgames.com format is used.
+func (c *Client) riotURL(hostPrefix string) string {
+	if c.RiotAPIBaseURL != "" {
+		return strings.TrimRight(c.RiotAPIBaseURL, "/")
+	}
+	return fmt.Sprintf("https://%s.api.riotgames.com", hostPrefix)
 }
 
 // APIError represents a non-200 HTTP response from an API call.
@@ -83,7 +96,16 @@ var (
 	ErrGameNotFound     = errors.New("game not found")
 	ErrAccountNotFound  = errors.New("account not found")
 	ErrChampionNotFound = errors.New("champion not found")
+	ErrMatchNotFound    = errors.New("match not found")
 )
+
+// RegionToCluster maps Riot API regional routing values to their continental cluster.
+var RegionToCluster = map[string]string{
+	"na1": "americas", "br1": "americas", "la1": "americas", "la2": "americas",
+	"euw1": "europe", "eun1": "europe", "ru": "europe", "tr1": "europe",
+	"kr": "asia", "jp1": "asia",
+	"oc1": "sea", "sg2": "sea", "tw2": "sea", "vn2": "sea",
+}
 
 // SummonerDTO represents the data returned by the Summoner API.
 type SummonerDTO struct {
@@ -96,11 +118,11 @@ type SummonerDTO struct {
 	SummonerLevel int64  `json:"summonerLevel"`
 }
 
-// FetchSummonerByName retrieves summoner information by summoner name.
-func (c *Client) FetchSummonerByName(ctx context.Context, summonerName, riotRegion, riotAPIKey string) (SummonerDTO, error) {
+// FetchSummonerByPUUID retrieves summoner information by encrypted PUUID.
+func (c *Client) FetchSummonerByPUUID(ctx context.Context, puuid, riotRegion, riotAPIKey string) (SummonerDTO, error) {
 	var summoner SummonerDTO
-	url := fmt.Sprintf("https://%s.api.riotgames.com/lol/summoner/v4/summoners/by-name/%s", riotRegion, summonerName)
-	if err := c.doJSON(ctx, url, riotAPIKey, &summoner); err != nil {
+	reqURL := fmt.Sprintf("%s/lol/summoner/v4/summoners/by-puuid/%s", c.riotURL(riotRegion), url.PathEscape(puuid))
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &summoner); err != nil {
 		return summoner, mapAPIError(err, ErrSummonerNotFound)
 	}
 	return summoner, nil
@@ -117,24 +139,15 @@ type AccountDTO struct {
 func (c *Client) FetchAccountByRiotID(ctx context.Context, gameName, tagLine, riotRegion, riotAPIKey string) (AccountDTO, error) {
 	var acct AccountDTO
 	// Determine the regional cluster for account-v1.
-	var cluster string
-	switch riotRegion {
-	case "na1", "br1", "la1", "la2":
-		cluster = "americas"
-	case "euw1", "eun1", "ru", "tr1":
-		cluster = "europe"
-	case "kr", "jp1":
-		cluster = "asia"
-	case "oc1", "sg2", "tw2", "vn2":
-		cluster = "sea"
-	default:
+	cluster, ok := RegionToCluster[riotRegion]
+	if !ok {
 		cluster = riotRegion
 	}
-	url := fmt.Sprintf(
-		"https://%s.api.riotgames.com/riot/account/v1/accounts/by-riot-id/%s/%s",
-		cluster, gameName, tagLine,
+	reqURL := fmt.Sprintf(
+		"%s/riot/account/v1/accounts/by-riot-id/%s/%s",
+		c.riotURL(cluster), url.PathEscape(gameName), url.PathEscape(tagLine),
 	)
-	if err := c.doJSON(ctx, url, riotAPIKey, &acct); err != nil {
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &acct); err != nil {
 		return acct, mapAPIError(err, ErrAccountNotFound)
 	}
 	return acct, nil
@@ -143,19 +156,47 @@ func (c *Client) FetchAccountByRiotID(ctx context.Context, gameName, tagLine, ri
 // FetchCurrentGameByPUUID retrieves current game info using encrypted PUUID (spectator v5).
 func (c *Client) FetchCurrentGameByPUUID(ctx context.Context, puuid, riotRegion, riotAPIKey string) (models.CurrentGameInfo, error) {
 	var game models.CurrentGameInfo
-	url := fmt.Sprintf("https://%s.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/%s", riotRegion, puuid)
-	if err := c.doJSON(ctx, url, riotAPIKey, &game); err != nil {
+	reqURL := fmt.Sprintf("%s/lol/spectator/v5/active-games/by-summoner/%s", c.riotURL(riotRegion), url.PathEscape(puuid))
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &game); err != nil {
 		return game, mapAPIError(err, ErrGameNotFound)
 	}
 	return game, nil
 }
 
+// FetchMatchIDs retrieves recent match IDs for a player by PUUID (match-v5, cluster routing).
+func (c *Client) FetchMatchIDs(ctx context.Context, puuid, riotRegion, riotAPIKey string, count int) ([]string, error) {
+	cluster, ok := RegionToCluster[riotRegion]
+	if !ok {
+		cluster = riotRegion
+	}
+	var ids []string
+	reqURL := fmt.Sprintf("%s/lol/match/v5/matches/by-puuid/%s/ids?count=%d", c.riotURL(cluster), url.PathEscape(puuid), count)
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// FetchMatch retrieves full match data by match ID (match-v5, cluster routing).
+func (c *Client) FetchMatch(ctx context.Context, matchID, riotRegion, riotAPIKey string) (models.MatchDTO, error) {
+	cluster, ok := RegionToCluster[riotRegion]
+	if !ok {
+		cluster = riotRegion
+	}
+	var match models.MatchDTO
+	reqURL := fmt.Sprintf("%s/lol/match/v5/matches/%s", c.riotURL(cluster), url.PathEscape(matchID))
+	if err := c.doJSON(ctx, reqURL, riotAPIKey, &match); err != nil {
+		return match, mapAPIError(err, ErrMatchNotFound)
+	}
+	return match, nil
+}
+
 // FetchChampionData fetches detailed champion information for a given champion ID.
 func (c *Client) FetchChampionData(ctx context.Context, championID string) (models.Champion, error) {
 	var champion models.Champion
-	url := fmt.Sprintf("%schampions/%s.json", c.ChampionDataURL, championID)
-	c.Logger.Debug("Fetching champion data", "url", url, "champID", championID)
-	if err := c.doJSON(ctx, url, "", &champion); err != nil {
+	reqURL := fmt.Sprintf("%schampions/%s.json", c.ChampionDataURL, url.PathEscape(championID))
+	c.Logger.Debug("Fetching champion data", "url", reqURL, "champID", championID)
+	if err := c.doJSON(ctx, reqURL, "", &champion); err != nil {
 		return champion, mapAPIError(err, ErrChampionNotFound)
 	}
 	return champion, nil
@@ -164,9 +205,9 @@ func (c *Client) FetchChampionData(ctx context.Context, championID string) (mode
 // FetchChampionList fetches a map of all champions.
 func (c *Client) FetchChampionList(ctx context.Context) (map[string]models.Champion, error) {
 	var champions map[string]models.Champion
-	url := fmt.Sprintf("%schampions.json", c.ChampionDataURL)
-	c.Logger.Debug("Fetching champion list", "url", url)
-	if err := c.doJSON(ctx, url, "", &champions); err != nil {
+	reqURL := fmt.Sprintf("%schampions.json", c.ChampionDataURL)
+	c.Logger.Debug("Fetching champion list", "url", reqURL)
+	if err := c.doJSON(ctx, reqURL, "", &champions); err != nil {
 		return champions, err
 	}
 	return champions, nil

@@ -1,4 +1,4 @@
-.PHONY: build clean test lint
+.PHONY: build clean test lint mock
 
 all: templ build
 
@@ -14,6 +14,9 @@ test:
 lint:
 	gofmt -s -w .
 	go vet ./...
+
+mock:
+	uv run cmd/mockserver/server.py
 
 clean:
 	rm -f lolmatchup.bin

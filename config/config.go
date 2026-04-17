@@ -29,8 +29,9 @@ type AppConfig struct {
 	Cache      *cache.Cache `toml:"-"`
 	HTTPClient *http.Client `toml:"-"`
 	// Riot API configuration
-	RiotAPIKey string `toml:"riot_api_key"`
-	RiotRegion string `toml:"riot_region"`
+	RiotAPIKey     string `toml:"riot_api_key"`
+	RiotRegion     string `toml:"riot_region"`
+	RiotAPIBaseURL string `toml:"riot_api_base_url"`
 }
 
 // New returns an AppConfig with default values.
@@ -62,6 +63,9 @@ func (cfg *AppConfig) Validate(logger *log.Logger) {
 	}
 	if cfg.RiotRegion != "" && !validRegions[cfg.RiotRegion] {
 		logger.Warnf("Riot region %q is not a recognized region", cfg.RiotRegion)
+	}
+	if cfg.RiotAPIBaseURL != "" {
+		logger.Warnf("Using mock Riot API at %s", cfg.RiotAPIBaseURL)
 	}
 }
 

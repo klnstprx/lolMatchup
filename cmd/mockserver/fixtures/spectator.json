@@ -1,0 +1,126 @@
+{
+  "5O4UWTGk3J65dGoWrf1SDPumvDNqAw4Yv5nVAk3klS-IeT3Wv3nOuoH16RLv6dbUVldHWvKJX9_DYQ": {
+    "gameId": 7823170118,
+    "mapId": 11,
+    "gameMode": "CLASSIC",
+    "gameType": "MATCHED",
+    "gameQueueConfigId": 420,
+    "participants": [
+      {
+        "puuid": "5O4UWTGk3J65dGoWrf1SDPumvDNqAw4Yv5nVAk3klS-IeT3Wv3nOuoH16RLv6dbUVldHWvKJX9_DYQ",
+        "teamId": 100,
+        "spell1Id": 4,
+        "spell2Id": 11,
+        "championId": 72,
+        "profileIconId": 7050,
+        "riotId": "Zanzarah#1996",
+        "bot": false
+      },
+      {
+        "puuid": null,
+        "teamId": 100,
+        "spell1Id": 4,
+        "spell2Id": 7,
+        "championId": 518,
+        "profileIconId": 977,
+        "riotId": "Neeko",
+        "bot": false
+      },
+      {
+        "puuid": null,
+        "teamId": 100,
+        "spell1Id": 4,
+        "spell2Id": 12,
+        "championId": 115,
+        "profileIconId": 6242,
+        "riotId": "Ziggs",
+        "bot": false
+      },
+      {
+        "puuid": "OpJvoSmLPCGxHsXCV998YCqNdyGDmvYeC8QLJ_rThFEMZWxEp2h5h4FimPwn3fTqhRmnK_QqfOiaqA",
+        "teamId": 100,
+        "spell1Id": 4,
+        "spell2Id": 12,
+        "championId": 126,
+        "profileIconId": 6855,
+        "riotId": "SORS EST PARATUS#VISUM",
+        "bot": false
+      },
+      {
+        "puuid": "FRyrNyb2n2qNYDBhl8Av7suRIYqdD1jwqMJQX4_dshYIbCr47Agwm-if16pgS9_tZP1dqhsvmDTAow",
+        "teamId": 100,
+        "spell1Id": 12,
+        "spell2Id": 4,
+        "championId": 238,
+        "profileIconId": 4050,
+        "riotId": "Aldia#Twtv",
+        "bot": false
+      },
+      {
+        "puuid": "pDPTZDvEJxH3DeHuxbmwaW3TS0BaBi1TGrwzy-9PlQ4dQVc7frYBZtK4NAu04VdRepJAzB7TPB2uuw",
+        "teamId": 200,
+        "spell1Id": 12,
+        "spell2Id": 4,
+        "championId": 24,
+        "profileIconId": 6923,
+        "riotId": "Neleenga#12345",
+        "bot": false
+      },
+      {
+        "puuid": null,
+        "teamId": 200,
+        "spell1Id": 4,
+        "spell2Id": 11,
+        "championId": 5,
+        "profileIconId": 28,
+        "riotId": "XinZhao",
+        "bot": false
+      },
+      {
+        "puuid": "X9EV1StPwvM-hQcPVj-6pVLifZnTcngLUIjO-uhXWPA6r9kGEdUx7NXjKlFBxrNqarGUh_Y1n2uF0w",
+        "teamId": 200,
+        "spell1Id": 14,
+        "spell2Id": 4,
+        "championId": 44,
+        "profileIconId": 3150,
+        "riotId": "\u0192\u0142ash#EUW",
+        "bot": false
+      },
+      {
+        "puuid": null,
+        "teamId": 200,
+        "spell1Id": 6,
+        "spell2Id": 4,
+        "championId": 67,
+        "profileIconId": 3233,
+        "riotId": "Vayne",
+        "bot": false
+      },
+      {
+        "puuid": null,
+        "teamId": 200,
+        "spell1Id": 4,
+        "spell2Id": 21,
+        "championId": 235,
+        "profileIconId": 6872,
+        "riotId": "Senna",
+        "bot": false
+      }
+    ],
+    "platformId": "EUW1",
+    "bannedChampions": [
+      {"championId": -1, "teamId": 100, "pickTurn": 1},
+      {"championId": 35, "teamId": 100, "pickTurn": 2},
+      {"championId": 55, "teamId": 100, "pickTurn": 3},
+      {"championId": 84, "teamId": 100, "pickTurn": 4},
+      {"championId": 34, "teamId": 100, "pickTurn": 5},
+      {"championId": 34, "teamId": 200, "pickTurn": 6},
+      {"championId": 105, "teamId": 200, "pickTurn": 7},
+      {"championId": 84, "teamId": 200, "pickTurn": 8},
+      {"championId": 36, "teamId": 200, "pickTurn": 9},
+      {"championId": 43, "teamId": 200, "pickTurn": 10}
+    ],
+    "gameStartTime": 1776410445286,
+    "gameLength": 895
+  }
+}

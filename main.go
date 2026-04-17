@@ -49,6 +49,7 @@ func main() {
 		Logger:            cfg.Logger,
 		ChampionDataURL:   cfg.MerakiURL,
 		DDragonVersionURL: cfg.DDragonVersionURL,
+		RiotAPIBaseURL:    cfg.RiotAPIBaseURL,
 	}
 
 	// Prepare data loader, fetch or refresh patch info

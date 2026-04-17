@@ -31,8 +31,8 @@ func newTestClient(transport fakeTransport) *Client {
 	}
 }
 
-func TestFetchSummonerByName(t *testing.T) {
-	const jsonBody = `{"id":"1","accountId":"2","puuid":"3","name":"TestSumm","profileIconId":10,"revisionDate":123,"summonerLevel":5}`
+func TestFetchSummonerByPUUID(t *testing.T) {
+	const jsonBody = `{"puuid":"test-puuid","profileIconId":10,"revisionDate":123,"summonerLevel":5}`
 
 	tests := []struct {
 		name       string
@@ -53,7 +53,7 @@ func TestFetchSummonerByName(t *testing.T) {
 					Body:       io.NopCloser(strings.NewReader(tt.body)),
 				},
 			})
-			summ, err := c.FetchSummonerByName(context.Background(), "x", "r", "k")
+			summ, err := c.FetchSummonerByPUUID(context.Background(), "test-puuid", "euw1", "k")
 			if tt.wantErr != nil {
 				if !errors.Is(err, tt.wantErr) {
 					t.Fatalf("expected error %v, got %v", tt.wantErr, err)
@@ -63,7 +63,7 @@ func TestFetchSummonerByName(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
-			if summ.Name != "TestSumm" || summ.ID != "1" {
+			if summ.PUUID != "test-puuid" || summ.SummonerLevel != 5 {
 				t.Errorf("bad summoner parsed: %+v", summ)
 			}
 		})
@@ -262,6 +262,180 @@ func TestFetchLatestPatch(t *testing.T) {
 			}
 			if patch != tt.wantPatch {
 				t.Errorf("expected patch %q, got %q", tt.wantPatch, patch)
+			}
+		})
+	}
+}
+
+// capturingTransport records the request URL for inspection.
+type capturingTransport struct {
+	lastURL string
+	resp    *http.Response
+}
+
+func (ct *capturingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	ct.lastURL = req.URL.String()
+	return ct.resp, nil
+}
+
+func TestURLEncoding(t *testing.T) {
+	const okJSON = `{"id":"1","accountId":"2","puuid":"3","name":"Test","profileIconId":1,"revisionDate":0,"summonerLevel":1}`
+	const acctJSON = `{"puuid":"abc","gameName":"Player","tagLine":"NA1"}`
+	const gameJSON = `{"gameId":1,"participants":[]}`
+
+	tests := []struct {
+		name      string
+		call      func(c *Client)
+		wantInURL string
+	}{
+		{
+			name: "summoner puuid with slash",
+			call: func(c *Client) {
+				c.FetchSummonerByPUUID(context.Background(), "abc/def", "na1", "k")
+			},
+			wantInURL: "abc%2Fdef",
+		},
+		{
+			name: "riot id gameName with space",
+			call: func(c *Client) {
+				c.FetchAccountByRiotID(context.Background(), "Some Player", "NA1", "na1", "k")
+			},
+			wantInURL: "Some%20Player",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ct := &capturingTransport{
+				resp: &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader(okJSON)),
+				},
+			}
+			c := &Client{
+				HTTPClient:        &http.Client{Transport: ct},
+				Logger:            log.New(os.Stderr),
+				ChampionDataURL:   "http://fake.test/",
+				DDragonVersionURL: "http://fake.test/versions.json",
+			}
+			// Use acctJSON for account tests
+			if strings.Contains(tt.name, "riot id") {
+				ct.resp = &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader(acctJSON)),
+				}
+			}
+			if strings.Contains(tt.name, "game") {
+				ct.resp = &http.Response{
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader(gameJSON)),
+				}
+			}
+			tt.call(c)
+			if !strings.Contains(ct.lastURL, tt.wantInURL) {
+				t.Errorf("expected URL to contain %q, got %q", tt.wantInURL, ct.lastURL)
+			}
+		})
+	}
+}
+
+func TestFetchMatchIDs(t *testing.T) {
+	const idsJSON = `["EUW1_123","EUW1_456","EUW1_789"]`
+
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+		wantCount  int
+		wantErr    bool
+	}{
+		{"success", http.StatusOK, idsJSON, 3, false},
+		{"server error", http.StatusInternalServerError, "", 0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := newTestClient(fakeTransport{
+				resp: &http.Response{
+					StatusCode: tt.statusCode,
+					Body:       io.NopCloser(strings.NewReader(tt.body)),
+				},
+			})
+			ids, err := c.FetchMatchIDs(context.Background(), "puuid", "euw1", "k", 3)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if len(ids) != tt.wantCount {
+				t.Errorf("expected %d IDs, got %d", tt.wantCount, len(ids))
+			}
+		})
+	}
+}
+
+func TestFetchMatch(t *testing.T) {
+	const matchJSON = `{"metadata":{"matchId":"EUW1_123"},"info":{"gameDuration":1684,"gameMode":"CLASSIC","queueId":420,"gameStartTimestamp":1776410475512,"participants":[{"puuid":"test","championName":"Skarner","win":true,"kills":8,"deaths":4,"assists":20}]}}`
+
+	tests := []struct {
+		name       string
+		statusCode int
+		body       string
+		wantErr    error
+	}{
+		{"success", http.StatusOK, matchJSON, nil},
+		{"not found", http.StatusNotFound, "", ErrMatchNotFound},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := newTestClient(fakeTransport{
+				resp: &http.Response{
+					StatusCode: tt.statusCode,
+					Body:       io.NopCloser(strings.NewReader(tt.body)),
+				},
+			})
+			match, err := c.FetchMatch(context.Background(), "EUW1_123", "euw1", "k")
+			if tt.wantErr != nil {
+				if !errors.Is(err, tt.wantErr) {
+					t.Fatalf("expected %v, got %v", tt.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if match.Metadata.MatchID != "EUW1_123" {
+				t.Errorf("expected matchId EUW1_123, got %q", match.Metadata.MatchID)
+			}
+			if match.Info.GameDuration != 1684 {
+				t.Errorf("expected duration 1684, got %d", match.Info.GameDuration)
+			}
+		})
+	}
+}
+
+func TestRiotURL(t *testing.T) {
+	tests := []struct {
+		name       string
+		baseURL    string
+		hostPrefix string
+		want       string
+	}{
+		{"default uses real API", "", "euw1", "https://euw1.api.riotgames.com"},
+		{"custom base URL", "http://localhost:9090", "euw1", "http://localhost:9090"},
+		{"trailing slash stripped", "http://localhost:9090/", "euw1", "http://localhost:9090"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{RiotAPIBaseURL: tt.baseURL}
+			got := c.riotURL(tt.hostPrefix)
+			if got != tt.want {
+				t.Errorf("riotURL(%q) = %q, want %q", tt.hostPrefix, got, tt.want)
 			}
 		})
 	}
