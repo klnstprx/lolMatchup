@@ -26,6 +26,7 @@ templ ChampionCompact(champion models.Champion, cfg *config.AppConfig) {
 				hx-get={ fmt.Sprintf("/champion?champion=%s&modal=1", champion.Name) }
 				hx-target="body"
 				hx-swap="beforeend"
+				hx-on::before-request="document.getElementById('modal')?.remove()"
 			>
 				View
 			</button>

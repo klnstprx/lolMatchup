@@ -1,0 +1,168 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+	"time"
+)
+
+// formatDuration turns seconds into "28m" or "1h 5m".
+func formatDuration(seconds int64) string {
+	d := time.Duration(seconds) * time.Second
+	h := int(d.Hours())
+	m := int(d.Minutes()) % 60
+	if h > 0 {
+		return fmt.Sprintf("%dh %dm", h, m)
+	}
+	return fmt.Sprintf("%dm", m)
+}
+
+// timeAgo returns a human-readable relative time string.
+func timeAgo(epochMs int64) string {
+	t := time.UnixMilli(epochMs)
+	d := time.Since(t)
+	switch {
+	case d < time.Minute:
+		return "just now"
+	case d < time.Hour:
+		return fmt.Sprintf("%dm ago", int(d.Minutes()))
+	case d < 24*time.Hour:
+		return fmt.Sprintf("%dh ago", int(d.Hours()))
+	default:
+		days := int(d.Hours() / 24)
+		if days == 1 {
+			return "1d ago"
+		}
+		return fmt.Sprintf("%dd ago", days)
+	}
+}
+
+// positionShort maps Riot position strings to short labels.
+func positionShort(pos string) string {
+	switch pos {
+	case "TOP":
+		return "TOP"
+	case "JUNGLE":
+		return "JG"
+	case "MIDDLE":
+		return "MID"
+	case "BOTTOM":
+		return "BOT"
+	case "UTILITY":
+		return "SUP"
+	default:
+		return pos
+	}
+}
+
+// queueName maps common queue IDs to display names.
+func queueName(queueID int) string {
+	switch queueID {
+	case 420:
+		return "Ranked Solo"
+	case 440:
+		return "Ranked Flex"
+	case 400:
+		return "Normal Draft"
+	case 430:
+		return "Normal Blind"
+	case 450:
+		return "ARAM"
+	default:
+		return "Game"
+	}
+}
+
+// MatchHistory renders a list of recent match summaries.
+// Uses native <details> elements with a shared name for exclusive accordion behavior.
+templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppConfig) {
+	<div class="mt-6">
+		<h3 class="mb-3 text-lg font-semibold text-slate-900">Recent Matches</h3>
+		if len(matches) == 0 {
+			<p class="text-sm text-slate-400">No recent matches found.</p>
+		} else {
+			<div class="space-y-2">
+				for _, m := range matches {
+					<details name="match-accordion">
+						<summary
+							class={
+								"list-none cursor-pointer rounded-lg border-l-4 bg-white p-3 shadow-sm transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden",
+								templ.KV("border-emerald-500", m.Win),
+								templ.KV("border-red-400", !m.Win),
+							}
+						>
+							<!-- Top row: champion, result, KDA, CS, duration -->
+							<div class="flex items-center gap-3">
+								<img
+									class="h-9 w-9 rounded-full ring-1 ring-slate-200"
+									src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.ChampionName))) }
+									alt={ m.ChampionName }
+								/>
+								<div class="min-w-0 flex-1">
+									<div class="flex items-center gap-2">
+										<span
+											class={
+												"text-xs font-bold",
+												templ.KV("text-emerald-600", m.Win),
+												templ.KV("text-red-500", !m.Win),
+											}
+										>
+											if m.Win {
+												W
+											} else {
+												L
+											}
+										</span>
+										<span class="text-sm font-semibold text-slate-900">{ m.ChampionName }</span>
+										if positionShort(m.Position) != "" && positionShort(m.Position) != "Invalid" {
+											<span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">{ positionShort(m.Position) }</span>
+										}
+										<span class="ml-auto text-xs text-slate-400">{ timeAgo(m.GameStartTime) }</span>
+									</div>
+									<div class="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+										<span class="font-medium text-slate-700">
+											{ fmt.Sprint(m.Kills) }/{ fmt.Sprint(m.Deaths) }/{ fmt.Sprint(m.Assists) }
+										</span>
+										<span>{ fmt.Sprint(m.CS) } CS</span>
+										<span>{ formatDuration(m.GameDuration) }</span>
+										<span class="text-slate-400">{ queueName(m.QueueID) }</span>
+									</div>
+								</div>
+							</div>
+							<!-- Bottom row: items -->
+							<div class="mt-2 flex items-center gap-1">
+								for _, itemID := range m.Items {
+									if itemID > 0 {
+										<img
+											class="h-6 w-6 rounded"
+											src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/item/%d.png", cfg.PatchNumber, itemID))) }
+											alt={ fmt.Sprintf("Item %d", itemID) }
+										/>
+									}
+								}
+								<div class="ml-auto flex items-center gap-3 text-[11px] text-slate-400">
+									<span>{ fmt.Sprintf("%dk dmg", m.Damage/1000) }</span>
+									<span>{ fmt.Sprintf("%dk gold", m.Gold/1000) }</span>
+								</div>
+							</div>
+						</summary>
+						<!-- Match detail panel: lazy-loaded on toggle via HTMX -->
+						<div
+							id={ fmt.Sprintf("match-%s", m.MatchID) }
+							class="match-detail-panel"
+							hx-get={ fmt.Sprintf("/match?id=%s&puuid=%s", m.MatchID, puuid) }
+							hx-trigger="toggle from:closest details"
+							hx-swap="innerHTML"
+						>
+							<div class="mt-1 flex items-center justify-center gap-1 py-2 text-sm text-slate-400">
+								<svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+								Loading match details…
+							</div>
+						</div>
+					</details>
+				}
+			</div>
+		}
+	</div>
+}

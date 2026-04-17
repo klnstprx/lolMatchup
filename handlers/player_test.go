@@ -36,12 +36,13 @@ func newTestPlayerHandler(transport http.RoundTripper) *PlayerHandler {
 }
 
 func TestPlayerGET(t *testing.T) {
-	const summonerJSON = `{"id":"abc","accountId":"def","puuid":"ghi","name":"TestPlayer","profileIconId":1,"revisionDate":1700000000000,"summonerLevel":30}`
+	const acctJSON = `{"puuid":"test-puuid","gameName":"TestPlayer","tagLine":"NA1"}`
+	const summonerJSON = `{"puuid":"test-puuid","profileIconId":1,"revisionDate":1700000000000,"summonerLevel":30}`
 
 	tests := []struct {
 		name       string
 		query      string
-		transport  *fakeTransport
+		transport  http.RoundTripper
 		wantStatus int
 		wantBody   string
 	}{
@@ -64,49 +65,65 @@ func TestPlayerGET(t *testing.T) {
 			wantBody:   "Invalid format",
 		},
 		{
-			name:  "summoner found returns 200",
+			name:  "player found returns 200",
 			query: "/player?riotID=TestPlayer%23NA1",
-			transport: &fakeTransport{
-				resp: &http.Response{
+			transport: multiTransport{routes: map[string]*http.Response{
+				"by-riot-id": {
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader(acctJSON)),
+				},
+				"by-puuid": {
 					StatusCode: http.StatusOK,
 					Body:       io.NopCloser(strings.NewReader(summonerJSON)),
 				},
-			},
+			}},
 			wantStatus: http.StatusOK,
 		},
 		{
-			name:  "summoner not found returns 404",
+			name:  "account not found returns 404",
 			query: "/player?riotID=Unknown%23NA1",
-			transport: &fakeTransport{
-				resp: &http.Response{
+			transport: multiTransport{routes: map[string]*http.Response{
+				"by-riot-id": {
 					StatusCode: http.StatusNotFound,
 					Body:       io.NopCloser(strings.NewReader("")),
 				},
-			},
+			}},
 			wantStatus: http.StatusNotFound,
 			wantBody:   "not found",
 		},
 		{
-			name:  "permission denied returns 403",
+			name:  "account permission denied returns 403",
 			query: "/player?riotID=TestPlayer%23NA1",
-			transport: &fakeTransport{
-				resp: &http.Response{
+			transport: multiTransport{routes: map[string]*http.Response{
+				"by-riot-id": {
 					StatusCode: http.StatusForbidden,
 					Body:       io.NopCloser(strings.NewReader("Forbidden")),
 				},
-			},
+			}},
 			wantStatus: http.StatusForbidden,
 			wantBody:   "Permission denied",
+		},
+		{
+			name:  "summoner not found returns 404",
+			query: "/player?riotID=TestPlayer%23NA1",
+			transport: multiTransport{routes: map[string]*http.Response{
+				"by-riot-id": {
+					StatusCode: http.StatusOK,
+					Body:       io.NopCloser(strings.NewReader(acctJSON)),
+				},
+				"by-puuid": {
+					StatusCode: http.StatusNotFound,
+					Body:       io.NopCloser(strings.NewReader("")),
+				},
+			}},
+			wantStatus: http.StatusNotFound,
+			wantBody:   "not found",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var transport http.RoundTripper
-			if tt.transport != nil {
-				transport = tt.transport
-			}
-			h := newTestPlayerHandler(transport)
+			h := newTestPlayerHandler(tt.transport)
 
 			r := gin.New()
 			r.GET("/player", h.PlayerGET)

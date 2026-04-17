@@ -1,9 +1,8 @@
 package components
 
-// PlayerPage renders the standalone player lookup form.
-// The form for looking up a player by nickname#tag.
-templ PlayerForm() {
-	<div class="mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow">
+// PlayerForm renders the player search form.
+templ PlayerForm(prefill string) {
+	<div class="rounded-xl border border-slate-200 bg-white p-6 shadow">
 		<h2 class="text-xl font-semibold text-slate-900">Player Lookup</h2>
 		<p class="mt-1 text-sm text-slate-600">Enter a Riot ID in the format nickname#tag (e.g. Foo#NA1).</p>
 		<form id="playerForm" hx-get="/player" hx-trigger="submit" hx-target="#playerResult" hx-swap="innerHTML" hx-indicator=".htmx-indicator" class="mt-6 space-y-4">
@@ -14,8 +13,13 @@ templ PlayerForm() {
 					type="text"
 					name="riotID"
 					placeholder="nickname#tag"
+					pattern=".+#.+"
+					title="Use format: nickname#tag (e.g. Faker#T1)"
 					required
 					autofocus
+					if prefill != "" {
+						value={ prefill }
+					}
 				/>
 			</div>
 			<div class="flex items-center gap-3">
@@ -26,13 +30,21 @@ templ PlayerForm() {
 				</div>
 			</div>
 		</form>
-		<div id="playerResult" class="mt-6"></div>
 	</div>
 }
 
-// PlayerPage renders the standalone player lookup form.
-templ PlayerPage() {
+// PlayerPage renders the player lookup page with optional server-side results.
+templ PlayerPage(prefill string, result *PlayerResult) {
 	@layout("Player Lookup") {
-		@PlayerForm()
+		<div class="mx-auto max-w-4xl">
+			@PlayerForm(prefill)
+			<div id="playerResult" class="mt-6">
+				if result != nil && result.Error != "" {
+					@ErrorMessage(result.Error)
+				} else if result != nil {
+					@PlayerComponent(result.Account, result.Summoner, result.Matches, result.Matchups, result.Config, result.MatchesLoaded, result.MatchesTotal, result.FetchedAt)
+				}
+			</div>
+		</div>
 	}
 }

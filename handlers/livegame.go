@@ -1,17 +1,21 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 	"github.com/klnstprx/lolMatchup/client"
 	"github.com/klnstprx/lolMatchup/components"
 	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
 	"github.com/klnstprx/lolMatchup/renderer"
 )
 
@@ -38,13 +42,13 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	// Parse Riot ID in form nickname#tag
 	riotID, ok := c.GetQuery("riotID")
 	if !ok || riotID == "" {
-		c.String(http.StatusBadRequest, "Summoner identifier is required (nickname#tag).")
+		renderError(c, http.StatusBadRequest, "Summoner identifier is required (nickname#tag).")
 		h.Logger.Error("riotID query param missing", "url", c.Request.URL.String())
 		return
 	}
 	idParts := strings.SplitN(riotID, "#", 2)
 	if len(idParts) != 2 {
-		c.String(http.StatusBadRequest, "Invalid format for Summoner; use nickname#tag.")
+		renderError(c, http.StatusBadRequest, "Invalid format for Summoner; use nickname#tag.")
 		h.Logger.Error("invalid riotID format", "riotID", riotID)
 		return
 	}
@@ -55,16 +59,16 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, client.ErrAccountNotFound):
-			c.String(http.StatusNotFound, fmt.Sprintf("Account '%s#%s' not found.", gameName, tagLine))
+			renderError(c, http.StatusNotFound, fmt.Sprintf("Account '%s#%s' not found.", gameName, tagLine))
 			h.Logger.Debug("Account not found", "riotID", gameName+"#"+tagLine)
 			return
 		case errors.Is(err, client.ErrPermissionDenied):
-			c.String(http.StatusForbidden, "Permission denied: check your Riot API key and region.")
+			renderError(c, http.StatusForbidden, "Permission denied: check your Riot API key and region.")
 			h.Logger.Error("Permission denied fetching account info", "error", err)
 			return
 		default:
 			h.Logger.Error("Error fetching account info", "error", err)
-			c.String(http.StatusInternalServerError, "Error fetching account data.")
+			renderError(c, http.StatusInternalServerError, "Error fetching account data.")
 			return
 		}
 	}
@@ -74,60 +78,277 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, client.ErrGameNotFound):
-			c.String(http.StatusNotFound, fmt.Sprintf("Account '%s#%s' is not currently in a game.", gameName, tagLine))
+			renderError(c, http.StatusNotFound, fmt.Sprintf("Account '%s#%s' is not currently in a game.", gameName, tagLine))
 			h.Logger.Debug("No active game for account", "riotID", gameName+"#"+tagLine)
 			return
 		case errors.Is(err, client.ErrPermissionDenied):
-			c.String(http.StatusForbidden, "Permission denied: check your Riot API key and region.")
+			renderError(c, http.StatusForbidden, "Permission denied: check your Riot API key and region.")
 			h.Logger.Error("Permission denied fetching active game", "error", err)
 			return
 		default:
 			h.Logger.Error("Error fetching active game", "error", err)
-			c.String(http.StatusInternalServerError, "Error fetching live game data.")
+			renderError(c, http.StatusInternalServerError, "Error fetching live game data.")
 			return
 		}
 	}
 
-	// Find the user's team
-	var userTeamID int64
-	for _, p := range activeGame.Participants {
-		if p.RiotID == riotID {
-			userTeamID = p.TeamID
-			break
+	vd := h.buildViewData(activeGame, riotID)
+	if !vd.found {
+		h.Logger.Warn("Player not found in participant list", "riotID", riotID)
+		renderError(c, http.StatusNotFound, fmt.Sprintf("Could not identify '%s' in the current game's participant list.", riotID))
+		return
+	}
+
+	// Enrich opponents with recent match data (best-effort, non-blocking)
+	h.enrichOpponents(ctx, vd.parts)
+
+	cmp := components.LiveGameInfo(vd.parts, h.Config, riotID, vd.userChampionName, vd.userChampionID)
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+}
+
+// LiveGamePageGET renders the live game search page. If a riotID query param is present,
+// it performs the lookup server-side and renders the page with results pre-populated.
+func (h *LiveGameHandler) LiveGamePageGET(c *gin.Context) {
+	ctx := c.Request.Context()
+	prefill := c.Query("riotID")
+
+	var result *components.LiveGameResult
+	if prefill != "" {
+		result = h.lookupLiveGame(ctx, prefill)
+	}
+
+	cmp := components.LiveGamePage(prefill, result)
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+}
+
+// lookupLiveGame performs the full live game lookup (account → spectator → resolve teams).
+// On failure, returns a LiveGameResult with the Error field set.
+func (h *LiveGameHandler) lookupLiveGame(ctx context.Context, riotID string) *components.LiveGameResult {
+	idParts := strings.SplitN(riotID, "#", 2)
+	if len(idParts) != 2 {
+		return &components.LiveGameResult{Error: "Invalid format for Summoner; use nickname#tag."}
+	}
+	gameName, tagLine := idParts[0], idParts[1]
+
+	acct, err := h.Client.FetchAccountByRiotID(ctx, gameName, tagLine, h.Config.RiotRegion, h.Config.RiotAPIKey)
+	if err != nil {
+		h.Logger.Debug("live game page lookup: account error", "riotID", riotID, "error", err)
+		switch {
+		case errors.Is(err, client.ErrAccountNotFound):
+			return &components.LiveGameResult{Error: fmt.Sprintf("Account '%s' not found.", riotID)}
+		case errors.Is(err, client.ErrPermissionDenied):
+			return &components.LiveGameResult{Error: "Permission denied: check your Riot API key and region."}
+		default:
+			return &components.LiveGameResult{Error: "Error fetching account data."}
 		}
 	}
 
-	// Build opponent list: lookup numeric championId -> textual ID -> display name
-	keyMap := h.Config.Cache.GetChampionKeyMap() // numeric key -> textual ID
-	nameMap := h.Config.Cache.GetChampionMap()   // champion Name -> textual ID
+	activeGame, err := h.Client.FetchCurrentGameByPUUID(ctx, acct.PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey)
+	if err != nil {
+		h.Logger.Debug("live game page lookup: spectator error", "riotID", riotID, "error", err)
+		switch {
+		case errors.Is(err, client.ErrGameNotFound):
+			return &components.LiveGameResult{Error: fmt.Sprintf("Account '%s' is not currently in a game.", riotID)}
+		case errors.Is(err, client.ErrPermissionDenied):
+			return &components.LiveGameResult{Error: "Permission denied: check your Riot API key and region."}
+		default:
+			return &components.LiveGameResult{Error: "Error fetching live game data."}
+		}
+	}
+
+	vd := h.buildViewData(activeGame, riotID)
+	if !vd.found {
+		h.Logger.Warn("Player not found in participant list", "riotID", riotID)
+		return &components.LiveGameResult{Error: fmt.Sprintf("Could not identify '%s' in the current game's participant list.", riotID)}
+	}
+
+	h.enrichOpponents(ctx, vd.parts)
+
+	return &components.LiveGameResult{
+		Parts:            vd.parts,
+		Config:           h.Config,
+		RiotID:           riotID,
+		UserChampionName: vd.userChampionName,
+		UserChampionID:   vd.userChampionID,
+	}
+}
+
+// liveGameViewData holds the resolved participant data for rendering.
+type liveGameViewData struct {
+	parts            []components.OpponentView
+	userChampionID   string
+	userChampionName string
+	found            bool
+}
+
+// buildViewData resolves champion IDs and splits participants into user team vs opponents.
+func (h *LiveGameHandler) buildViewData(game models.CurrentGameInfo, riotID string) liveGameViewData {
+	keyMap := h.Config.Cache.GetChampionKeyMap()
+	nameMap := h.Config.Cache.GetChampionMap()
 	textualToName := make(map[string]string, len(nameMap))
 	for name, id := range nameMap {
 		textualToName[id] = name
 	}
 
-	var parts []map[string]string
-	for _, p := range activeGame.Participants {
-		if p.TeamID == userTeamID {
-			continue
-		}
-		numKey := strconv.FormatInt(p.ChampionID, 10)
-		textID, found := keyMap[numKey]
-		if !found {
+	resolve := func(championID int64) (textID, champName string) {
+		numKey := strconv.FormatInt(championID, 10)
+		textID, ok := keyMap[numKey]
+		if !ok {
 			h.Logger.Error("Champion ID missing from keyMap", "championId", numKey)
 			textID = numKey
 		}
-		champName, foundName := textualToName[textID]
-		if !foundName {
+		champName, ok = textualToName[textID]
+		if !ok {
 			champName = textID
 		}
-		parts = append(parts, map[string]string{
-			"riotId":       p.RiotID,
-			"championId":   textID,
-			"championName": champName,
-		})
+		return textID, champName
 	}
 
-	// Render using templ component
-	cmp := components.LiveGameInfo(parts, h.Config)
-	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+	var vd liveGameViewData
+	var userTeamID int64
+	for _, p := range game.Participants {
+		if p.RiotID == riotID {
+			userTeamID = p.TeamID
+			vd.userChampionID, vd.userChampionName = resolve(p.ChampionID)
+			vd.found = true
+			break
+		}
+	}
+	if !vd.found {
+		return vd
+	}
+
+	for _, p := range game.Participants {
+		if p.TeamID == userTeamID {
+			continue
+		}
+		textID, champName := resolve(p.ChampionID)
+		vd.parts = append(vd.parts, components.OpponentView{
+			RiotID:       p.RiotID,
+			ChampionID:   textID,
+			ChampionName: champName,
+			PUUID:        p.PUUID,
+		})
+	}
+	return vd
+}
+
+const (
+	enrichMatchCount = 5
+	enrichTimeout    = 10 * time.Second
+	enrichParallel   = 5
+)
+
+// enrichOpponents fetches recent match data for each opponent and attaches enrichment stats.
+// Errors are logged but not propagated (graceful degradation).
+func (h *LiveGameHandler) enrichOpponents(ctx context.Context, opponents []components.OpponentView) {
+	enrichCtx, cancel := context.WithTimeout(ctx, enrichTimeout)
+	defer cancel()
+
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, enrichParallel)
+
+	for i := range opponents {
+		if opponents[i].PUUID == "" {
+			continue
+		}
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			enrichment := h.computeEnrichment(enrichCtx, opponents[idx].PUUID, opponents[idx].ChampionName)
+			opponents[idx].Enrichment = &enrichment
+		}(i)
+	}
+	wg.Wait()
+}
+
+// computeEnrichment computes enrichment stats for a single opponent from their recent matches.
+func (h *LiveGameHandler) computeEnrichment(ctx context.Context, puuid, currentChampName string) models.OpponentEnrichment {
+	var e models.OpponentEnrichment
+
+	ids, err := h.Client.FetchMatchIDs(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey, enrichMatchCount)
+	if err != nil {
+		h.Logger.Debug("enrichment: failed to fetch match IDs", "puuid", puuid, "error", err)
+		return e
+	}
+
+	positionCounts := make(map[string]int)
+	streakCounting := true
+	var lastWin *bool
+
+	for _, matchID := range ids {
+		match, fetchErr := h.Client.FetchMatch(ctx, matchID, h.Config.RiotRegion, h.Config.RiotAPIKey)
+		if fetchErr != nil {
+			continue
+		}
+		for _, p := range match.Info.Participants {
+			if p.PUUID != puuid {
+				continue
+			}
+
+			// Champion-specific stats
+			if p.ChampionName == currentChampName {
+				e.ChampionGames++
+				if p.Win {
+					e.ChampionWins++
+				} else {
+					e.ChampionLosses++
+				}
+			}
+
+			// Streak calculation (matches are ordered most-recent first)
+			if streakCounting {
+				if lastWin == nil {
+					w := p.Win
+					lastWin = &w
+					if p.Win {
+						e.WinStreak = 1
+					} else {
+						e.LossStreak = 1
+					}
+				} else if *lastWin == p.Win {
+					if p.Win {
+						e.WinStreak++
+					} else {
+						e.LossStreak++
+					}
+				} else {
+					streakCounting = false
+				}
+			}
+
+			// Position frequency for off-role detection
+			pos := p.IndividualPosition
+			if pos != "" && pos != "Invalid" {
+				positionCounts[pos]++
+			}
+			break
+		}
+	}
+
+	// Determine most played position
+	maxCount := 0
+	for pos, count := range positionCounts {
+		if count > maxCount {
+			maxCount = count
+			e.MostPlayedPosition = pos
+		}
+	}
+
+	// Off-role detection: if they have enough data and never played this
+	// position recently, they may be off-role. We approximate by checking
+	// if the champion was never seen in their recent matches — meaning
+	// they might be on an unfamiliar role. A more accurate check would
+	// compare spectator-assigned position vs most-played, but spectator-v5
+	// doesn't provide position assignments.
+	// Instead: if they have a clear main role (>= 3 of 5 games) and
+	// zero games on the current champion, flag as possibly off-role.
+	if e.ChampionGames == 0 && len(ids) >= enrichMatchCount && maxCount >= 3 {
+		e.PossiblyOffRole = true
+	}
+
+	return e
 }

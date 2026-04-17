@@ -1,0 +1,98 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+	"math"
+)
+
+// winRate calculates win percentage from a MatchupRecord.
+func winRate(m models.MatchupRecord) int {
+	if m.Games <= 0 {
+		return 0
+	}
+	return int(math.Round(float64(m.Wins) * 100 / float64(m.Games)))
+}
+
+// matchupBorderClass returns Tailwind border+background classes based on win rate intensity.
+func matchupBorderClass(m models.MatchupRecord) string {
+	wr := winRate(m)
+	switch {
+	case m.Wins == m.Losses:
+		return "border-slate-200"
+	case wr >= 75:
+		return "border-emerald-400 bg-emerald-100/60"
+	case wr > 50:
+		return "border-emerald-200 bg-emerald-50/50"
+	case wr <= 25:
+		return "border-red-400 bg-red-100/60"
+	default:
+		return "border-red-200 bg-red-50/50"
+	}
+}
+
+// MatchupStats renders a grid of lane matchup records.
+templ MatchupStats(matchups []models.MatchupRecord, cfg *config.AppConfig) {
+	if len(matchups) > 0 {
+		<div class="mt-6">
+			<h3 class="mb-3 text-lg font-semibold text-slate-900">Lane Matchups</h3>
+			<div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+				for _, m := range matchups {
+					<div
+						class={
+							"flex items-center gap-3 rounded-lg border bg-white p-3 shadow-sm",
+							matchupBorderClass(m),
+						}
+					>
+						<img
+							class="h-8 w-8 rounded-full ring-1 ring-slate-200"
+							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.PlayerChampion))) }
+							alt={ m.PlayerChampion }
+						/>
+						<span class="text-xs font-medium text-slate-400">vs</span>
+						<img
+							class="h-8 w-8 rounded-full ring-1 ring-slate-200"
+							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.EnemyChampion))) }
+							alt={ m.EnemyChampion }
+						/>
+						<div class="ml-auto text-right">
+							<span
+								class={
+									"text-sm font-bold",
+									templ.KV("text-emerald-700", m.Wins > m.Losses),
+									templ.KV("text-red-600", m.Losses > m.Wins),
+									templ.KV("text-slate-700", m.Wins == m.Losses),
+								}
+							>
+								{ fmt.Sprintf("%dW %dL", m.Wins, m.Losses) }
+							</span>
+							<p
+								class={
+									"text-xs font-semibold",
+									templ.KV("text-emerald-600", m.Wins > m.Losses),
+									templ.KV("text-red-500", m.Losses > m.Wins),
+									templ.KV("text-slate-500", m.Wins == m.Losses),
+								}
+							>
+								{ fmt.Sprintf("%d%%", winRate(m)) }
+							</p>
+							<div class="mt-1 h-1.5 w-16 overflow-hidden rounded-full bg-slate-200">
+								<div
+									class={
+										"h-full rounded-full",
+										templ.KV("bg-emerald-500", m.Wins > m.Losses),
+										templ.KV("bg-red-400", m.Losses > m.Wins),
+										templ.KV("bg-slate-400", m.Wins == m.Losses),
+									}
+									style={ fmt.Sprintf("width: %d%%", winRate(m)) }
+								></div>
+							</div>
+							<p class="text-[10px] text-slate-400">{ m.PlayerChampion } vs { m.EnemyChampion }</p>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}

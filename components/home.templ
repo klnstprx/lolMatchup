@@ -3,37 +3,25 @@ package components
 templ headerTemplate(name string) {
 	<header class="sticky top-0 z-40 bg-gradient-to-r from-slate-900 to-indigo-900 text-white shadow">
 		<div class="container mx-auto px-4">
-			<div class="flex h-16 items-center justify-between">
+			<div class="flex h-14 items-center justify-between">
 				<a href="/" class="flex items-center space-x-2">
 					<span class="inline-flex h-8 w-8 items-center justify-center rounded bg-indigo-600 text-white font-bold">LM</span>
-					<span class="text-lg font-semibold tracking-wide">{ name }</span>
+					<span class="text-lg font-semibold tracking-wide hidden sm:inline">{ name }</span>
 				</a>
-				<div class="hidden md:block">
+				<nav>
 					<ul class="flex items-center space-x-6 text-sm">
-						<li><a href="/champion-search" class="hover:text-indigo-300 transition-colors">Champion Lookup</a></li>
-						<li><a href="/player-search" class="hover:text-indigo-300 transition-colors">Player Lookup</a></li>
-						<li><a href="/livegame-search" class="hover:text-indigo-300 transition-colors">Live Game Lookup</a></li>
+						<li><a href="/champion-search" class="hover:text-indigo-300 transition-colors">Champions</a></li>
+						<li><a href="/player-search" class="hover:text-indigo-300 transition-colors">Players</a></li>
+						<li><a href="/livegame-search" class="hover:text-indigo-300 transition-colors">Live Game</a></li>
 					</ul>
-				</div>
+				</nav>
 			</div>
 		</div>
 	</header>
 }
 
-templ navTemplate() {
-	<nav class="md:hidden bg-slate-800 text-slate-100">
-		<div class="container mx-auto px-4 py-2">
-			<ul class="grid grid-cols-3 gap-2 text-center text-sm">
-				<li><a href="/champion-search" class="block rounded bg-slate-700 py-2 hover:bg-slate-600">Champions</a></li>
-				<li><a href="/player-search" class="block rounded bg-slate-700 py-2 hover:bg-slate-600">Players</a></li>
-				<li><a href="/livegame-search" class="block rounded bg-slate-700 py-2 hover:bg-slate-600">Live</a></li>
-			</ul>
-		</div>
-	</nav>
-}
-
 templ footerTemplate() {
-	<footer class="mt-16 bg-slate-900 text-slate-300">
+	<footer class="mt-auto bg-slate-900 text-slate-300">
 		<div class="container mx-auto px-4 py-6 text-center text-sm">
 			&copy; 2025 LoL Matchup
 		</div>
@@ -41,22 +29,25 @@ templ footerTemplate() {
 }
 
 templ layout(name string) {
+	<!DOCTYPE html>
 	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta
+				name="htmx-config"
+				content='{"responseHandling": [{"code":"204", "swap": false}, {"code":"[23]..", "swap": true}, {"code":"[45]..", "swap": true, "error": false}, {"code":"...", "swap": true}]}'
+			/>
 			<title>{ name }</title>
 			<script src="https://cdn.tailwindcss.com"></script>
 		</head>
 		<body class="flex min-h-screen flex-col bg-slate-50">
 			@headerTemplate("LoL Matchup")
-			@navTemplate()
-			<main class="container mx-auto my-10 flex-grow px-4">
+			<main class="container mx-auto flex-grow px-4 py-8">
 				{ children... }
 			</main>
 			@footerTemplate()
 			<script src="/static/htmx/htmx.min.js"></script>
-			<script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 		</body>
 	</html>
 }

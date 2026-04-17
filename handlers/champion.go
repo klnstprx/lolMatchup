@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -31,12 +32,53 @@ func NewChampionHandler(cfg *config.AppConfig, client *client.Client) *ChampionH
 	}
 }
 
+// ChampionPageGET renders the champion search page. If a champion query param is present,
+// it performs the lookup server-side and renders the page with results pre-populated.
+func (h *ChampionHandler) ChampionPageGET(c *gin.Context) {
+	ctx := c.Request.Context()
+	prefill := c.Query("champion")
+
+	var result *components.ChampionResult
+	if prefill != "" {
+		result = h.lookupChampion(ctx, prefill)
+	}
+
+	cmp := components.ChampionPage(prefill, result)
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+}
+
+// lookupChampion performs a champion lookup for server-side page rendering.
+// On failure, returns a ChampionResult with the Error field set.
+func (h *ChampionHandler) lookupChampion(ctx context.Context, inputName string) *components.ChampionResult {
+	championID, err := h.Cache.SearchChampionName(inputName)
+	if err != nil {
+		h.Logger.Debug("champion page lookup: name not found in cache", "error", err)
+		championID = inputName
+	}
+
+	champion, inCache := h.Cache.GetChampionByID(championID)
+	if inCache {
+		return &components.ChampionResult{Champion: champion, Config: h.Config}
+	}
+
+	fetchedChampion, fetchErr := h.Client.FetchChampionData(ctx, championID)
+	if fetchErr != nil {
+		h.Logger.Debug("champion page lookup: fetch error", "input", inputName, "error", fetchErr)
+		if errors.Is(fetchErr, client.ErrChampionNotFound) {
+			return &components.ChampionResult{Error: fmt.Sprintf("Champion '%s' not found.", inputName)}
+		}
+		return &components.ChampionResult{Error: "Error fetching champion data."}
+	}
+	h.Cache.SetChampion(fetchedChampion)
+	return &components.ChampionResult{Champion: fetchedChampion, Config: h.Config}
+}
+
 // ChampionGET handles /champion GET requests, returning champion data in templ format.
 func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 	ctx := c.Request.Context()
 	inputName, ok := c.GetQuery("champion")
 	if !ok || inputName == "" {
-		c.String(http.StatusBadRequest, "Champion name is required.")
+		renderError(c, http.StatusBadRequest, "Champion name is required.")
 		h.Logger.Error("Champion name query param is missing", "url", c.Request.URL.String())
 		return
 	}
@@ -56,11 +98,11 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 		if fetchErr != nil {
 			if errors.Is(fetchErr, client.ErrChampionNotFound) {
 				h.Logger.Debug("Champion not found", "input", inputName, "championID", championID)
-				c.String(http.StatusNotFound, fmt.Sprintf("Champion '%s' not found.", inputName))
+				renderError(c, http.StatusNotFound, fmt.Sprintf("Champion '%s' not found.", inputName))
 				return
 			}
 			h.Logger.Error("Failed to fetch champion detail", "error", fetchErr, "championID", championID)
-			c.String(http.StatusInternalServerError, "Error fetching champion data.")
+			renderError(c, http.StatusInternalServerError, "Error fetching champion data.")
 			return
 		}
 		h.Cache.SetChampion(fetchedChampion)
@@ -68,11 +110,14 @@ func (h *ChampionHandler) ChampionGET(c *gin.Context) {
 		h.Logger.Debug("Fetched champion data", "championID", champion.ID)
 	}
 
-	// Render based on 'modal' or 'compact' query param
+	// Render based on query param: modal, detail, compact, or default
 	var comp templ.Component
 	if _, ok := c.GetQuery("modal"); ok {
 		// full component inside modal overlay
 		comp = components.ChampionModal(champion, h.Config)
+	} else if _, ok := c.GetQuery("detail"); ok {
+		// inline detail view (used in live game side panel)
+		comp = components.ChampionDetail(champion, h.Config)
 	} else if _, ok := c.GetQuery("compact"); ok {
 		// inline compact view
 		comp = components.ChampionCompact(champion, h.Config)

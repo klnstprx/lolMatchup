@@ -11,6 +11,36 @@ import (
 	"github.com/klnstprx/lolMatchup/models"
 )
 
+// Bonus constants for fuzzy matching: applied to Levenshtein distance to favor
+// names that start with or contain the typed text.
+const (
+	prefixBonus    = 2 // bonus for a champion whose name starts with typed text
+	substringBonus = 1 // bonus if typed text appears anywhere inside name
+)
+
+// fuzzyScore computes a weighted Levenshtein distance for a candidate name against
+// typed input, applying prefix and substring bonuses. Returns the weighted distance
+// and whether the candidate is within threshold.
+func fuzzyScore(typed, processedName string, threshold int) (weighted int, ok bool) {
+	dist := levenshteinDistance(typed, processedName)
+	if dist > threshold+prefixBonus {
+		return 0, false
+	}
+	weighted = dist
+	if len(processedName) >= len(typed) && processedName[:len(typed)] == typed {
+		weighted -= prefixBonus
+	} else if strings.Contains(processedName, typed) {
+		weighted -= substringBonus
+	}
+	if weighted < 0 {
+		weighted = 0
+	}
+	if weighted > threshold {
+		return 0, false
+	}
+	return weighted, true
+}
+
 type Cache struct {
 	Path                 string
 	Patch                string
@@ -102,6 +132,27 @@ func (c *Cache) Invalidate() {
 	c.ChampionKeyMap = make(map[string]string)
 }
 
+// GetPatch returns the current cached patch version.
+func (c *Cache) GetPatch() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.Patch
+}
+
+// SetPatch sets the cached patch version.
+func (c *Cache) SetPatch(patch string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.Patch = patch
+}
+
+// GetChampionMapLen returns the number of entries in the champion name map.
+func (c *Cache) GetChampionMapLen() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return len(c.ChampionMap)
+}
+
 // SetChampionKeyMap sets the mapping from numeric key to textual champion ID.
 func (c *Cache) SetChampionKeyMap(m map[string]string) {
 	c.mu.Lock()
@@ -118,7 +169,7 @@ func (c *Cache) GetChampionKeyMap() map[string]string {
 
 // SearchChampionName returns the champion ID for the best match against "input."
 // It uses Levenshtein to handle fuzzy matching, but also applies a bonus if the
-// champion’s name starts with (prefix) or contains the user’s input (substring).
+// champion's name starts with (prefix) or contains the user's input (substring).
 // Ties in the same weighted distance are broken alphabetically by champion name.
 func (c *Cache) SearchChampionName(input string) (string, error) {
 	c.mu.RLock()
@@ -129,75 +180,39 @@ func (c *Cache) SearchChampionName(input string) (string, error) {
 		return "", fmt.Errorf("no champion found matching '%s'", input)
 	}
 
-	const (
-		prefixBonus    = 2 // bigger bonus for a champion whose name starts with typed text
-		substringBonus = 1 // smaller bonus if typed text appears anywhere else inside name
-	)
-
 	type candidate struct {
-		ChampionName string
-		ChampionID   string
-		BaseDistance int // the pure Levenshtein distance
-		WeightedDist int // distance after bonuses
+		name       string
+		championID string
+		weighted   int
 	}
 
 	var results []candidate
 
 	for name, champID := range c.ChampionMap {
 		processedName := preprocessString(name)
-
-		// Compute the standard Levenshtein distance.
-		dist := levenshteinDistance(typed, processedName)
-		// If the raw distance is far beyond our threshold, skip early.
-		// (Optionally allow some “room” for a prefix bonus.)
-		if dist > c.LevenshteinThreshold+prefixBonus {
+		weighted, ok := fuzzyScore(typed, processedName, c.LevenshteinThreshold)
+		if !ok {
 			continue
 		}
-
-		// Start with raw distance, then apply bonuses (subtract).
-		weighted := dist
-
-		// 1) Prefix check
-		if len(processedName) >= len(typed) &&
-			processedName[:len(typed)] == typed {
-			weighted -= prefixBonus
-		} else {
-			// 2) Substring check
-			if strings.Contains(processedName, typed) {
-				weighted -= substringBonus
-			}
-		}
-
-		if weighted < 0 {
-			weighted = 0
-		}
-
-		// If the final weighted distance remains within threshold after bonuses,
-		// consider it a valid candidate.
-		if weighted <= c.LevenshteinThreshold {
-			results = append(results, candidate{
-				ChampionName: name,
-				ChampionID:   champID,
-				BaseDistance: dist,
-				WeightedDist: weighted,
-			})
-		}
+		results = append(results, candidate{
+			name:       name,
+			championID: champID,
+			weighted:   weighted,
+		})
 	}
 
 	if len(results) == 0 {
 		return "", fmt.Errorf("no champion found matching '%s'", input)
 	}
 
-	// Sort all valid candidates first by WeightedDist ascending, then by name alphabetical.
 	sort.Slice(results, func(i, j int) bool {
-		if results[i].WeightedDist != results[j].WeightedDist {
-			return results[i].WeightedDist < results[j].WeightedDist
+		if results[i].weighted != results[j].weighted {
+			return results[i].weighted < results[j].weighted
 		}
-		return results[i].ChampionName < results[j].ChampionName
+		return results[i].name < results[j].name
 	})
 
-	best := results[0]
-	return best.ChampionID, nil
+	return results[0].championID, nil
 }
 
 // Sets champion map in cache.
@@ -280,29 +295,14 @@ func (c *Cache) Autocomplete(input string, limit int) []string {
 		name     string
 		weighted int
 	}
-	const (
-		prefixBonus    = 2
-		substringBonus = 1
-	)
 	var fuzzy []candidate
 	for name := range c.ChampionMap {
 		processed := preprocessString(name)
-		dist := levenshteinDistance(typed, processed)
-		if dist > c.LevenshteinThreshold+prefixBonus {
+		weighted, ok := fuzzyScore(typed, processed, c.LevenshteinThreshold)
+		if !ok {
 			continue
 		}
-		weighted := dist
-		if len(processed) >= len(typed) && processed[:len(typed)] == typed {
-			weighted -= prefixBonus
-		} else if strings.Contains(processed, typed) {
-			weighted -= substringBonus
-		}
-		if weighted < 0 {
-			weighted = 0
-		}
-		if weighted <= c.LevenshteinThreshold {
-			fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
-		}
+		fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
 	}
 	if len(fuzzy) == 0 {
 		return nil
@@ -311,8 +311,8 @@ func (c *Cache) Autocomplete(input string, limit int) []string {
 		if fuzzy[i].weighted != fuzzy[j].weighted {
 			return fuzzy[i].weighted < fuzzy[j].weighted
 		}
-		// break ties by reverse alphabetical so that "Ashe" beats "Ahri"
-		return fuzzy[i].name > fuzzy[j].name
+		// break ties alphabetically
+		return fuzzy[i].name < fuzzy[j].name
 	})
 	// Build ordered list of fuzzy suggestions
 	var suggestions []string
@@ -324,4 +324,101 @@ func (c *Cache) Autocomplete(input string, limit int) []string {
 		suggestions = suggestions[:limit]
 	}
 	return suggestions
+}
+
+// AutocompleteResult holds enriched data for one autocomplete suggestion.
+type AutocompleteResult struct {
+	Name      string
+	Key       string
+	Positions []string
+	Roles     []string
+}
+
+// AutocompleteRich returns up to 'limit' enriched champion suggestions that best
+// match the input, including champion key, positions, and roles.
+func (c *Cache) AutocompleteRich(input string, limit int) []AutocompleteResult {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	typed := preprocessString(input)
+	if typed == "" {
+		return nil
+	}
+
+	var names []string
+
+	// 1) prefix matches
+	for name := range c.ChampionMap {
+		if strings.HasPrefix(preprocessString(name), typed) {
+			names = append(names, name)
+		}
+	}
+	if len(names) > 0 {
+		sort.Strings(names)
+		if limit > 0 && len(names) > limit {
+			names = names[:limit]
+		}
+		return c.enrichNames(names)
+	}
+
+	// 2) substring matches
+	for name := range c.ChampionMap {
+		if strings.Contains(preprocessString(name), typed) {
+			names = append(names, name)
+		}
+	}
+	if len(names) > 0 {
+		sort.Strings(names)
+		if limit > 0 && len(names) > limit {
+			names = names[:limit]
+		}
+		return c.enrichNames(names)
+	}
+
+	// 3) fuzzy fallback
+	type candidate struct {
+		name     string
+		weighted int
+	}
+	var fuzzy []candidate
+	for name := range c.ChampionMap {
+		processed := preprocessString(name)
+		weighted, ok := fuzzyScore(typed, processed, c.LevenshteinThreshold)
+		if !ok {
+			continue
+		}
+		fuzzy = append(fuzzy, candidate{name: name, weighted: weighted})
+	}
+	if len(fuzzy) == 0 {
+		return nil
+	}
+	sort.Slice(fuzzy, func(i, j int) bool {
+		if fuzzy[i].weighted != fuzzy[j].weighted {
+			return fuzzy[i].weighted < fuzzy[j].weighted
+		}
+		return fuzzy[i].name < fuzzy[j].name
+	})
+	for _, cand := range fuzzy {
+		names = append(names, cand.name)
+	}
+	if limit > 0 && len(names) > limit {
+		names = names[:limit]
+	}
+	return c.enrichNames(names)
+}
+
+// enrichNames converts a list of champion names into AutocompleteResults
+// by looking up champion data from the cache. Must be called with c.mu held.
+func (c *Cache) enrichNames(names []string) []AutocompleteResult {
+	results := make([]AutocompleteResult, 0, len(names))
+	for _, name := range names {
+		key := c.ChampionMap[name]
+		r := AutocompleteResult{Name: name, Key: key}
+		if champ, ok := c.Champions[key]; ok {
+			r.Positions = champ.Positions
+			r.Roles = champ.Roles
+		}
+		results = append(results, r)
+	}
+	return results
 }

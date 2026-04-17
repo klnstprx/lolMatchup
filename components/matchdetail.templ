@@ -1,0 +1,124 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+)
+
+// MatchDetailView renders the full match with both teams side by side.
+templ MatchDetailView(match models.MatchDTO, highlightPUUID string, cfg *config.AppConfig) {
+	<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+		<!-- Match header -->
+		<div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+			<div class="flex items-center gap-3">
+				<h4 class="text-base font-semibold text-slate-900">{ queueName(match.Info.QueueID) }</h4>
+				<span class="text-sm text-slate-500">{ formatDuration(match.Info.GameDuration) }</span>
+			</div>
+			<div class="flex items-center gap-3">
+					<span class="text-xs text-slate-400">{ timeAgo(match.Info.GameStartTimestamp) }</span>
+					<button
+						class="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+						onclick="this.closest('[id^=match-]').innerHTML=''"
+						aria-label="Close"
+					>
+						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+					</button>
+				</div>
+		</div>
+		<!-- Two-team grid -->
+		<div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+			@matchTeam(match, 100, highlightPUUID, cfg)
+			@matchTeam(match, 200, highlightPUUID, cfg)
+		</div>
+		<p class="mt-3 text-center text-[11px] text-slate-400">Click a player for detailed stats</p>
+	</div>
+}
+
+// matchTeam renders one team's players.
+templ matchTeam(match models.MatchDTO, teamID int, highlightPUUID string, cfg *config.AppConfig) {
+	<!-- Determine win/loss for team header -->
+	<div>
+		for i, p := range match.Info.Participants {
+			if p.TeamID == teamID {
+				if i == 0 || (i > 0 && match.Info.Participants[i-1].TeamID != teamID) {
+					<div class={
+						"mb-2 flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold",
+						templ.KV("bg-emerald-50 text-emerald-700", p.Win),
+						templ.KV("bg-red-50 text-red-600", !p.Win),
+					}>
+						if p.Win {
+							Victory
+						} else {
+							Defeat
+						}
+						if teamID == 100 {
+							<span class="font-normal text-slate-400">— Blue Side</span>
+						} else {
+							<span class="font-normal text-slate-400">— Red Side</span>
+						}
+					</div>
+				}
+			}
+		}
+		<!-- Column headers -->
+		<div class="flex items-center gap-x-2 px-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+			<div class="h-4 w-8 flex-none"></div>
+			<div class="w-24">Player</div>
+			<span class="w-14 text-center">KDA</span>
+			<span class="w-10 text-center">CS</span>
+			<span class="w-10 text-right">DMG</span>
+		</div>
+		<div class="space-y-1">
+			for _, p := range match.Info.Participants {
+				if p.TeamID == teamID {
+					<div
+						class={
+							"flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 rounded-lg p-2 text-xs transition-colors",
+							templ.KV("bg-indigo-50 ring-1 ring-indigo-200 hover:bg-indigo-100", p.PUUID == highlightPUUID),
+							templ.KV("hover:bg-slate-100", p.PUUID != highlightPUUID),
+						}
+						hx-get={ fmt.Sprintf("/match/player?id=%s&puuid=%s", match.Metadata.MatchID, p.PUUID) }
+						hx-target="body"
+						hx-swap="beforeend"
+						hx-on::before-request="document.getElementById('modal')?.remove()"
+						hx-indicator="find .player-row-spinner"
+					>
+						<!-- Champion icon -->
+						<img
+							class="h-8 w-8 flex-none rounded-full ring-1 ring-slate-200"
+							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, p.ChampionName))) }
+							alt={ p.ChampionName }
+						/>
+						<!-- Name + champion -->
+						<div class="w-24 min-w-0">
+							<p class="truncate font-semibold text-slate-900">{ p.ChampionName }</p>
+							<p class="truncate text-slate-400">{ p.RiotIDGameName }</p>
+						</div>
+						<!-- KDA -->
+						<span class="w-14 text-center font-semibold text-slate-700">{ fmt.Sprintf("%d/%d/%d", p.Kills, p.Deaths, p.Assists) }</span>
+						<!-- CS -->
+						<span class="w-10 text-center text-slate-500">{ fmt.Sprint(p.TotalMinionsKilled + p.NeutralMinionsKilled) }</span>
+						<!-- Damage -->
+						<span class="w-10 text-right text-slate-500">{ fmt.Sprintf("%dk", p.TotalDamageDealtToChampions/1000) }</span>
+						<!-- Items -->
+						<div class="flex flex-none gap-0.5">
+							for _, itemID := range []int{p.Item0, p.Item1, p.Item2, p.Item3, p.Item4, p.Item5, p.Item6} {
+								if itemID > 0 {
+									<img
+										class="h-5 w-5 rounded"
+										src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/item/%d.png", cfg.PatchNumber, itemID))) }
+										alt={ fmt.Sprintf("Item %d", itemID) }
+									/>
+								}
+							}
+						</div>
+						<div class="player-row-spinner htmx-indicator ml-auto">
+							<svg class="h-3 w-3 animate-spin text-slate-400" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+}

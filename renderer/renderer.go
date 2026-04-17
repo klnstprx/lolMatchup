@@ -17,6 +17,11 @@ type HTMLTemplRenderer struct {
 // Instance implements gin's HTMLRender interface. If the data is a templ.Component,
 // it returns our custom Renderer struct; otherwise, it falls back to the default
 // provided gin HTML renderer (if set).
+//
+// NOTE: This method uses context.Background() because the HTMLRender interface
+// has no access to the HTTP request context. Handlers should always use
+// renderer.New(ctx, status, component) instead of c.HTML() to ensure proper
+// context propagation (cancellation, timeouts, request-scoped values).
 func (r *HTMLTemplRenderer) Instance(s string, d interface{}) render.Render {
 	templData, ok := d.(templ.Component)
 	if !ok {

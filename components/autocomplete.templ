@@ -1,7 +1,14 @@
 package components
 
-templ ChampionForm() {
-	<div class="mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow">
+import (
+	"fmt"
+	"strings"
+
+	"github.com/klnstprx/lolMatchup/cache"
+)
+
+templ ChampionForm(prefill string) {
+	<div class="rounded-xl border border-slate-200 bg-white p-6 shadow">
 		<h2 class="text-xl font-semibold text-slate-900">Champion Lookup</h2>
 		<p class="mt-1 text-sm text-slate-600">Start typing a champion name and pick from suggestions. Submit to view full details.</p>
 		<form
@@ -24,13 +31,18 @@ templ ChampionForm() {
 					hx-trigger="keyup changed delay:300ms"
 					hx-target="#autocompleteResults"
 					hx-swap="innerHTML"
+					hx-indicator="#champAutoSpinner"
 					autocomplete="off"
 					spellcheck="false"
 					autocorrect="off"
 					autocapitalize="none"
+					if prefill != "" {
+						value={ prefill }
+					}
 				/>
 			</div>
 			<div id="autocompleteResults"></div>
+			<div id="champAutoSpinner" class="htmx-indicator text-xs text-slate-400">Searching...</div>
 			<div class="flex items-center gap-3">
 				<button class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500" type="submit">Search</button>
 				<div class="htmx-indicator inline-flex items-center gap-2 text-sm text-slate-500">
@@ -39,29 +51,46 @@ templ ChampionForm() {
 				</div>
 			</div>
 		</form>
-		<div id="championResult" class="mt-6"></div>
 	</div>
 }
 
-script handleSubmit(name string) {
-  document.querySelector('#championForm input[name=champion]').value=name;
-  document.querySelector('#autocompleteResults').innerHTML = null;
+// formatRole title-cases a role string like "ASSASSIN" to "Assassin".
+func formatRole(role string) string {
+	if role == "" {
+		return ""
+	}
+	return strings.ToUpper(role[:1]) + strings.ToLower(role[1:])
 }
 
-// The partial component which displays a list of matched champion names.
-templ ChampionAutocomplete(matches []string) {
-	<ul class="w-full rounded-md border border-slate-200 bg-white shadow-sm">
-		if len(matches) == 0 {
-			<div></div>
-		} else {
+// The partial component which displays a list of matched champion names with icons and roles.
+// Each suggestion is a plain link — no JavaScript needed.
+templ ChampionAutocomplete(matches []cache.AutocompleteResult, query string, patchNumber string) {
+	if len(matches) > 0 {
+		<ul class="w-full rounded-md border border-slate-200 bg-white shadow-sm">
 			for _, m := range matches {
-				<li
-					class="cursor-pointer px-3 py-2 hover:bg-slate-50"
-					onclick={ handleSubmit(m) }
-				>
-					{ m }
+				<li>
+					<a
+						href={ templ.URL(fmt.Sprintf("/champion-search?champion=%s", m.Name)) }
+						class="flex items-center gap-2 px-3 py-2 hover:bg-slate-50"
+					>
+						<img
+							class="h-6 w-6 rounded-full"
+							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", patchNumber, m.Key))) }
+							alt={ m.Name }
+						/>
+						<span class="flex-1 text-sm font-medium text-slate-900">{ m.Name }</span>
+						for i, role := range m.Roles {
+							if i < 2 {
+								<span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500">{ formatRole(role) }</span>
+							}
+						}
+					</a>
 				</li>
 			}
-		}
-	</ul>
+		</ul>
+	} else if query != "" {
+		<ul class="w-full rounded-md border border-slate-200 bg-white shadow-sm">
+			<li class="px-3 py-2 text-sm text-slate-400">No champions found</li>
+		</ul>
+	}
 }

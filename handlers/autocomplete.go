@@ -13,6 +13,8 @@ import (
 	"github.com/klnstprx/lolMatchup/renderer"
 )
 
+const defaultAutocompleteLimit = 10
+
 type AutocompleteHandler struct {
 	Logger *log.Logger
 	Cache  *cache.Cache
@@ -30,13 +32,16 @@ func NewAutocompleteHandler(cfg *config.AppConfig, client *client.Client) *Autoc
 }
 
 // AutocompleteGET handles /autocomplete requests for champion names.
+// Accepts "champion" or "q" query param to support both champion form and unified search.
 func (h *AutocompleteHandler) AutocompleteGET(c *gin.Context) {
 	userQuery := strings.TrimSpace(c.Query("champion"))
-	// Get up to 10 best fuzzy/autocomplete matches
-	var suggestions []string
-	if userQuery != "" {
-		suggestions = h.Cache.Autocomplete(userQuery, 10)
+	if userQuery == "" {
+		userQuery = strings.TrimSpace(c.Query("q"))
 	}
-	comp := components.ChampionAutocomplete(suggestions)
+	var suggestions []cache.AutocompleteResult
+	if userQuery != "" {
+		suggestions = h.Cache.AutocompleteRich(userQuery, defaultAutocompleteLimit)
+	}
+	comp := components.ChampionAutocomplete(suggestions, userQuery, h.Config.PatchNumber)
 	c.Render(http.StatusOK, renderer.New(c.Request.Context(), http.StatusOK, comp))
 }

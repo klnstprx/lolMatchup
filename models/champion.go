@@ -6,6 +6,8 @@ type Champion struct {
 	Name      string                       `json:"name"`
 	Title     string                       `json:"title"`
 	Icon      string                       `json:"icon"`
+	Positions []string                     `json:"positions"`
+	Roles     []string                     `json:"roles"`
 	Stats     ChampionStats                `json:"stats"`
 	Abilities map[string][]ChampionAbility `json:"abilities"`
 }

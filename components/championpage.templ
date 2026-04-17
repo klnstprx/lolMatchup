@@ -1,8 +1,29 @@
 package components
 
-// ChampionPage renders the standalone champion lookup form.
-templ ChampionPage() {
+import (
+	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
+)
+
+// ChampionResult holds the result of a champion lookup for server-side rendering.
+type ChampionResult struct {
+	Champion models.Champion
+	Config   *config.AppConfig
+	Error    string // non-empty if lookup failed
+}
+
+// ChampionPage renders the standalone champion lookup form with optional pre-populated results.
+templ ChampionPage(prefill string, result *ChampionResult) {
 	@layout("Champion Lookup") {
-		@ChampionForm()
+		<div class="mx-auto max-w-4xl">
+			@ChampionForm(prefill)
+			<div id="championResult" class="mt-6">
+				if result != nil && result.Error != "" {
+					@ErrorMessage(result.Error)
+				} else if result != nil {
+					@ChampionComponent(result.Champion, result.Config)
+				}
+			</div>
+		</div>
 	}
 }

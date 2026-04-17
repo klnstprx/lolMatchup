@@ -32,12 +32,14 @@ func NewDataLoader(cfg *config.AppConfig, client *client.Client, cache *cache.Ca
 
 // Initialize checks the latest patch from DDragon and refreshes champion data if needed.
 func (dl *DataLoader) Initialize(ctx context.Context) error {
+	cachedPatch := dl.Cache.GetPatch()
+
 	latestPatch, err := dl.Client.FetchLatestPatch(ctx)
 	if err != nil {
 		// Fallback to cached patch if available (offline mode)
-		if dl.Cache.Patch != "" {
-			dl.Logger.Warnf("Could not fetch latest patch, using cached patch %s: %v", dl.Cache.Patch, err)
-			dl.Config.PatchNumber = dl.Cache.Patch
+		if cachedPatch != "" {
+			dl.Logger.Warnf("Could not fetch latest patch, using cached patch %s: %v", cachedPatch, err)
+			dl.Config.PatchNumber = cachedPatch
 			return nil
 		}
 		return fmt.Errorf("failed to fetch latest patch: %w", err)
@@ -45,10 +47,10 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 	dl.Logger.Infof("Latest patch version: %s", latestPatch)
 	dl.Config.PatchNumber = latestPatch
 
-	if dl.Cache.Patch != latestPatch {
-		dl.Logger.Infof("Patch changed from %s to %s; invalidating cache.", dl.Cache.Patch, latestPatch)
+	if cachedPatch != latestPatch {
+		dl.Logger.Infof("Patch changed from %s to %s; invalidating cache.", cachedPatch, latestPatch)
 		dl.Cache.Invalidate()
-		dl.Cache.Patch = latestPatch
+		dl.Cache.SetPatch(latestPatch)
 
 		champions, err := dl.Client.FetchChampionList(ctx)
 		if err != nil {
@@ -63,7 +65,7 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		}
 	} else {
 		dl.Logger.Info("Patch is up to date. Checking champion map in cache.")
-		if len(dl.Cache.ChampionMap) == 0 {
+		if dl.Cache.GetChampionMapLen() == 0 {
 			dl.Logger.Info("Champion map is empty; fetching from Meraki.")
 			champions, err := dl.Client.FetchChampionList(ctx)
 			if err != nil {

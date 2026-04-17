@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 	"github.com/klnstprx/lolMatchup/cache"
+	"github.com/klnstprx/lolMatchup/config"
 )
 
 func newTestAutocompleteHandler() *AutocompleteHandler {
@@ -26,6 +27,7 @@ func newTestAutocompleteHandler() *AutocompleteHandler {
 	return &AutocompleteHandler{
 		Logger: log.New(os.Stderr),
 		Cache:  c,
+		Config: &config.AppConfig{PatchNumber: "15.9.1"},
 	}
 }
 

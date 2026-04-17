@@ -17,9 +17,11 @@ func LoggerMiddleware(logger *log.Logger) gin.HandlerFunc {
 
 		latency := time.Since(start)
 		status := c.Writer.Status()
+		reqID, _ := c.Get(requestIDHeader)
 
 		if c.Request.URL.Path == "/autocomplete" {
 			logger.Debug("Incoming request",
+				"requestID", reqID,
 				"method", c.Request.Method,
 				"path", c.Request.URL.Path,
 				"status", status,
@@ -31,6 +33,7 @@ func LoggerMiddleware(logger *log.Logger) gin.HandlerFunc {
 		}
 
 		logger.Info("Incoming request",
+			"requestID", reqID,
 			"method", c.Request.Method,
 			"path", c.Request.URL.Path,
 			"status", status,

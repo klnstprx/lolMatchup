@@ -1,0 +1,258 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/models"
+	"math"
+	"net/url"
+)
+
+// pct computes a percentage, clamped to 0-100.
+func pct(value, max int) int {
+	if max <= 0 {
+		return 0
+	}
+	p := int(math.Round(float64(value) * 100 / float64(max)))
+	if p > 100 {
+		return 100
+	}
+	return p
+}
+
+// fmtK formats a number as "12.3k" or "0" for small values.
+func fmtK(v int) string {
+	if v >= 1000 {
+		return fmt.Sprintf("%.1fk", float64(v)/1000)
+	}
+	return fmt.Sprint(v)
+}
+
+// PlayerStatsModal renders a detailed stats modal for a single player in a match.
+templ PlayerStatsModal(sc models.PlayerStatsContext) {
+	<div id="modal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 sm:p-6 md:p-10" onclick="this.remove()">
+		<div
+			class="relative mx-auto h-[85vh] w-full max-w-2xl overflow-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl"
+			onclick="event.stopPropagation()"
+		>
+			<!-- Close button -->
+			<button
+				class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200"
+				onclick="document.getElementById('modal').remove()"
+				aria-label="Close"
+			>
+				<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+			</button>
+			<!-- Header -->
+			<div class="mb-6 flex items-center gap-4">
+				<img
+					class="h-16 w-16 rounded-full shadow ring-2 ring-slate-200"
+					src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", sc.PatchNumber, sc.Player.ChampionName))) }
+					alt={ sc.Player.ChampionName }
+				/>
+				<div>
+					<h2 class="text-xl font-bold text-slate-900">{ sc.Player.ChampionName }</h2>
+					<a
+						class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
+						href={ templ.URL("/player-search?riotID=" + url.QueryEscape(sc.Player.RiotIDGameName+"#"+sc.Player.RiotIDTagline)) }
+					>{ sc.Player.RiotIDGameName }#{ sc.Player.RiotIDTagline }</a>
+					<div class="mt-1 flex items-center gap-2">
+						<span class={
+							"rounded px-2 py-0.5 text-xs font-bold",
+							templ.KV("bg-emerald-100 text-emerald-700", sc.Player.Win),
+							templ.KV("bg-red-100 text-red-600", !sc.Player.Win),
+						}>
+							if sc.Player.Win {
+								Victory
+							} else {
+								Defeat
+							}
+						</span>
+						<span class="text-sm font-semibold text-slate-700">{ fmt.Sprintf("%d / %d / %d", sc.Player.Kills, sc.Player.Deaths, sc.Player.Assists) }</span>
+						<span class="text-xs text-slate-400">{ fmt.Sprintf("KP: %.0f%%", sc.KillParticipation*100) }</span>
+					</div>
+				</div>
+			</div>
+			<!-- Damage Section -->
+			<section class="mb-5">
+				<h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Damage</h3>
+				<!-- Damage to Champions total -->
+				<div class="mb-2 flex items-baseline justify-between">
+					<span class="text-sm text-slate-600">Damage to Champions</span>
+					<span class="text-lg font-bold text-slate-900">{ fmtK(sc.Player.TotalDamageDealtToChampions) }</span>
+				</div>
+				<!-- Stacked damage bar -->
+				<div class="mb-1 h-5 w-full overflow-hidden rounded-full bg-slate-100">
+					if sc.Player.TotalDamageDealtToChampions > 0 {
+						<div class="flex h-full">
+							<div
+								class="bg-amber-400"
+								style={ fmt.Sprintf("width: %d%%", pct(sc.Player.PhysicalDamageDealtToChampions, sc.Player.TotalDamageDealtToChampions)) }
+							></div>
+							<div
+								class="bg-blue-400"
+								style={ fmt.Sprintf("width: %d%%", pct(sc.Player.MagicDamageDealtToChampions, sc.Player.TotalDamageDealtToChampions)) }
+							></div>
+							<div
+								class="bg-slate-300"
+								style={ fmt.Sprintf("width: %d%%", pct(sc.Player.TrueDamageDealtToChampions, sc.Player.TotalDamageDealtToChampions)) }
+							></div>
+						</div>
+					}
+				</div>
+				<div class="mb-3 flex gap-4 text-[11px] text-slate-500">
+					<span><span class="inline-block h-2 w-2 rounded-full bg-amber-400"></span> Physical { fmtK(sc.Player.PhysicalDamageDealtToChampions) }</span>
+					<span><span class="inline-block h-2 w-2 rounded-full bg-blue-400"></span> Magic { fmtK(sc.Player.MagicDamageDealtToChampions) }</span>
+					<span><span class="inline-block h-2 w-2 rounded-full bg-slate-300"></span> True { fmtK(sc.Player.TrueDamageDealtToChampions) }</span>
+				</div>
+				<!-- Damage share bar -->
+				<div class="mb-2 flex items-center justify-between text-sm">
+					<span class="text-slate-600">Team Damage Share</span>
+					<span class="font-semibold text-slate-900">{ fmt.Sprintf("%.0f%%", float64(pct(sc.Player.TotalDamageDealtToChampions, sc.TeamTotalDamage))) }</span>
+				</div>
+				<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+					<div class="h-full rounded-full bg-purple-400" style={ fmt.Sprintf("width: %d%%", pct(sc.Player.TotalDamageDealtToChampions, sc.TeamTotalDamage)) }></div>
+				</div>
+				<!-- Damage vs max in game bar -->
+				<div class="mb-2 flex items-center justify-between text-sm">
+					<span class="text-slate-600">vs Highest in Game</span>
+					<span class="font-semibold text-slate-900">{ fmtK(sc.Player.TotalDamageDealtToChampions) } / { fmtK(sc.MaxDamageInGame) }</span>
+				</div>
+				<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+					<div class="h-full rounded-full bg-rose-400" style={ fmt.Sprintf("width: %d%%", pct(sc.Player.TotalDamageDealtToChampions, sc.MaxDamageInGame)) }></div>
+				</div>
+				<!-- Other damage stats -->
+				<div class="grid grid-cols-3 gap-2 text-xs">
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmtK(sc.Player.TotalDamageTaken) }</div>
+						<div class="text-slate-500">Damage Taken</div>
+					</div>
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmtK(sc.Player.DamageSelfMitigated) }</div>
+						<div class="text-slate-500">Self Mitigated</div>
+					</div>
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmtK(sc.Player.DamageDealtToObjectives) }</div>
+						<div class="text-slate-500">Obj. Damage</div>
+					</div>
+				</div>
+			</section>
+			<!-- Combat Section -->
+			<section class="mb-5">
+				<h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Combat</h3>
+				<!-- Kill Participation bar -->
+				<div class="mb-2 flex items-center justify-between text-sm">
+					<span class="text-slate-600">Kill Participation</span>
+					<span class="font-semibold text-slate-900">{ fmt.Sprintf("%.0f%%", sc.KillParticipation*100) }</span>
+				</div>
+				<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+					<div class="h-full rounded-full bg-indigo-400" style={ fmt.Sprintf("width: %.0f%%", sc.KillParticipation*100) }></div>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					if sc.Player.FirstBloodKill {
+						<span class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700">First Blood</span>
+					}
+					if sc.Player.LargestKillingSpree > 0 {
+						<span class="rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-700">{ fmt.Sprintf("Spree: %d", sc.Player.LargestKillingSpree) }</span>
+					}
+					if sc.Player.DoubleKills > 0 {
+						<span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">{ fmt.Sprintf("Double x%d", sc.Player.DoubleKills) }</span>
+					}
+					if sc.Player.TripleKills > 0 {
+						<span class="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">{ fmt.Sprintf("Triple x%d", sc.Player.TripleKills) }</span>
+					}
+					if sc.Player.QuadraKills > 0 {
+						<span class="rounded-full bg-fuchsia-100 px-2.5 py-1 text-xs font-semibold text-fuchsia-700">{ fmt.Sprintf("Quadra x%d", sc.Player.QuadraKills) }</span>
+					}
+					if sc.Player.PentaKills > 0 {
+						<span class="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-bold text-yellow-700">{ fmt.Sprintf("PENTA x%d", sc.Player.PentaKills) }</span>
+					}
+				</div>
+				if sc.Player.TotalTimeSpentDead > 0 {
+					<div class="mt-2 text-xs text-slate-500">Time spent dead: { fmt.Sprintf("%dm %ds", sc.Player.TotalTimeSpentDead/60, sc.Player.TotalTimeSpentDead%60) }</div>
+				}
+			</section>
+			<!-- Vision Section -->
+			<section class="mb-5">
+				<h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Vision</h3>
+				<div class="mb-2 flex items-center justify-between text-sm">
+					<span class="text-slate-600">Vision Score</span>
+					<span class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.VisionScore) }</span>
+				</div>
+				<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+					<div class="h-full rounded-full bg-cyan-400" style={ fmt.Sprintf("width: %d%%", pct(sc.Player.VisionScore, sc.MaxVisionInGame)) }></div>
+				</div>
+				<div class="grid grid-cols-3 gap-2 text-xs">
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.WardsPlaced) }</div>
+						<div class="text-slate-500">Wards Placed</div>
+					</div>
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.WardsKilled) }</div>
+						<div class="text-slate-500">Wards Killed</div>
+					</div>
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.DetectorWardsPlaced) }</div>
+						<div class="text-slate-500">Control Wards</div>
+					</div>
+				</div>
+			</section>
+			<!-- Objectives Section -->
+			<section class="mb-5">
+				<h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Objectives</h3>
+				<div class="flex flex-wrap gap-2">
+					if sc.Player.TurretTakedowns > 0 {
+						<div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-center">
+							<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.TurretTakedowns) }</div>
+							<div class="text-slate-500">Turrets</div>
+						</div>
+					}
+					if sc.Player.InhibitorTakedowns > 0 {
+						<div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-center">
+							<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.InhibitorTakedowns) }</div>
+							<div class="text-slate-500">Inhibitors</div>
+						</div>
+					}
+					if sc.Player.DragonKills > 0 {
+						<div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-center">
+							<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.DragonKills) }</div>
+							<div class="text-slate-500">Dragons</div>
+						</div>
+					}
+					if sc.Player.BaronKills > 0 {
+						<div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-center">
+							<div class="font-semibold text-slate-900">{ fmt.Sprint(sc.Player.BaronKills) }</div>
+							<div class="text-slate-500">Barons</div>
+						</div>
+					}
+					if sc.Player.ObjectivesStolen > 0 {
+						<div class="rounded-lg bg-red-50 px-3 py-2 text-xs text-center">
+							<div class="font-semibold text-red-700">{ fmt.Sprint(sc.Player.ObjectivesStolen) }</div>
+							<div class="text-red-500">Stolen</div>
+						</div>
+					}
+				</div>
+			</section>
+			<!-- Economy Section -->
+			<section class="mb-2">
+				<h3 class="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Economy</h3>
+				<div class="mb-2 flex items-center justify-between text-sm">
+					<span class="text-slate-600">Gold Earned</span>
+					<span class="font-semibold text-slate-900">{ fmtK(sc.Player.GoldEarned) }</span>
+				</div>
+				<div class="mb-3 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+					<div class="h-full rounded-full bg-yellow-400" style={ fmt.Sprintf("width: %d%%", pct(sc.Player.GoldEarned, sc.MaxGoldInGame)) }></div>
+				</div>
+				<div class="grid grid-cols-2 gap-2 text-xs">
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmtK(sc.Player.GoldEarned) }</div>
+						<div class="text-slate-500">Gold Earned</div>
+					</div>
+					<div class="rounded-lg bg-slate-50 p-2 text-center">
+						<div class="font-semibold text-slate-900">{ fmtK(sc.Player.GoldSpent) }</div>
+						<div class="text-slate-500">Gold Spent</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+}

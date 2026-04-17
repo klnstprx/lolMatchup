@@ -1,0 +1,8 @@
+package components
+
+// ErrorMessage renders a styled error message for HTMX responses.
+templ ErrorMessage(message string) {
+	<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+		<p>{ message }</p>
+	</div>
+}

@@ -31,7 +31,7 @@ func TestAutocomplete(t *testing.T) {
 		{name: "prefix a", input: "a", limit: 10, expected: []string{"Ahri", "Anivia", "Ashe", "Azir"}},
 		{name: "prefix az", input: "az", limit: 10, expected: []string{"Azir"}},
 		{name: "fuzzy typo brom", input: "brom", limit: 10, expected: []string{"Braum"}},
-		{name: "fuzzy typo sah", input: "sah", limit: 10, expected: []string{"Ashe", "Ahri"}},
+		{name: "fuzzy typo sah", input: "sah", limit: 10, expected: []string{"Ahri", "Ashe"}},
 		{name: "limit results", input: "a", limit: 2, expected: []string{"Ahri", "Anivia"}},
 	}
 	for _, tc := range tests {
@@ -116,6 +116,60 @@ func TestLoadNonexistentCache(t *testing.T) {
 	got, ok := c.GetChampionByID("X")
 	if !ok || !reflect.DeepEqual(got, initialChamp) {
 		t.Errorf("Champions changed: got %+v, ok=%v, want %+v", got, ok, initialChamp)
+	}
+}
+
+// TestGetSetPatch verifies that GetPatch and SetPatch are thread-safe round-trips.
+func TestGetSetPatch(t *testing.T) {
+	c := New("", 3)
+	if got := c.GetPatch(); got != "" {
+		t.Errorf("initial GetPatch() = %q, want empty", got)
+	}
+	c.SetPatch("14.9.1")
+	if got := c.GetPatch(); got != "14.9.1" {
+		t.Errorf("GetPatch() = %q, want %q", got, "14.9.1")
+	}
+	c.SetPatch("15.1.1")
+	if got := c.GetPatch(); got != "15.1.1" {
+		t.Errorf("GetPatch() = %q, want %q", got, "15.1.1")
+	}
+}
+
+// TestGetChampionMapLen verifies the champion map length accessor.
+func TestGetChampionMapLen(t *testing.T) {
+	c := New("", 3)
+	if got := c.GetChampionMapLen(); got != 0 {
+		t.Errorf("initial GetChampionMapLen() = %d, want 0", got)
+	}
+	c.SetChampionMap(map[string]string{"Ahri": "Ahri", "Ashe": "Ashe"})
+	if got := c.GetChampionMapLen(); got != 2 {
+		t.Errorf("GetChampionMapLen() = %d, want 2", got)
+	}
+}
+
+// TestFuzzyScore tests the shared fuzzy scoring helper.
+func TestFuzzyScore(t *testing.T) {
+	tests := []struct {
+		name      string
+		typed     string
+		candidate string
+		threshold int
+		wantOK    bool
+	}{
+		{"exact match", "ashe", "ashe", 3, true},
+		{"prefix match", "ash", "ashe", 3, true},
+		{"substring match", "sh", "ashe", 3, true},
+		{"close typo", "ahse", "ashe", 3, true},
+		{"too far", "zzzzz", "ashe", 3, false},
+		{"empty typed", "", "ashe", 3, true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			_, ok := fuzzyScore(tc.typed, tc.candidate, tc.threshold)
+			if ok != tc.wantOK {
+				t.Errorf("fuzzyScore(%q, %q, %d): ok=%v, want %v", tc.typed, tc.candidate, tc.threshold, ok, tc.wantOK)
+			}
+		})
 	}
 }
 

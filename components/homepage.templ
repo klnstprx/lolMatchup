@@ -1,44 +1,54 @@
 package components
 
-// HomePage renders the landing page with links to lookup pages.
+// HomePage renders the landing page with a unified search and feature cards.
 templ HomePage() {
 	@layout("LoL Matchup") {
-		<section class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 p-8 text-white shadow">
-			<div class="max-w-3xl">
-				<h1 class="text-3xl font-bold tracking-tight">League of Legends Lookup Suite</h1>
-				<p class="mt-2 text-white/90">Search champions, players and inspect live games with instant results powered by htmx.</p>
-				<div class="mt-6 flex flex-wrap gap-3">
-					<a href="/champion-search" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/20">Champion Lookup</a>
-					<a href="/player-search" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/20">Player Lookup</a>
-					<a href="/livegame-search" class="inline-flex items-center rounded-md bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur hover:bg-white/20">Live Game Lookup</a>
-				</div>
-			</div>
-		</section>
-		<section class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-			<a href="/champion-search" class="group rounded-xl border border-slate-200 bg-white p-6 shadow hover:shadow-md">
-				<div class="flex items-start justify-between">
-					<h3 class="text-lg font-semibold text-slate-900">Champion Lookup</h3>
-					<span class="rounded bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">Search</span>
-				</div>
-				<p class="mt-2 text-sm text-slate-600">Find champion stats, abilities and passives with a polished, readable layout.</p>
-				<div class="mt-4 text-sm font-semibold text-indigo-700 group-hover:underline">Go to Champion Search →</div>
-			</a>
-			<a href="/player-search" class="group rounded-xl border border-slate-200 bg-white p-6 shadow hover:shadow-md">
-				<div class="flex items-start justify-between">
-					<h3 class="text-lg font-semibold text-slate-900">Player Lookup</h3>
-					<span class="rounded bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">Search</span>
-				</div>
-				<p class="mt-2 text-sm text-slate-600">Enter a Riot ID (nickname#tag) to view profile details instantly.</p>
-				<div class="mt-4 text-sm font-semibold text-indigo-700 group-hover:underline">Go to Player Search →</div>
-			</a>
-			<a href="/livegame-search" class="group rounded-xl border border-slate-200 bg-white p-6 shadow hover:shadow-md">
-				<div class="flex items-start justify-between">
-					<h3 class="text-lg font-semibold text-slate-900">Live Game Lookup</h3>
-					<span class="rounded bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-700">Live</span>
-				</div>
-				<p class="mt-2 text-sm text-slate-600">Inspect a live match and click a champion to preview compact details.</p>
-				<div class="mt-4 text-sm font-semibold text-indigo-700 group-hover:underline">Go to Live Game Search →</div>
-			</a>
-		</section>
+		<div class="mx-auto max-w-4xl">
+			<!-- Hero search -->
+			<section class="rounded-2xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 p-8 text-white shadow">
+				<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">League of Legends Lookup</h1>
+				<p class="mt-2 text-sm text-white/80">Search a champion by name, or enter a Riot ID (nickname#tag) for player lookup.</p>
+				<form id="homeSearchForm" class="mt-6" action="/search" method="get" hx-get="/search" hx-trigger="submit">
+					<div class="relative">
+						<input
+							id="homeSearchInput"
+							class="block w-full rounded-lg border-0 bg-white/15 px-4 py-3 text-white placeholder-white/60 shadow-sm backdrop-blur focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/40"
+							type="text"
+							name="q"
+							placeholder="Champion name or nickname#tag"
+							autocomplete="off"
+							spellcheck="false"
+							autocorrect="off"
+							autocapitalize="none"
+							hx-get="/autocomplete"
+							hx-trigger="keyup changed delay:300ms"
+							hx-target="#homeAutocompleteResults"
+							hx-swap="innerHTML"
+							hx-indicator="#homeAutoSpinner"
+						/>
+						<button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-white/20 px-3 py-1.5 text-sm font-semibold hover:bg-white/30">
+							Search
+						</button>
+					</div>
+					<div id="homeAutocompleteResults" class="mt-1 text-slate-900 [&_ul]:rounded-lg [&_ul]:shadow-lg"></div>
+					<div id="homeAutoSpinner" class="htmx-indicator mt-1 text-xs text-white/60">Searching...</div>
+				</form>
+			</section>
+			<!-- Feature cards -->
+			<section class="mt-8 grid gap-4 sm:grid-cols-3">
+				<a href="/champion-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+					<h3 class="text-base font-semibold text-slate-900">Champions</h3>
+					<p class="mt-1 text-sm text-slate-500">Stats, abilities and scaling data.</p>
+				</a>
+				<a href="/player-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+					<h3 class="text-base font-semibold text-slate-900">Players</h3>
+					<p class="mt-1 text-sm text-slate-500">Match history and lane matchups.</p>
+				</a>
+				<a href="/livegame-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+					<h3 class="text-base font-semibold text-slate-900">Live Game</h3>
+					<p class="mt-1 text-sm text-slate-500">Inspect an ongoing match in real time.</p>
+				</a>
+			</section>
+		</div>
 	}
 }
