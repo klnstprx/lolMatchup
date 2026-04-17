@@ -47,6 +47,7 @@ type Cache struct {
 	Champions            map[string]models.Champion
 	ChampionMap          map[string]string
 	ChampionKeyMap       map[string]string // numeric key to textual champion ID
+	SummonerSpells       map[string]models.SummonerSpell
 	LevenshteinThreshold int
 
 	mu sync.RWMutex
@@ -59,6 +60,7 @@ func New(path string, threshold int) *Cache {
 		Champions:            make(map[string]models.Champion),
 		ChampionMap:          make(map[string]string),
 		ChampionKeyMap:       make(map[string]string),
+		SummonerSpells:       make(map[string]models.SummonerSpell),
 		LevenshteinThreshold: threshold,
 	}
 }
@@ -77,10 +79,11 @@ func (c *Cache) Load() error {
 
 	dec := json.NewDecoder(file)
 	var persist struct {
-		Patch          string                     `json:"patch"`
-		Champions      map[string]models.Champion `json:"champions"`
-		ChampionMap    map[string]string          `json:"champion_map"`
-		ChampionKeyMap map[string]string          `json:"champion_key_map"`
+		Patch          string                          `json:"patch"`
+		Champions      map[string]models.Champion      `json:"champions"`
+		ChampionMap    map[string]string               `json:"champion_map"`
+		ChampionKeyMap map[string]string               `json:"champion_key_map"`
+		SummonerSpells map[string]models.SummonerSpell `json:"summoner_spells"`
 	}
 	if err := dec.Decode(&persist); err != nil {
 		// On decode errors, ignore and start fresh
@@ -91,6 +94,9 @@ func (c *Cache) Load() error {
 	c.ChampionMap = persist.ChampionMap
 	c.ChampionKeyMap = persist.ChampionKeyMap
 	c.Champions = persist.Champions
+	if persist.SummonerSpells != nil {
+		c.SummonerSpells = persist.SummonerSpells
+	}
 	c.mu.Unlock()
 	return nil
 }
@@ -108,15 +114,17 @@ func (c *Cache) Save() error {
 
 	enc := json.NewEncoder(file)
 	persist := struct {
-		Patch          string                     `json:"patch"`
-		Champions      map[string]models.Champion `json:"champions"`
-		ChampionMap    map[string]string          `json:"champion_map"`
-		ChampionKeyMap map[string]string          `json:"champion_key_map"`
+		Patch          string                          `json:"patch"`
+		Champions      map[string]models.Champion      `json:"champions"`
+		ChampionMap    map[string]string               `json:"champion_map"`
+		ChampionKeyMap map[string]string               `json:"champion_key_map"`
+		SummonerSpells map[string]models.SummonerSpell `json:"summoner_spells"`
 	}{
 		Patch:          c.Patch,
 		Champions:      c.Champions,
 		ChampionMap:    c.ChampionMap,
 		ChampionKeyMap: c.ChampionKeyMap,
+		SummonerSpells: c.SummonerSpells,
 	}
 	if err := enc.Encode(&persist); err != nil {
 		return fmt.Errorf("failed to encode cache data: %w", err)
@@ -130,6 +138,7 @@ func (c *Cache) Invalidate() {
 	c.Champions = make(map[string]models.Champion)
 	c.ChampionMap = make(map[string]string)
 	c.ChampionKeyMap = make(map[string]string)
+	c.SummonerSpells = make(map[string]models.SummonerSpell)
 }
 
 // GetPatch returns the current cached patch version.
@@ -227,6 +236,27 @@ func (c *Cache) GetChampionMap() map[string]string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.ChampionMap
+}
+
+// GetSummonerSpells retrieves the summoner spell map (keyed by numeric ID).
+func (c *Cache) GetSummonerSpells() map[string]models.SummonerSpell {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.SummonerSpells
+}
+
+// SetSummonerSpells sets the summoner spell map.
+func (c *Cache) SetSummonerSpells(m map[string]models.SummonerSpell) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.SummonerSpells = m
+}
+
+// GetSummonerSpellsLen returns the number of cached summoner spells.
+func (c *Cache) GetSummonerSpellsLen() int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return len(c.SummonerSpells)
 }
 
 func (c *Cache) ClearChampions() {

@@ -102,7 +102,7 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	// Enrich opponents with recent match data (best-effort, non-blocking)
 	h.enrichOpponents(ctx, vd.parts)
 
-	cmp := components.LiveGameInfo(vd.parts, h.Config, riotID, vd.userChampionName, vd.userChampionID)
+	cmp := components.LiveGameInfo(vd.parts, h.Config, riotID, vd.userChampionName, vd.userChampionID, vd.enemyBans, vd.userBans, vd.gameStartTime)
 	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 }
 
@@ -122,27 +122,27 @@ func (h *LiveGameHandler) PlayerLiveGameGET(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, client.ErrGameNotFound) {
 			// Not in game — render status with polling
-			cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+			cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now(), nil, nil, 0)
 			c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 			return
 		}
 		// Other errors: graceful degradation, render not-in-game
 		h.Logger.Debug("player livegame check failed", "puuid", puuid, "error", err)
-		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now(), nil, nil, 0)
 		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 		return
 	}
 
 	vd := h.buildViewData(activeGame, riotID)
 	if !vd.found {
-		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now(), nil, nil, 0)
 		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 		return
 	}
 
 	h.enrichOpponents(ctx, vd.parts)
 
-	cmp := components.LiveGameStatus(true, riotID, vd.parts, h.Config, vd.userChampionName, vd.userChampionID, puuid, time.Now())
+	cmp := components.LiveGameStatus(true, riotID, vd.parts, h.Config, vd.userChampionName, vd.userChampionID, puuid, time.Now(), vd.enemyBans, vd.userBans, vd.gameStartTime)
 	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 }
 
@@ -152,18 +152,23 @@ type liveGameViewData struct {
 	userChampionID   string
 	userChampionName string
 	found            bool
+	enemyBans        []components.BannedChampionView
+	userBans         []components.BannedChampionView
+	gameStartTime    int64
 }
 
-// buildViewData resolves champion IDs and splits participants into user team vs opponents.
+// buildViewData resolves champion IDs, summoner spells, and bans, and splits
+// participants into user team vs opponents.
 func (h *LiveGameHandler) buildViewData(game models.CurrentGameInfo, riotID string) liveGameViewData {
 	keyMap := h.Config.Cache.GetChampionKeyMap()
 	nameMap := h.Config.Cache.GetChampionMap()
+	spellMap := h.Config.Cache.GetSummonerSpells()
 	textualToName := make(map[string]string, len(nameMap))
 	for name, id := range nameMap {
 		textualToName[id] = name
 	}
 
-	resolve := func(championID int64) (textID, champName string) {
+	resolveChampion := func(championID int64) (textID, champName string) {
 		numKey := strconv.FormatInt(championID, 10)
 		textID, ok := keyMap[numKey]
 		if !ok {
@@ -177,12 +182,21 @@ func (h *LiveGameHandler) buildViewData(game models.CurrentGameInfo, riotID stri
 		return textID, champName
 	}
 
+	resolveSpell := func(spellID int64) *models.SummonerSpell {
+		key := strconv.FormatInt(spellID, 10)
+		if spell, ok := spellMap[key]; ok {
+			return &spell
+		}
+		return nil
+	}
+
 	var vd liveGameViewData
+	vd.gameStartTime = game.GameStartTime
 	var userTeamID int64
 	for _, p := range game.Participants {
 		if p.RiotID == riotID {
 			userTeamID = p.TeamID
-			vd.userChampionID, vd.userChampionName = resolve(p.ChampionID)
+			vd.userChampionID, vd.userChampionName = resolveChampion(p.ChampionID)
 			vd.found = true
 			break
 		}
@@ -195,14 +209,34 @@ func (h *LiveGameHandler) buildViewData(game models.CurrentGameInfo, riotID stri
 		if p.TeamID == userTeamID {
 			continue
 		}
-		textID, champName := resolve(p.ChampionID)
+		textID, champName := resolveChampion(p.ChampionID)
 		vd.parts = append(vd.parts, components.OpponentView{
 			RiotID:       p.RiotID,
 			ChampionID:   textID,
 			ChampionName: champName,
 			PUUID:        p.PUUID,
+			Spell1:       resolveSpell(p.Spell1ID),
+			Spell2:       resolveSpell(p.Spell2ID),
 		})
 	}
+
+	// Resolve banned champions, split by team.
+	for _, ban := range game.BannedChampions {
+		if ban.ChampionID == -1 {
+			continue
+		}
+		textID, champName := resolveChampion(ban.ChampionID)
+		bv := components.BannedChampionView{
+			ChampionID:   textID,
+			ChampionName: champName,
+		}
+		if ban.TeamID == userTeamID {
+			vd.userBans = append(vd.userBans, bv)
+		} else {
+			vd.enemyBans = append(vd.enemyBans, bv)
+		}
+	}
+
 	return vd
 }
 
@@ -233,6 +267,18 @@ func (h *LiveGameHandler) enrichOpponents(ctx context.Context, opponents []compo
 
 			enrichment := h.computeEnrichment(enrichCtx, opponents[idx].PUUID, opponents[idx].ChampionName)
 			opponents[idx].Enrichment = &enrichment
+
+			// Fetch ranked tier (best-effort)
+			entries, err := h.Client.FetchLeagueEntries(enrichCtx, opponents[idx].PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey)
+			if err == nil {
+				for _, e := range entries {
+					if e.QueueType == "RANKED_SOLO_5x5" {
+						opponents[idx].RankedTier = components.TierTitle(e.Tier, e.Rank)
+						opponents[idx].RankedColor = components.TierColorClass(e.Tier)
+						break
+					}
+				}
+			}
 		}(i)
 	}
 	wg.Wait()

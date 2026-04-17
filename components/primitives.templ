@@ -19,6 +19,17 @@ templ ChampionIcon(championID, patch, sizeClass, extraClass string) {
 	/>
 }
 
+// SummonerSpellIcon renders a summoner spell icon from DDragon CDN.
+// imageFull is the DDragon image filename (e.g. "SummonerFlash.png"),
+// patch is the game version, sizeClass is Tailwind sizing, extraClass is optional.
+templ SummonerSpellIcon(imageFull, patch, sizeClass, extraClass string) {
+	<img
+		class={ sizeClass + " rounded " + extraClass }
+		src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/spell/%s", patch, imageFull))) }
+		alt={ imageFull }
+	/>
+}
+
 // badgeClasses returns Tailwind classes for a badge variant.
 func badgeClasses(variant string) string {
 	base := "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold"

@@ -45,6 +45,12 @@ func newTestLiveGameHandler(transport http.RoundTripper) *LiveGameHandler {
 		"266": "Aatrox",
 		"103": "Ahri",
 	})
+	c.SetSummonerSpells(map[string]models.SummonerSpell{
+		"4":  {Name: "Flash", Key: "4", ImageFull: "SummonerFlash.png", Cooldown: 300},
+		"14": {Name: "Ignite", Key: "14", ImageFull: "SummonerDot.png", Cooldown: 180},
+		"11": {Name: "Smite", Key: "11", ImageFull: "SummonerSmite.png", Cooldown: 15},
+		"12": {Name: "Teleport", Key: "12", ImageFull: "SummonerTeleport.png", Cooldown: 360},
+	})
 
 	cfg := config.New()
 	cfg.Logger = log.New(os.Stderr)
@@ -172,9 +178,14 @@ func TestLiveGameGET_Success(t *testing.T) {
 	acctJSON := `{"puuid":"abc-123","gameName":"Player","tagLine":"NA1"}`
 
 	game := models.CurrentGameInfo{
+		GameStartTime: 1713300000000,
 		Participants: []models.CurrentGameParticipant{
-			{ChampionID: 266, TeamID: 100, RiotID: "Player#NA1"},
-			{ChampionID: 103, TeamID: 200, RiotID: "Enemy#NA1"},
+			{ChampionID: 266, TeamID: 100, RiotID: "Player#NA1", Spell1ID: 4, Spell2ID: 12},
+			{ChampionID: 103, TeamID: 200, RiotID: "Enemy#NA1", Spell1ID: 4, Spell2ID: 14},
+		},
+		BannedChampions: []models.BannedChampion{
+			{PickTurn: 1, ChampionID: 103, TeamID: 100},
+			{PickTurn: 2, ChampionID: 266, TeamID: 200},
 		},
 	}
 	gameJSON, err := json.Marshal(game)

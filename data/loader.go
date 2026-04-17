@@ -60,6 +60,13 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 		dl.Cache.SetChampionMap(nameMap)
 		dl.Cache.SetChampionKeyMap(keyMap)
 
+		spells, err := dl.Client.FetchSummonerSpells(ctx, latestPatch)
+		if err != nil {
+			dl.Logger.Errorf("Could not fetch summoner spells: %v", err)
+		} else {
+			dl.Cache.SetSummonerSpells(spells)
+		}
+
 		if err := dl.Cache.Save(); err != nil {
 			dl.Logger.Errorf("Could not save cache: %v", err)
 		}
@@ -77,6 +84,18 @@ func (dl *DataLoader) Initialize(ctx context.Context) error {
 
 			if err := dl.Cache.Save(); err != nil {
 				dl.Logger.Errorf("Could not save cache: %v", err)
+			}
+		}
+		if dl.Cache.GetSummonerSpellsLen() == 0 {
+			dl.Logger.Info("Summoner spells cache is empty; fetching from DDragon.")
+			spells, err := dl.Client.FetchSummonerSpells(ctx, latestPatch)
+			if err != nil {
+				dl.Logger.Errorf("Could not fetch summoner spells: %v", err)
+			} else {
+				dl.Cache.SetSummonerSpells(spells)
+				if err := dl.Cache.Save(); err != nil {
+					dl.Logger.Errorf("Could not save cache: %v", err)
+				}
 			}
 		}
 	}

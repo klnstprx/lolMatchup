@@ -6,7 +6,6 @@ import (
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/models"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -22,44 +21,11 @@ func queueDisplayName(queueType string) string {
 	}
 }
 
-// tierColorClass returns a Tailwind text color class for a ranked tier.
-func tierColorClass(tier string) string {
-	switch strings.ToUpper(tier) {
-	case "IRON":
-		return "text-stone-500"
-	case "BRONZE":
-		return "text-amber-800"
-	case "SILVER":
-		return "text-slate-400"
-	case "GOLD":
-		return "text-yellow-600"
-	case "PLATINUM":
-		return "text-cyan-600"
-	case "EMERALD":
-		return "text-emerald-600"
-	case "DIAMOND":
-		return "text-blue-500"
-	case "MASTER":
-		return "text-purple-600"
-	case "GRANDMASTER":
-		return "text-red-600"
-	case "CHALLENGER":
-		return "text-amber-400"
-	default:
-		return "text-slate-600"
-	}
-}
+// tierColorClass delegates to the exported TierColorClass in tier.go.
+func tierColorClass(tier string) string { return TierColorClass(tier) }
 
-// tierTitle returns a properly cased tier + rank string (e.g. "Gold II").
-func tierTitle(tier, rank string) string {
-	t := strings.ToUpper(tier)
-	cased := strings.ToUpper(tier[:1]) + strings.ToLower(tier[1:])
-	// Master+ tiers have no subdivision
-	if t == "MASTER" || t == "GRANDMASTER" || t == "CHALLENGER" {
-		return cased
-	}
-	return cased + " " + rank
-}
+// tierTitle delegates to the exported TierTitle in tier.go.
+func tierTitle(tier, rank string) string { return TierTitle(tier, rank) }
 
 // PlayerComponent renders a player profile card with account and summoner data,
 // followed by live game status (async), matchup stats, and match history.

@@ -58,6 +58,11 @@ func TestSaveLoadCache(t *testing.T) {
 	champB := models.Champion{ID: 2, Key: "Ashe", Name: "Ashe", Title: "the Frost Archer"}
 	orig.SetChampion(champA)
 	orig.SetChampion(champB)
+	spells := map[string]models.SummonerSpell{
+		"4":  {Name: "Flash", Key: "4", ImageFull: "SummonerFlash.png", Cooldown: 300},
+		"14": {Name: "Ignite", Key: "14", ImageFull: "SummonerDot.png", Cooldown: 180},
+	}
+	orig.SetSummonerSpells(spells)
 
 	// Save to disk
 	if err := orig.Save(); err != nil {
@@ -88,6 +93,10 @@ func TestSaveLoadCache(t *testing.T) {
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Champion %s: got %+v, want %+v", want.Key, got, want)
 		}
+	}
+	// Check summoner spells
+	if !reflect.DeepEqual(loaded.GetSummonerSpells(), spells) {
+		t.Errorf("SummonerSpells: got %v, want %v", loaded.GetSummonerSpells(), spells)
 	}
 }
 
@@ -170,6 +179,40 @@ func TestFuzzyScore(t *testing.T) {
 				t.Errorf("fuzzyScore(%q, %q, %d): ok=%v, want %v", tc.typed, tc.candidate, tc.threshold, ok, tc.wantOK)
 			}
 		})
+	}
+}
+
+// TestSummonerSpellsGetSet verifies summoner spell get/set and length methods.
+func TestSummonerSpellsGetSet(t *testing.T) {
+	c := New("", 3)
+	if got := c.GetSummonerSpellsLen(); got != 0 {
+		t.Errorf("initial GetSummonerSpellsLen() = %d, want 0", got)
+	}
+	spells := map[string]models.SummonerSpell{
+		"4":  {Name: "Flash", Key: "4", ImageFull: "SummonerFlash.png", Cooldown: 300},
+		"14": {Name: "Ignite", Key: "14", ImageFull: "SummonerDot.png", Cooldown: 180},
+	}
+	c.SetSummonerSpells(spells)
+	if got := c.GetSummonerSpellsLen(); got != 2 {
+		t.Errorf("GetSummonerSpellsLen() = %d, want 2", got)
+	}
+	if !reflect.DeepEqual(c.GetSummonerSpells(), spells) {
+		t.Errorf("GetSummonerSpells() = %v, want %v", c.GetSummonerSpells(), spells)
+	}
+}
+
+// TestInvalidateResetsSummonerSpells verifies Invalidate clears summoner spells.
+func TestInvalidateResetsSummonerSpells(t *testing.T) {
+	c := New("", 3)
+	c.SetSummonerSpells(map[string]models.SummonerSpell{
+		"4": {Name: "Flash", Key: "4", ImageFull: "SummonerFlash.png", Cooldown: 300},
+	})
+	if c.GetSummonerSpellsLen() == 0 {
+		t.Fatal("expected non-empty spells before invalidate")
+	}
+	c.Invalidate()
+	if got := c.GetSummonerSpellsLen(); got != 0 {
+		t.Errorf("GetSummonerSpellsLen() after Invalidate() = %d, want 0", got)
 	}
 }
 

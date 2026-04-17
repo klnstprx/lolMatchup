@@ -205,6 +205,18 @@ func (c *Client) FetchLeagueEntries(ctx context.Context, puuid, riotRegion, riot
 	return entries, nil
 }
 
+// FetchSummonerSpells fetches summoner spell data from DDragon and returns a map
+// keyed by numeric spell ID (e.g. "4" for Flash).
+func (c *Client) FetchSummonerSpells(ctx context.Context, patchNumber string) (map[string]models.SummonerSpell, error) {
+	reqURL := fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/data/en_US/summoner.json", patchNumber)
+	c.Logger.Debug("Fetching summoner spells", "url", reqURL)
+	var data models.DDragonSpellData
+	if err := c.doJSON(ctx, reqURL, "", &data); err != nil {
+		return nil, fmt.Errorf("failed to fetch summoner spells: %w", err)
+	}
+	return models.ParseSummonerSpells(data), nil
+}
+
 // FetchChampionData fetches detailed champion information for a given champion ID.
 func (c *Client) FetchChampionData(ctx context.Context, championID string) (models.Champion, error) {
 	var champion models.Champion

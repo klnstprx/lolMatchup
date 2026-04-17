@@ -10,7 +10,7 @@ import (
 // LiveGameStatus wraps live game info with HTMX polling and status indicators.
 // When inGame is true, renders LiveGameInfo with auto-refresh every 30s.
 // When inGame is false, renders a subtle "not in game" notice that polls for changes.
-templ LiveGameStatus(inGame bool, riotID string, parts []OpponentView, cfg *config.AppConfig, userChampionName, userChampionID, puuid string, refreshedAt time.Time) {
+templ LiveGameStatus(inGame bool, riotID string, parts []OpponentView, cfg *config.AppConfig, userChampionName, userChampionID, puuid string, refreshedAt time.Time, enemyBans, userBans []BannedChampionView, gameStartTime int64) {
 	<div
 		id="liveGameSection"
 		hx-get={ fmt.Sprintf("/player/livegame?puuid=%s&riotID=%s", url.QueryEscape(puuid), url.QueryEscape(riotID)) }
@@ -39,7 +39,7 @@ templ LiveGameStatus(inGame bool, riotID string, parts []OpponentView, cfg *conf
 						</button>
 					</div>
 				</div>
-				@LiveGameInfo(parts, cfg, riotID, userChampionName, userChampionID)
+				@LiveGameInfo(parts, cfg, riotID, userChampionName, userChampionID, enemyBans, userBans, gameStartTime)
 			</div>
 		} else {
 			<div class="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
