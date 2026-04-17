@@ -30,5 +30,27 @@
       "hotStreak": false
     }
   ],
-  "2KFHMSl0sgPO0lRev6cZkRjRAlTcG2200UhY8xKRK2tX7XxFbftqnnpgjaxrCFi1nb3Zk9wglmVKNw": []
+  "2KFHMSl0sgPO0lRev6cZkRjRAlTcG2200UhY8xKRK2tX7XxFbftqnnpgjaxrCFi1nb3Zk9wglmVKNw": [],
+  "pDPTZDvEJxH3DeHuxbmwaW3TS0BaBi1TGrwzy-9PlQ4dQVc7frYBZtK4NAu04VdRepJAzB7TPB2uuw": [
+    {
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "DIAMOND",
+      "rank": "III",
+      "leaguePoints": 67,
+      "wins": 210,
+      "losses": 195,
+      "hotStreak": false
+    }
+  ],
+  "X9EV1StPwvM-hQcPVj-6pVLifZnTcngLUIjO-uhXWPA6r9kGEdUx7NXjKlFBxrNqarGUh_Y1n2uF0w": [
+    {
+      "queueType": "RANKED_SOLO_5x5",
+      "tier": "EMERALD",
+      "rank": "I",
+      "leaguePoints": 88,
+      "wins": 132,
+      "losses": 121,
+      "hotStreak": true
+    }
+  ]
 }

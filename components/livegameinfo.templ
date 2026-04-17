@@ -49,6 +49,15 @@ func threatBorderClass(e *models.OpponentEnrichment) string {
 	}
 }
 
+// winRate returns a win percentage string like "52%" from wins and losses.
+func winRatePct(wins, losses int) string {
+	total := wins + losses
+	if total == 0 {
+		return "0%"
+	}
+	return fmt.Sprintf("%d%%", wins*100/total)
+}
+
 // OpponentView holds display data for one opponent in a live game.
 type OpponentView struct {
 	RiotID       string
@@ -60,6 +69,8 @@ type OpponentView struct {
 	Spell2       *models.SummonerSpell
 	RankedTier   string // e.g. "Gold IV", "" if unranked
 	RankedColor  string // Tailwind color class for the tier
+	RankedWins   int    // Solo/Duo total wins
+	RankedLosses int    // Solo/Duo total losses
 }
 
 // BannedChampionView holds display data for a banned champion.
@@ -190,7 +201,14 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 						<div class="flex items-baseline justify-between gap-2">
 							<p class="truncate text-base font-semibold text-slate-900">{ p.ChampionName }</p>
 							if p.RankedTier != "" {
-								<span class={ "shrink-0 text-xs font-semibold", p.RankedColor }>{ p.RankedTier }</span>
+								<span class="shrink-0 text-right">
+									<span class={ "text-xs font-semibold", p.RankedColor }>{ p.RankedTier }</span>
+									<span class="block text-[10px] text-slate-400">
+										{ fmt.Sprintf("%dW %dL (%s)", p.RankedWins, p.RankedLosses, winRatePct(p.RankedWins, p.RankedLosses)) }
+									</span>
+								</span>
+							} else if p.Enrichment != nil {
+								<span class="shrink-0 text-xs text-slate-400">Unranked</span>
 							}
 						</div>
 						<p class="truncate text-xs text-slate-400">{ p.RiotID }</p>
@@ -203,14 +221,15 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 									templ.KV("text-red-600", p.Enrichment.ChampionWins < p.Enrichment.ChampionLosses),
 								}>
 									{ fmt.Sprintf("%dW %dL", p.Enrichment.ChampionWins, p.Enrichment.ChampionLosses) }
-									if p.Enrichment.ChampionGames > 0 {
-										<span class="text-slate-400 font-normal">
-											{ fmt.Sprintf("(%d%%)", p.Enrichment.ChampionWins*100/p.Enrichment.ChampionGames) }
-										</span>
-									}
+									<span class="text-slate-400 font-normal">
+										{ fmt.Sprintf("(%s)", winRatePct(p.Enrichment.ChampionWins, p.Enrichment.ChampionLosses)) }
+									</span>
+									<span class="text-[10px] text-slate-400 font-normal">
+										{ fmt.Sprintf("· %d games on %s", p.Enrichment.ChampionGames, p.ChampionName) }
+									</span>
 								</p>
 							} else {
-								<p class="mt-0.5 text-sm text-slate-400">No games on { p.ChampionName }</p>
+								<p class="mt-0.5 text-sm text-slate-400">No recent games on { p.ChampionName }</p>
 							}
 							<!-- Badges -->
 							<div class="mt-1.5 flex flex-wrap gap-1.5">

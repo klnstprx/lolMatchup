@@ -275,6 +275,8 @@ func (h *LiveGameHandler) enrichOpponents(ctx context.Context, opponents []compo
 					if e.QueueType == "RANKED_SOLO_5x5" {
 						opponents[idx].RankedTier = components.TierTitle(e.Tier, e.Rank)
 						opponents[idx].RankedColor = components.TierColorClass(e.Tier)
+						opponents[idx].RankedWins = e.Wins
+						opponents[idx].RankedLosses = e.Losses
 						break
 					}
 				}
