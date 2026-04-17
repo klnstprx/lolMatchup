@@ -1,0 +1,52 @@
+package components
+
+import (
+	"fmt"
+	"github.com/klnstprx/lolMatchup/config"
+	"net/url"
+	"time"
+)
+
+// LiveGameStatus wraps live game info with HTMX polling and status indicators.
+// When inGame is true, renders LiveGameInfo with auto-refresh every 30s.
+// When inGame is false, renders a subtle "not in game" notice that polls for changes.
+templ LiveGameStatus(inGame bool, riotID string, parts []OpponentView, cfg *config.AppConfig, userChampionName, userChampionID, puuid string, refreshedAt time.Time) {
+	<div
+		id="liveGameSection"
+		hx-get={ fmt.Sprintf("/player/livegame?puuid=%s&riotID=%s", url.QueryEscape(puuid), url.QueryEscape(riotID)) }
+		hx-trigger="every 30s"
+		hx-target="#liveGameSection"
+		hx-swap="outerHTML"
+	>
+		if inGame {
+			<div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+				<div class="mb-3 flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+						<h3 class="text-sm font-semibold text-emerald-800">Currently In Game</h3>
+					</div>
+					<div class="flex items-center gap-2 text-xs text-slate-400">
+						if !refreshedAt.IsZero() {
+							<span>Updated { refreshedAt.Format("15:04:05") }</span>
+						}
+						<button
+							hx-get={ fmt.Sprintf("/player/livegame?puuid=%s&riotID=%s", url.QueryEscape(puuid), url.QueryEscape(riotID)) }
+							hx-target="#liveGameSection"
+							hx-swap="outerHTML"
+							class="rounded bg-white px-2 py-0.5 text-slate-500 shadow-sm hover:bg-slate-50 hover:text-slate-700"
+						>
+							Refresh
+						</button>
+					</div>
+				</div>
+				@LiveGameInfo(parts, cfg, riotID, userChampionName, userChampionID)
+			</div>
+		} else {
+			<div class="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-500">
+				<svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+				Not currently in a game
+				<span class="text-xs text-slate-400">· auto-checking</span>
+			</div>
+		}
+	</div>
+}

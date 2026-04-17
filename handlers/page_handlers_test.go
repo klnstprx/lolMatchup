@@ -17,23 +17,32 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
+func newTestConfig() *config.AppConfig {
+	cfg := config.New()
+	cfg.Logger = log.New(os.Stderr)
+	cfg.Cache = cache.New("", 3)
+	return cfg
+}
+
 func newTestPageHandler() *PageHandler {
+	cfg := newTestConfig()
+	apiClient := &client.Client{HTTPClient: &http.Client{}, Logger: cfg.Logger}
+	ch := NewChampionHandler(cfg, apiClient)
+	ph := NewPlayerHandler(cfg, apiClient)
 	return &PageHandler{
-		Logger: log.New(os.Stderr),
+		Logger:          cfg.Logger,
+		ChampionHandler: ch,
+		PlayerHandler:   ph,
 	}
 }
 
 func TestPageHandlers(t *testing.T) {
 	h := newTestPageHandler()
 
-	ph := newTestPlayerHandler(nil)
-
-	cfg := config.New()
-	cfg.Logger = log.New(os.Stderr)
-	cfg.Cache = cache.New("", 3)
+	cfg := newTestConfig()
 	apiClient := &client.Client{HTTPClient: &http.Client{}, Logger: cfg.Logger}
 	ch := NewChampionHandler(cfg, apiClient)
-	lgh := NewLiveGameHandler(cfg, apiClient)
+	ph := newTestPlayerHandler(nil)
 
 	tests := []struct {
 		name    string
@@ -43,7 +52,6 @@ func TestPageHandlers(t *testing.T) {
 		{"HomePageGET", "/", h.HomePageGET},
 		{"ChampionPageGET", "/champion", ch.ChampionPageGET},
 		{"PlayerPageGET", "/player", ph.PlayerPageGET},
-		{"LiveGamePageGET", "/livegame", lgh.LiveGamePageGET},
 	}
 
 	for _, tt := range tests {
@@ -73,11 +81,12 @@ func TestSearchGET(t *testing.T) {
 	h := newTestPageHandler()
 
 	tests := []struct {
-		name           string
-		query          string
-		htmx           bool
-		wantStatus     int
-		wantRedirect   string // Location header for non-HTMX, HX-Redirect for HTMX
+		name         string
+		query        string
+		htmx         bool
+		wantStatus   int
+		wantRedirect string // Location header for non-HTMX redirects
+		wantBody     bool   // true if we expect an HTML body (HTMX proxy case)
 	}{
 		{
 			name:         "empty query redirects to home",
@@ -98,18 +107,18 @@ func TestSearchGET(t *testing.T) {
 			wantRedirect: "/player-search?riotID=Faker%23KR",
 		},
 		{
-			name:         "HTMX champion query returns HX-Redirect",
-			query:        "Ahri",
-			htmx:         true,
-			wantStatus:   http.StatusOK,
-			wantRedirect: "/champion-search?champion=Ahri",
+			name:       "HTMX champion query proxies to champion handler",
+			query:      "Ahri",
+			htmx:       true,
+			wantStatus: http.StatusInternalServerError, // no API server → fetch error
+			wantBody:   true,
 		},
 		{
-			name:         "HTMX player query returns HX-Redirect",
-			query:        "Faker#KR",
-			htmx:         true,
-			wantStatus:   http.StatusOK,
-			wantRedirect: "/player-search?riotID=Faker%23KR",
+			name:       "HTMX player query proxies to player handler",
+			query:      "Faker#KR",
+			htmx:       true,
+			wantStatus: http.StatusInternalServerError, // no API server → fetch error
+			wantBody:   true,
 		},
 	}
 
@@ -130,10 +139,9 @@ func TestSearchGET(t *testing.T) {
 				t.Errorf("expected status %d, got %d", tt.wantStatus, w.Code)
 			}
 
-			if tt.htmx {
-				got := w.Header().Get("HX-Redirect")
-				if got != tt.wantRedirect {
-					t.Errorf("expected HX-Redirect %q, got %q", tt.wantRedirect, got)
+			if tt.wantBody {
+				if w.Body.Len() == 0 {
+					t.Error("expected non-empty response body for HTMX proxy")
 				}
 			} else if tt.wantStatus == http.StatusFound {
 				got := w.Header().Get("Location")

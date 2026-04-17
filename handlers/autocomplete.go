@@ -33,11 +33,20 @@ func NewAutocompleteHandler(cfg *config.AppConfig, client *client.Client) *Autoc
 
 // AutocompleteGET handles /autocomplete requests for champion names.
 // Accepts "champion" or "q" query param to support both champion form and unified search.
+// When the query contains "#", it returns a player search suggestion instead.
 func (h *AutocompleteHandler) AutocompleteGET(c *gin.Context) {
 	userQuery := strings.TrimSpace(c.Query("champion"))
 	if userQuery == "" {
 		userQuery = strings.TrimSpace(c.Query("q"))
 	}
+
+	// If query contains #, show a player search suggestion
+	if strings.Contains(userQuery, "#") {
+		comp := components.PlayerSearchSuggestion(userQuery)
+		c.Render(http.StatusOK, renderer.New(c.Request.Context(), http.StatusOK, comp))
+		return
+	}
+
 	var suggestions []cache.AutocompleteResult
 	if userQuery != "" {
 		suggestions = h.Cache.AutocompleteRich(userQuery, defaultAutocompleteLimit)

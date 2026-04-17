@@ -1,0 +1,20 @@
+package components
+
+import "fmt"
+
+// Spinner renders a circular loading spinner SVG.
+// sizeClass should be a Tailwind size like "h-4 w-4" or "h-3 w-3".
+templ Spinner(sizeClass string) {
+	<svg class={ sizeClass + " animate-spin" } viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+}
+
+// ChampionIcon renders a champion portrait from DDragon CDN.
+// championID is the textual champion key (e.g. "Ahri"), patch is the game version,
+// sizeClass is Tailwind sizing (e.g. "h-8 w-8"), extraClass is optional additional classes.
+templ ChampionIcon(championID, patch, sizeClass, extraClass string) {
+	<img
+		class={ sizeClass + " rounded-full " + extraClass }
+		src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", patch, championID))) }
+		alt={ championID }
+	/>
+}

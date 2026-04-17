@@ -3,18 +3,34 @@ package components
 import (
 	"fmt"
 	"github.com/klnstprx/lolMatchup/config"
+	"github.com/klnstprx/lolMatchup/models"
 )
+
+// OpponentView holds display data for one opponent in a live game.
+type OpponentView struct {
+	RiotID       string
+	ChampionID   string
+	ChampionName string
+	PUUID        string
+	Enrichment   *models.OpponentEnrichment
+}
+
+// LiveGameResult holds the result of a live game lookup for server-side rendering.
+type LiveGameResult struct {
+	Parts            []OpponentView
+	Config           *config.AppConfig
+	RiotID           string
+	UserChampionName string
+	UserChampionID   string
+	Error            string // non-empty if lookup failed
+}
 
 // LiveGameInfo renders a grid of participants in the current game, showing champion avatars.
 templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, userChampionName, userChampionID string) {
 	<!-- Player context banner -->
 	if userChampionName != "" {
 		<div class="mb-4 flex items-center gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-3">
-			<img
-				class="h-10 w-10 rounded-full ring-2 ring-indigo-200"
-				src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, userChampionID))) }
-				alt={ userChampionName }
-			/>
+			@ChampionIcon(userChampionID, cfg.PatchNumber, "h-10 w-10", "ring-2 ring-indigo-200")
 			<div class="min-w-0">
 				<p class="text-sm font-semibold text-indigo-900">
 					{ userRiotID }
@@ -39,11 +55,7 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 					hx-swap="innerHTML"
 					hx-indicator="#championDetailSpinner"
 				>
-					<img
-						class="h-10 w-10 rounded-full ring-1 ring-slate-200 sm:h-12 sm:w-12"
-						src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, p.ChampionID))) }
-						alt={ p.ChampionName }
-					/>
+					@ChampionIcon(p.ChampionID, cfg.PatchNumber, "h-10 w-10 sm:h-12 sm:w-12", "ring-1 ring-slate-200")
 					<div class="min-w-0 flex-1">
 						<p class="truncate text-base font-semibold text-slate-900">{ p.ChampionName }</p>
 						<p class="truncate text-sm text-slate-500">{ p.RiotID }</p>
@@ -89,7 +101,7 @@ templ LiveGameInfo(parts []OpponentView, cfg *config.AppConfig, userRiotID, user
 		</div>
 		<!-- Right: champion details panel (sticky, scrollable) -->
 		<div id="championDetailSpinner" class="htmx-indicator mb-2 flex items-center justify-center gap-2 text-sm text-slate-500">
-			<svg class="h-4 w-4 animate-spin text-slate-400" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+			@Spinner("h-4 w-4 text-slate-400")
 			Loading champion…
 		</div>
 		<div id="championDetail" class="sticky top-20 min-h-[12rem] max-h-[85vh] overflow-y-auto rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-4">

@@ -8,7 +8,7 @@ templ HomePage() {
 			<section class="rounded-2xl bg-gradient-to-r from-indigo-600 to-fuchsia-600 p-8 text-white shadow">
 				<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">League of Legends Lookup</h1>
 				<p class="mt-2 text-sm text-white/80">Search a champion by name, or enter a Riot ID (nickname#tag) for player lookup.</p>
-				<form id="homeSearchForm" class="mt-6" action="/search" method="get" hx-get="/search" hx-trigger="submit">
+				<form id="homeSearchForm" class="mt-6" action="/search" method="get" hx-get="/search" hx-trigger="submit" hx-target="#homeResult" hx-swap="innerHTML" hx-indicator="#homeSearchSpinner">
 					<div class="relative">
 						<input
 							id="homeSearchInput"
@@ -34,19 +34,22 @@ templ HomePage() {
 					<div id="homeAutoSpinner" class="htmx-indicator mt-1 text-xs text-white/60">Searching...</div>
 				</form>
 			</section>
+			<!-- Search result area -->
+			<div id="homeResult" class="mt-6">
+				<div id="homeSearchSpinner" class="htmx-indicator flex items-center justify-center gap-2 py-8 text-sm text-slate-400">
+					@Spinner("h-5 w-5")
+					Loading...
+				</div>
+			</div>
 			<!-- Feature cards -->
-			<section class="mt-8 grid gap-4 sm:grid-cols-3">
+			<section class="mt-8 grid gap-4 sm:grid-cols-2">
 				<a href="/champion-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
 					<h3 class="text-base font-semibold text-slate-900">Champions</h3>
 					<p class="mt-1 text-sm text-slate-500">Stats, abilities and scaling data.</p>
 				</a>
-				<a href="/player-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+				<a href="/" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
 					<h3 class="text-base font-semibold text-slate-900">Players</h3>
-					<p class="mt-1 text-sm text-slate-500">Match history and lane matchups.</p>
-				</a>
-				<a href="/livegame-search" class="group rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
-					<h3 class="text-base font-semibold text-slate-900">Live Game</h3>
-					<p class="mt-1 text-sm text-slate-500">Inspect an ongoing match in real time.</p>
+					<p class="mt-1 text-sm text-slate-500">Match history, lane matchups, and live game status.</p>
 				</a>
 			</section>
 		</div>

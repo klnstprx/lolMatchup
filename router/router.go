@@ -38,19 +38,25 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	playerHandler := handlers.NewPlayerHandler(cfg, apiClient)
 	liveGameHandler := handlers.NewLiveGameHandler(cfg, apiClient)
 	matchHandler := handlers.NewMatchHandler(cfg, apiClient)
-	pageHandler := handlers.NewPageHandler(cfg)
+	pageHandler := handlers.NewPageHandler(cfg, championHandler, playerHandler)
 
 	// Cache policies
 	pageCache := middleware.CacheControl("public, max-age=300")
 	championCache := middleware.CacheControl("public, max-age=3600")
 	autocompleteCache := middleware.CacheControl("public, max-age=30")
 
-	// Page routes (cached for 5 minutes)
+	// Page routes
 	r.GET("/", pageCache, pageHandler.HomePageGET)
 	r.GET("/search", pageHandler.SearchGET)
 	r.GET("/champion-search", pageCache, championHandler.ChampionPageGET)
-	r.GET("/player-search", pageCache, playerHandler.PlayerPageGET)
-	r.GET("/livegame-search", pageCache, liveGameHandler.LiveGamePageGET)
+
+	// Legacy redirects — player and livegame searches now go through the homepage
+	r.GET("/player-search", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/")
+	})
+	r.GET("/livegame-search", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/")
+	})
 
 	// Champion data changes per patch — cache for 1 hour
 	r.GET("/champion", championCache, championHandler.ChampionGET)
@@ -59,6 +65,7 @@ func SetupRouter(cfg *config.AppConfig, apiClient *client.Client) *gin.Engine {
 	// Routes that call Riot API — rate limited, no cache (real-time data)
 	riotLimiter := middleware.RateLimitMiddleware(rate.Limit(15), 20)
 	r.GET("/player", riotLimiter, playerHandler.PlayerGET)
+	r.GET("/player/livegame", riotLimiter, liveGameHandler.PlayerLiveGameGET)
 	r.GET("/livegame", riotLimiter, liveGameHandler.LiveGameGET)
 	r.GET("/match", riotLimiter, matchHandler.MatchGET)
 	r.GET("/match/player", riotLimiter, matchHandler.MatchPlayerGET)

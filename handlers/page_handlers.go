@@ -14,12 +14,18 @@ import (
 
 // PageHandler handles rendering of standalone lookup pages.
 type PageHandler struct {
-	Logger *log.Logger
+	Logger          *log.Logger
+	ChampionHandler *ChampionHandler
+	PlayerHandler   *PlayerHandler
 }
 
 // NewPageHandler constructs a PageHandler.
-func NewPageHandler(cfg *config.AppConfig) *PageHandler {
-	return &PageHandler{Logger: cfg.Logger}
+func NewPageHandler(cfg *config.AppConfig, ch *ChampionHandler, ph *PlayerHandler) *PageHandler {
+	return &PageHandler{
+		Logger:          cfg.Logger,
+		ChampionHandler: ch,
+		PlayerHandler:   ph,
+	}
 }
 
 // HomePageGET renders the landing home page.
@@ -29,25 +35,39 @@ func (p *PageHandler) HomePageGET(c *gin.Context) {
 	c.Render(http.StatusOK, renderer.New(c.Request.Context(), http.StatusOK, cmp))
 }
 
-// SearchGET routes a unified search query to the appropriate lookup page.
-// If the query contains "#", it redirects to player search; otherwise to champion search.
-// For HTMX requests it uses the HX-Redirect header; for plain requests a 302 redirect.
+// SearchGET routes a unified search query to the appropriate handler.
+// For HTMX requests, it proxies directly to the champion or player handler
+// so the result renders inline on the homepage.
+// For plain HTTP requests, it redirects to the appropriate page.
 func (p *PageHandler) SearchGET(c *gin.Context) {
-	q := strings.TrimSpace(c.Query("q"))
+	// Parse q manually from the URL to avoid initializing Gin's queryCache,
+	// which cannot be reset before proxying to another handler.
+	q := strings.TrimSpace(c.Request.URL.Query().Get("q"))
 	if q == "" {
 		c.Redirect(http.StatusFound, "/")
 		return
 	}
+
+	isPlayer := strings.Contains(q, "#")
+
+	// HTMX request: proxy to the right handler for inline swap
+	if c.GetHeader("HX-Request") == "true" {
+		if isPlayer {
+			c.Request.URL.RawQuery = "riotID=" + url.QueryEscape(q)
+			p.PlayerHandler.PlayerGET(c)
+		} else {
+			c.Request.URL.RawQuery = "champion=" + url.QueryEscape(q)
+			p.ChampionHandler.ChampionGET(c)
+		}
+		return
+	}
+
+	// Non-HTMX: redirect to standalone pages
 	var target string
-	if strings.Contains(q, "#") {
+	if isPlayer {
 		target = "/player-search?riotID=" + url.QueryEscape(q)
 	} else {
 		target = "/champion-search?champion=" + url.QueryEscape(q)
-	}
-	if c.GetHeader("HX-Request") == "true" {
-		c.Header("HX-Redirect", target)
-		c.Status(http.StatusOK)
-		return
 	}
 	c.Redirect(http.StatusFound, target)
 }

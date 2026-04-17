@@ -106,71 +106,44 @@ func (h *LiveGameHandler) LiveGameGET(c *gin.Context) {
 	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 }
 
-// LiveGamePageGET renders the live game search page. If a riotID query param is present,
-// it performs the lookup server-side and renders the page with results pre-populated.
-func (h *LiveGameHandler) LiveGamePageGET(c *gin.Context) {
+// PlayerLiveGameGET handles GET /player/livegame?puuid=...&riotID=...
+// Returns a LiveGameStatus fragment for embedding in the player page.
+// Designed to be loaded via HTMX (hx-trigger="load" then "every 30s").
+func (h *LiveGameHandler) PlayerLiveGameGET(c *gin.Context) {
 	ctx := c.Request.Context()
-	prefill := c.Query("riotID")
-
-	var result *components.LiveGameResult
-	if prefill != "" {
-		result = h.lookupLiveGame(ctx, prefill)
+	puuid := c.Query("puuid")
+	riotID := c.Query("riotID")
+	if puuid == "" || riotID == "" {
+		c.Status(http.StatusNoContent)
+		return
 	}
 
-	cmp := components.LiveGamePage(prefill, result)
-	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
-}
-
-// lookupLiveGame performs the full live game lookup (account → spectator → resolve teams).
-// On failure, returns a LiveGameResult with the Error field set.
-func (h *LiveGameHandler) lookupLiveGame(ctx context.Context, riotID string) *components.LiveGameResult {
-	idParts := strings.SplitN(riotID, "#", 2)
-	if len(idParts) != 2 {
-		return &components.LiveGameResult{Error: "Invalid format for Summoner; use nickname#tag."}
-	}
-	gameName, tagLine := idParts[0], idParts[1]
-
-	acct, err := h.Client.FetchAccountByRiotID(ctx, gameName, tagLine, h.Config.RiotRegion, h.Config.RiotAPIKey)
+	activeGame, err := h.Client.FetchCurrentGameByPUUID(ctx, puuid, h.Config.RiotRegion, h.Config.RiotAPIKey)
 	if err != nil {
-		h.Logger.Debug("live game page lookup: account error", "riotID", riotID, "error", err)
-		switch {
-		case errors.Is(err, client.ErrAccountNotFound):
-			return &components.LiveGameResult{Error: fmt.Sprintf("Account '%s' not found.", riotID)}
-		case errors.Is(err, client.ErrPermissionDenied):
-			return &components.LiveGameResult{Error: "Permission denied: check your Riot API key and region."}
-		default:
-			return &components.LiveGameResult{Error: "Error fetching account data."}
+		if errors.Is(err, client.ErrGameNotFound) {
+			// Not in game — render status with polling
+			cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+			c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+			return
 		}
-	}
-
-	activeGame, err := h.Client.FetchCurrentGameByPUUID(ctx, acct.PUUID, h.Config.RiotRegion, h.Config.RiotAPIKey)
-	if err != nil {
-		h.Logger.Debug("live game page lookup: spectator error", "riotID", riotID, "error", err)
-		switch {
-		case errors.Is(err, client.ErrGameNotFound):
-			return &components.LiveGameResult{Error: fmt.Sprintf("Account '%s' is not currently in a game.", riotID)}
-		case errors.Is(err, client.ErrPermissionDenied):
-			return &components.LiveGameResult{Error: "Permission denied: check your Riot API key and region."}
-		default:
-			return &components.LiveGameResult{Error: "Error fetching live game data."}
-		}
+		// Other errors: graceful degradation, render not-in-game
+		h.Logger.Debug("player livegame check failed", "puuid", puuid, "error", err)
+		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+		return
 	}
 
 	vd := h.buildViewData(activeGame, riotID)
 	if !vd.found {
-		h.Logger.Warn("Player not found in participant list", "riotID", riotID)
-		return &components.LiveGameResult{Error: fmt.Sprintf("Could not identify '%s' in the current game's participant list.", riotID)}
+		cmp := components.LiveGameStatus(false, riotID, nil, h.Config, "", "", puuid, time.Now())
+		c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
+		return
 	}
 
 	h.enrichOpponents(ctx, vd.parts)
 
-	return &components.LiveGameResult{
-		Parts:            vd.parts,
-		Config:           h.Config,
-		RiotID:           riotID,
-		UserChampionName: vd.userChampionName,
-		UserChampionID:   vd.userChampionID,
-	}
+	cmp := components.LiveGameStatus(true, riotID, vd.parts, h.Config, vd.userChampionName, vd.userChampionID, puuid, time.Now())
+	c.Render(http.StatusOK, renderer.New(ctx, http.StatusOK, cmp))
 }
 
 // liveGameViewData holds the resolved participant data for rendering.

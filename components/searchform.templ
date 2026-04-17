@@ -1,0 +1,85 @@
+package components
+
+// SearchFormConfig holds configuration for the reusable search form component.
+type SearchFormConfig struct {
+	Title           string
+	Subtitle        string
+	InputName       string // query param name: "champion", "riotID", "q"
+	Placeholder     string
+	Pattern         string // HTML5 pattern attribute; empty = no validation
+	PatternTitle    string // title for pattern validation tooltip
+	ActionURL       string // hx-get target URL
+	ResultTargetID  string // hx-target value (e.g. "#championResult")
+	ButtonText      string
+	Prefill         string
+	AutocompleteURL string // non-empty enables keyup autocomplete
+}
+
+// SearchForm renders a configurable search form card.
+// When AutocompleteURL is set, the input sends keyup requests for suggestions.
+templ SearchForm(cfg SearchFormConfig) {
+	<div class="rounded-xl border border-slate-200 bg-white p-6 shadow">
+		<h2 class="text-xl font-semibold text-slate-900">{ cfg.Title }</h2>
+		<p class="mt-1 text-sm text-slate-600">{ cfg.Subtitle }</p>
+		<form
+			hx-get={ cfg.ActionURL }
+			hx-trigger="submit"
+			hx-target={ cfg.ResultTargetID }
+			hx-swap="innerHTML"
+			hx-indicator=".htmx-indicator"
+			class="mt-6 space-y-4"
+		>
+			<div>
+				<label class="mb-2 block text-sm font-medium text-slate-700">{ cfg.Title }</label>
+				<div class="relative">
+					if cfg.AutocompleteURL != "" {
+						<input
+							class="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 pr-9 text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+							type="text"
+							name={ cfg.InputName }
+							placeholder={ cfg.Placeholder }
+							hx-get={ cfg.AutocompleteURL }
+							hx-trigger="keyup changed delay:300ms"
+							hx-target="#autocompleteResults"
+							hx-swap="innerHTML"
+							hx-indicator="#champAutoSpinner"
+							autocomplete="off"
+							spellcheck="false"
+							autocorrect="off"
+							autocapitalize="none"
+							if cfg.Prefill != "" {
+								value={ cfg.Prefill }
+							}
+						/>
+						<div id="champAutoSpinner" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 hidden [&.htmx-request]:block">
+							@Spinner("h-4 w-4 text-slate-400")
+						</div>
+					} else {
+						<input
+							class="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 pr-9 text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+							type="text"
+							name={ cfg.InputName }
+							placeholder={ cfg.Placeholder }
+							if cfg.Pattern != "" {
+								pattern={ cfg.Pattern }
+								title={ cfg.PatternTitle }
+							}
+							required
+							autofocus
+							if cfg.Prefill != "" {
+								value={ cfg.Prefill }
+							}
+						/>
+						<div class="htmx-indicator pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 hidden [&.htmx-request]:block">
+							@Spinner("h-4 w-4 text-slate-400")
+						</div>
+					}
+				</div>
+				if cfg.AutocompleteURL != "" {
+					<div id="autocompleteResults"></div>
+				}
+			</div>
+			<button class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500" type="submit">{ cfg.ButtonText }</button>
+		</form>
+	</div>
+}

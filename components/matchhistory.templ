@@ -94,11 +94,7 @@ templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppC
 						>
 							<!-- Top row: champion, result, KDA, CS, duration -->
 							<div class="flex items-center gap-3">
-								<img
-									class="h-9 w-9 rounded-full ring-1 ring-slate-200"
-									src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.ChampionName))) }
-									alt={ m.ChampionName }
-								/>
+								@ChampionIcon(m.ChampionName, cfg.PatchNumber, "h-9 w-9", "ring-1 ring-slate-200")
 								<div class="min-w-0 flex-1">
 									<div class="flex items-center gap-2">
 										<span
@@ -156,7 +152,7 @@ templ MatchHistory(matches []models.MatchSummary, puuid string, cfg *config.AppC
 							hx-swap="innerHTML"
 						>
 							<div class="mt-1 flex items-center justify-center gap-1 py-2 text-sm text-slate-400">
-								<svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+								@Spinner("h-4 w-4")
 								Loading match details…
 							</div>
 						</div>

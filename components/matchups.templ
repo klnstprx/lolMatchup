@@ -45,17 +45,9 @@ templ MatchupStats(matchups []models.MatchupRecord, cfg *config.AppConfig) {
 							matchupBorderClass(m),
 						}
 					>
-						<img
-							class="h-8 w-8 rounded-full ring-1 ring-slate-200"
-							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.PlayerChampion))) }
-							alt={ m.PlayerChampion }
-						/>
+						@ChampionIcon(m.PlayerChampion, cfg.PatchNumber, "h-8 w-8", "ring-1 ring-slate-200")
 						<span class="text-xs font-medium text-slate-400">vs</span>
-						<img
-							class="h-8 w-8 rounded-full ring-1 ring-slate-200"
-							src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/champion/%s.png", cfg.PatchNumber, m.EnemyChampion))) }
-							alt={ m.EnemyChampion }
-						/>
+						@ChampionIcon(m.EnemyChampion, cfg.PatchNumber, "h-8 w-8", "ring-1 ring-slate-200")
 						<div class="ml-auto text-right">
 							<span
 								class={

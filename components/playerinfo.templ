@@ -5,72 +5,87 @@ import (
 	"github.com/klnstprx/lolMatchup/client"
 	"github.com/klnstprx/lolMatchup/config"
 	"github.com/klnstprx/lolMatchup/models"
+	"net/url"
 	"time"
 )
 
-// PlayerResult holds the full result of a player lookup for server-side rendering.
-type PlayerResult struct {
-	Account       client.AccountDTO
-	Summoner      client.SummonerDTO
-	Matches       []models.MatchSummary
-	Matchups      []models.MatchupRecord
-	Config        *config.AppConfig
-	Error         string // non-empty if lookup failed
-	FetchedAt     time.Time
-	MatchesLoaded int
-	MatchesTotal  int
-}
-
 // PlayerComponent renders a player profile card with account and summoner data,
-// followed by matchup stats and match history if available.
+// followed by live game status (async), matchup stats, and match history.
 templ PlayerComponent(acct client.AccountDTO, player client.SummonerDTO, matches []models.MatchSummary, matchups []models.MatchupRecord, cfg *config.AppConfig, matchesLoaded, matchesTotal int, fetchedAt time.Time) {
-	<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
-		<!-- Profile header -->
-		<div class="flex items-center gap-4 p-6">
-			<div class="relative">
-				<img
-					class="h-16 w-16 rounded-full shadow-md ring-2 ring-indigo-200"
-					src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%d.png", cfg.PatchNumber, player.ProfileIconID))) }
-					alt="Profile Icon"
-				/>
-				<span class="absolute -bottom-1 -right-1 rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold text-white shadow">
-					{ fmt.Sprint(player.SummonerLevel) }
-				</span>
+	<div class="player-result-container">
+		<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+			<!-- Profile header -->
+			<div class="flex items-center gap-4 p-6">
+				<div class="relative">
+					<img
+						class="h-16 w-16 rounded-full shadow-md ring-2 ring-indigo-200"
+						src={ string(templ.URL(fmt.Sprintf("https://ddragon.leagueoflegends.com/cdn/%s/img/profileicon/%d.png", cfg.PatchNumber, player.ProfileIconID))) }
+						alt="Profile Icon"
+					/>
+					<span class="absolute -bottom-1 -right-1 rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold text-white shadow">
+						{ fmt.Sprint(player.SummonerLevel) }
+					</span>
+				</div>
+				<div class="min-w-0 flex-1">
+					<h2 class="truncate text-xl font-bold text-slate-900">{ acct.GameName }</h2>
+					<p class="text-sm text-slate-500">#{ acct.TagLine }</p>
+				</div>
+				<!-- Refresh button -->
+				<div class="flex items-center gap-2">
+					if !fetchedAt.IsZero() {
+						<span class="text-xs text-slate-400">{ fetchedAt.Format("15:04:05") }</span>
+					}
+					<button
+						hx-get={ fmt.Sprintf("/player?riotID=%s", url.QueryEscape(acct.GameName+"#"+acct.TagLine)) }
+						hx-target="closest .player-result-container"
+						hx-swap="outerHTML"
+						hx-indicator="find .player-refresh-spinner"
+						class="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-500 shadow-sm hover:bg-slate-50 hover:text-slate-700"
+					>
+						<svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182M20.984 4.356v4.993"></path></svg>
+						Refresh
+						<span class="player-refresh-spinner htmx-indicator">
+							@Spinner("h-3 w-3 text-slate-400")
+						</span>
+					</button>
+				</div>
 			</div>
-			<div class="min-w-0">
-				<h2 class="truncate text-xl font-bold text-slate-900">{ acct.GameName }</h2>
-				<p class="text-sm text-slate-500">#{ acct.TagLine }</p>
-			</div>
-		</div>
-		<!-- Details -->
-		<div class="border-t border-slate-100 px-6 py-4">
-			<dl class="space-y-3 text-sm">
-				<div class="flex justify-between">
-					<dt class="text-slate-500">Summoner Level</dt>
-					<dd class="font-semibold text-slate-900">{ fmt.Sprint(player.SummonerLevel) }</dd>
-				</div>
-				<div class="flex justify-between">
-					<dt class="text-slate-500">Region</dt>
-					<dd class="font-semibold text-slate-900">{ cfg.RiotRegion }</dd>
-				</div>
-				<div class="flex justify-between">
-					<dt class="text-slate-500">Last Active</dt>
-					<dd class="font-semibold text-slate-900">{ time.UnixMilli(player.RevisionDate).Format("Jan 2, 2006") }</dd>
-				</div>
-				if !fetchedAt.IsZero() {
+			<!-- Details -->
+			<div class="border-t border-slate-100 px-6 py-4">
+				<dl class="space-y-3 text-sm">
 					<div class="flex justify-between">
-						<dt class="text-slate-500">Data as of</dt>
-						<dd class="font-semibold text-slate-900">{ fetchedAt.Format("Jan 2, 2006 15:04 MST") }</dd>
+						<dt class="text-slate-500">Summoner Level</dt>
+						<dd class="font-semibold text-slate-900">{ fmt.Sprint(player.SummonerLevel) }</dd>
 					</div>
-				}
-			</dl>
+					<div class="flex justify-between">
+						<dt class="text-slate-500">Region</dt>
+						<dd class="font-semibold text-slate-900">{ cfg.RiotRegion }</dd>
+					</div>
+					<div class="flex justify-between">
+						<dt class="text-slate-500">Last Active</dt>
+						<dd class="font-semibold text-slate-900">{ time.UnixMilli(player.RevisionDate).Format("Jan 2, 2006") }</dd>
+					</div>
+				</dl>
+			</div>
 		</div>
+		<!-- Live game status: loaded asynchronously, then polls every 30s -->
+		<div
+			id="liveGameSection"
+			hx-get={ fmt.Sprintf("/player/livegame?puuid=%s&riotID=%s", url.QueryEscape(acct.PUUID), url.QueryEscape(acct.GameName+"#"+acct.TagLine)) }
+			hx-trigger="load"
+			hx-swap="outerHTML"
+		>
+			<div class="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-slate-400">
+				@Spinner("h-4 w-4")
+				Checking live game status...
+			</div>
+		</div>
+		if matchesTotal > 0 && matchesLoaded < matchesTotal {
+			<div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+				{ fmt.Sprintf("Loaded %d of %d matches. Some matches could not be retrieved.", matchesLoaded, matchesTotal) }
+			</div>
+		}
+		@MatchupStats(matchups, cfg)
+		@MatchHistory(matches, acct.PUUID, cfg)
 	</div>
-	if matchesTotal > 0 && matchesLoaded < matchesTotal {
-		<div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-			{ fmt.Sprintf("Loaded %d of %d matches. Some matches could not be retrieved.", matchesLoaded, matchesTotal) }
-		</div>
-	}
-	@MatchupStats(matchups, cfg)
-	@MatchHistory(matches, acct.PUUID, cfg)
 }

@@ -12,11 +12,26 @@ type ChampionResult struct {
 	Error    string // non-empty if lookup failed
 }
 
+// ChampionFormConfig returns the SearchFormConfig for the champion lookup form.
+func ChampionFormConfig(prefill string) SearchFormConfig {
+	return SearchFormConfig{
+		Title:           "Champion Lookup",
+		Subtitle:        "Start typing a champion name and pick from suggestions. Submit to view full details.",
+		InputName:       "champion",
+		Placeholder:     "e.g. Ahri",
+		ActionURL:       "/champion",
+		ResultTargetID:  "#championResult",
+		ButtonText:      "Search",
+		Prefill:         prefill,
+		AutocompleteURL: "/autocomplete",
+	}
+}
+
 // ChampionPage renders the standalone champion lookup form with optional pre-populated results.
 templ ChampionPage(prefill string, result *ChampionResult) {
 	@layout("Champion Lookup") {
 		<div class="mx-auto max-w-4xl">
-			@ChampionForm(prefill)
+			@SearchForm(ChampionFormConfig(prefill))
 			<div id="championResult" class="mt-6">
 				if result != nil && result.Error != "" {
 					@ErrorMessage(result.Error)
